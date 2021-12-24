@@ -157,22 +157,35 @@ class SponsorBlockHandler {
               console.info('bringing back segments overlay');
               this.slider.appendChild(this.segmentsoverlay);
             }
+            if (n === this.slider) {
+              console.info('Slider removed, watching again!');
+              this.observer.disconnect();
+              this.watchForSlider();
+            }
           });
         }
       })
     });
 
+    this.watchForSlider();
+  }
+
+  watchForSlider() {
+    if (this.sliderInterval) clearInterval(this.sliderInterval);
     this.sliderInterval = setInterval(() => {
-      this.slider = document.querySelector('.ytlr-progress-bar__slider');
+      this.slider = document.querySelector('.ytlr-progress-bar__slider, .ytlr-multi-markers-player-bar-renderer');
+      console.info('Looking for slider...');
       if (this.slider) {
+        console.info('Found slider:', this.slider);
         clearInterval(this.sliderInterval);
         this.sliderInterval = null;
-        this.observer.observe(this.slider, {
+        this.observer.observe(this.slider.parentElement, {
           childList: true,
+          subtree: true,
         });
         this.slider.appendChild(this.segmentsoverlay);
       }
-    }, 500);
+    }, 1000);
   }
 
   scheduleSkip() {
