@@ -14,13 +14,23 @@ uiContainer.setAttribute('tabindex', 0);
 uiContainer.addEventListener('focus', () => console.info('uiContainer focused!'), true);
 uiContainer.addEventListener('blur', () => console.info('uiContainer blured!'), true);
 
+let cursorVisible = false;
+document.addEventListener('cursorStateChange', (evt) => {
+  cursorVisible = evt.detail.visibility;
+  console.info('Cursor visibility:', cursorVisible);
+}, false);
+
 uiContainer.addEventListener("keydown", (evt) => {
   console.info('uiContainer key event:', evt.type, evt.charCode);
   if (evt.charCode !== 404 && evt.charCode !== 172) {
     if (evt.keyCode in ARROW_KEY_CODE) {
       navigate(ARROW_KEY_CODE[evt.keyCode]);
     } else if (evt.keyCode === 13) { // "OK" button
-      document.querySelector(':focus').click();
+      // Key event is emitted when clicking with a cursor as well, which leads
+      // to double activation
+      if (!cursorVisible) {
+        document.querySelector(':focus').click();
+      }
     } else if (evt.keyCode === 27) { // Back button
       uiContainer.style.display = 'none';
       uiContainer.blur();
