@@ -14,12 +14,11 @@
         "supportsAudioGuidance": true
     },
     "vendorExtension": {
-        "userAgent": "$browserName$/$browserVersion$ ($platformName$-$platformVersion$), _TV_$chipSetName$/$firmwareVersion$ (LG, $modelName$, $networkMode$)",
+        "userAgent": "$browserName$/$browserVersion$ ($platformName$-$platformVersion$), _TV_O18/$firmwareVersion$ (LG, $modelName$, $networkMode$)",
         "allowCrossDomain": true
     },
     "deeplinkingParams": "{\"contentTarget\":\"v=$CONTENTID\"}",
-    "inAppSearchParams": "{\"contentTarget\":\"q=$SEARCH_KEYWORD\"}",
-    "inAppVoiceIntent": "{\"contentTarget\":{\"intent\":\"$INTENT\",\"intentParam\":\"$INTENT_PARAM\",\"languageCode\":\"$LANG_CODE\"}}",
+    "inAppSearchParams": "{\"target\":\"q=$SEARCH_KEYWORD\"}",
     "supportQueryRouting": "{\"amazonAlexa\":true,\"googleAssistant\":true}",
     "enablePigScreenSaver": false,
     "trustLevel": "netcast",
