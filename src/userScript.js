@@ -2,6 +2,7 @@ import 'whatwg-fetch';
 import './domrect-polyfill';
 
 import { handleLaunch, waitForChildAdd } from './utils';
+import { configRead } from './config';
 
 document.addEventListener(
   'webOSRelaunch',
@@ -23,6 +24,19 @@ import './ui.js';
     document.body,
     (node) => node instanceof HTMLVideoElement
   );
+
+  const applyMuteOverride = (evt) => {
+    const rect = evt.target.getBoundingClientRect();
+    const enablePreviewMute = configRead('enablePreviewMute');
+    const targetMute = enablePreviewMute && rect.left !== 0;
+    if (targetMute !== evt.target.muted) {
+      console.info('Setting mute override to:', targetMute);
+      evt.target.muted = targetMute;
+    }
+  };
+
+  video.addEventListener('play', (evt) => applyMuteOverride(evt));
+  video.addEventListener('volumechange', (evt) => applyMuteOverride(evt));
 
   const playerCtrlObs = new MutationObserver(() => {
     const style = video.style;
