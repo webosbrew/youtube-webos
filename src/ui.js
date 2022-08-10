@@ -58,6 +58,7 @@ uiContainer.innerHTML = `
 <label for="__sponsorblock_music_offtopic"><input type="checkbox" id="__sponsorblock_music_offtopic" /> Skip Music and Off-topic Segments</label>
 </blockquote>
 <div><small>Sponsor segments skipping - https://sponsor.ajay.app</small></div>
+<label for="__hide_logo"><input type="checkbox" id="__hide_logo" /> Hide YouTube logo (recommended on OLEDs)</label>
 `;
 
 document.querySelector('body').appendChild(uiContainer);
@@ -128,6 +129,11 @@ uiContainer
     configWrite('enableSponsorBlockMusicOfftopic', evt.target.checked);
   });
 
+uiContainer.querySelector('#__hide_logo').checked = configRead('hideLogo');
+uiContainer.querySelector('#__hide_logo').addEventListener('change', (evt) => {
+  configWrite('hideLogo', evt.target.checked);
+});
+
 const eventHandler = (evt) => {
   console.info(
     'Key event:',
@@ -193,3 +199,7 @@ export function showNotification(text, time = 3000) {
 setTimeout(() => {
   showNotification('Press [GREEN] to open YTAF configuration screen');
 }, 2000);
+
+window.addEventListener("DOMNodeInserted", (evt) => {
+  document.querySelector("ytlr-logo-entity").style.visibility = configRead('hideLogo') ? 'hidden' : 'visible';
+}, false);

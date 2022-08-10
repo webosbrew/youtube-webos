@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2022/08/11
+
+### Added
+
+- Option to hide YouTube logo (avoid OLED burning)
+
 ## [0.3.1] - 2022/01/27
 
 ### Fixed

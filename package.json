@@ -1,6 +1,6 @@
 {
   "name": "youtube-webos",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Youtube App without ADs",
   "main": "index.js",
   "scripts": {
