@@ -8,6 +8,13 @@ window.__spatialNavigation__.keyMode = 'NONE';
 
 const ARROW_KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
 
+const KEY_MAPPINGS = {
+  red: [403, 166],
+  green: [404, 172],
+  yellow: [405, 170],
+  blue: [406, 167]
+};
+
 const uiContainer = document.createElement('div');
 uiContainer.classList.add('ytaf-ui-container');
 uiContainer.style['display'] = 'none';
@@ -62,66 +69,70 @@ uiContainer.innerHTML = `
 
 document.querySelector('body').appendChild(uiContainer);
 
-uiContainer.querySelector('#__adblock').checked = configRead('enableAdBlock');
+function updateUI() {
+  uiContainer.querySelector('#__adblock').checked = configRead('enableAdBlock');
+  uiContainer.querySelector('#__sponsorblock').checked =
+    configRead('enableSponsorBlock');
+  uiContainer.querySelector('#__sponsorblock_sponsor').checked = configRead(
+    'enableSponsorBlockSponsor'
+  );
+  uiContainer.querySelector('#__sponsorblock_intro').checked = configRead(
+    'enableSponsorBlockIntro'
+  );
+  uiContainer.querySelector('#__sponsorblock_outro').checked = configRead(
+    'enableSponsorBlockOutro'
+  );
+  uiContainer.querySelector('#__sponsorblock_interaction').checked = configRead(
+    'enableSponsorBlockInteraction'
+  );
+  uiContainer.querySelector('#__sponsorblock_selfpromo').checked = configRead(
+    'enableSponsorBlockSelfPromo'
+  );
+  uiContainer.querySelector('#__sponsorblock_music_offtopic').checked =
+    configRead('enableSponsorBlockMusicOfftopic');
+}
+
+updateUI();
 uiContainer.querySelector('#__adblock').addEventListener('change', (evt) => {
   configWrite('enableAdBlock', evt.target.checked);
 });
 
-uiContainer.querySelector('#__sponsorblock').checked =
-  configRead('enableSponsorBlock');
 uiContainer
   .querySelector('#__sponsorblock')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlock', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_sponsor').checked = configRead(
-  'enableSponsorBlockSponsor'
-);
 uiContainer
   .querySelector('#__sponsorblock_sponsor')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockSponsor', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_intro').checked = configRead(
-  'enableSponsorBlockIntro'
-);
 uiContainer
   .querySelector('#__sponsorblock_intro')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockIntro', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_outro').checked = configRead(
-  'enableSponsorBlockOutro'
-);
 uiContainer
   .querySelector('#__sponsorblock_outro')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockOutro', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_interaction').checked = configRead(
-  'enableSponsorBlockInteraction'
-);
 uiContainer
   .querySelector('#__sponsorblock_interaction')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockInteraction', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_selfpromo').checked = configRead(
-  'enableSponsorBlockSelfPromo'
-);
 uiContainer
   .querySelector('#__sponsorblock_selfpromo')
   .addEventListener('change', (evt) => {
     configWrite('enableSponsorBlockSelfPromo', evt.target.checked);
   });
 
-uiContainer.querySelector('#__sponsorblock_music_offtopic').checked =
-  configRead('enableSponsorBlockMusicOfftopic');
 uiContainer
   .querySelector('#__sponsorblock_music_offtopic')
   .addEventListener('change', (evt) => {
@@ -136,7 +147,7 @@ const eventHandler = (evt) => {
     evt.keyCode,
     evt.defaultPrevented
   );
-  if (evt.charCode == 404 || evt.charCode == 172) {
+  if (KEY_MAPPINGS.green.includes(evt.charCode)) {
     console.info('Taking over!');
     evt.preventDefault();
     evt.stopPropagation();
@@ -150,6 +161,19 @@ const eventHandler = (evt) => {
         uiContainer.style.display = 'none';
         uiContainer.blur();
       }
+    }
+    return false;
+  }
+  if (KEY_MAPPINGS.red.includes(evt.charCode)) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    if (evt.type === 'keydown') {
+      const newValue = !configRead('enableSponsorBlock');
+      configWrite('enableSponsorBlock', newValue);
+      updateUI();
+      showNotification(
+        newValue ? 'SponsorBlock toggled on' : 'SponsorBlock toggled off'
+      );
     }
     return false;
   }
@@ -192,4 +216,5 @@ export function showNotification(text, time = 3000) {
 
 setTimeout(() => {
   showNotification('Press 🟩 to open YTAF configuration screen');
+  showNotification('Press 🟥 to toggle on/off SponsorBlock');
 }, 2000);
