@@ -1,5 +1,6 @@
 const CONFIG_KEY = 'ytaf-configuration';
 const defaultConfig = {
+  enableNotifications: true,
   enableAdBlock: true,
   enableSponsorBlock: true,
   enableSponsorBlockSponsor: true,

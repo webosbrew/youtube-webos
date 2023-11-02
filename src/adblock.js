@@ -14,20 +14,44 @@ import { configRead } from './config';
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
-  if (r.adPlacements && configRead('enableAdBlock')) {
-    r.adPlacements = [];
-  }
+  try {
+    if (r.adPlacements && configRead('enableAdBlock')) {
+      r.adPlacements = [];
+    }
 
-  // Drop "masthead" ad from home screen
-  if (
-    r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
-      ?.sectionListRenderer?.contents &&
-    configRead('enableAdBlock')
-  ) {
-    r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
-      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents.filter(
-        (elm) => !elm.tvMastheadRenderer
-      );
+    // Drop "masthead" ad from home screen
+    if (
+      r?.contents?.tvBrowseRenderer?.content?.tvSurfaceContentRenderer?.content
+        ?.sectionListRenderer?.contents &&
+      configRead('enableAdBlock')
+    ) {
+      r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents =
+        r.contents.tvBrowseRenderer.content.tvSurfaceContentRenderer.content.sectionListRenderer.contents
+          .filter((elm) => !elm.tvMastheadRenderer)
+          .map((elm) => {
+            // Drop recommended video tiles
+            if (elm?.shelfRenderer?.content?.horizontalListRenderer?.items) {
+              elm.shelfRenderer.content.horizontalListRenderer.items =
+                elm.shelfRenderer.content.horizontalListRenderer.items.filter(
+                  (item) =>
+                    !item?.tileRenderer?.metadata?.tileMetadataRenderer
+                      ?.lines ||
+                    !item?.tileRenderer?.metadata?.tileMetadataRenderer
+                      ?.lines[0]?.lineRenderer?.items ||
+                    item?.tileRenderer?.metadata?.tileMetadataRenderer?.lines[0]
+                      ?.lineRenderer?.items[0]?.lineItemRenderer?.badge
+                      ?.metadataBadgeRenderer?.style !== 'BADGE_STYLE_TYPE_AD'
+                );
+            }
+
+            return elm;
+          });
+    }
+  } catch (err) {
+    console.warn(
+      'adblock: an error occured during JSON.parse processing:',
+      err
+    );
   }
 
   return r;

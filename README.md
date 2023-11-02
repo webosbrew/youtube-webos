@@ -52,6 +52,18 @@ In order to disable autostart run this:
 luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
 
+## Known issues
+
+### Keyboard/Certain remote control buttons do not work
+Due to nature of Netcast compatiblity we need to use (to rewrite user-agent)
+external keyboards and most remote control buttons are not passed through to
+the app.
+
+### Playback speed adjustment does not work
+webOS internal browser does not support audio speed adjustment. (videos with
+changed playback speed are muted) Netcast compatiblity layer breaks video speed
+adjustment.
+
 ## Building
 
 - Clone the repository
