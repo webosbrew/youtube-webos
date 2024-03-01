@@ -47,6 +47,7 @@ uiContainer.addEventListener(
 
 uiContainer.innerHTML = `
 <h1>webOS YouTube Extended</h1>
+<label for="__hide_logo"><input type="checkbox" id="__hide_logo" /> Hide YouTube Logo</label>
 <label for="__adblock"><input type="checkbox" id="__adblock" /> Enable AdBlocking</label>
 <label for="__sponsorblock"><input type="checkbox" id="__sponsorblock" /> Enable SponsorBlock</label>
 <blockquote>
@@ -61,6 +62,12 @@ uiContainer.innerHTML = `
 `;
 
 document.querySelector('body').appendChild(uiContainer);
+
+uiContainer.querySelector('#__hide_logo').checked = configRead('hideLogo');
+uiContainer.querySelector('#__hide_logo').addEventListener('change', (evt) => {
+  configWrite('hideLogo', evt.target.checked);
+  logoHideShow();
+});
 
 uiContainer.querySelector('#__adblock').checked = configRead('enableAdBlock');
 uiContainer.querySelector('#__adblock').addEventListener('change', (evt) => {
@@ -190,6 +197,18 @@ export function showNotification(text, time = 3000) {
   }, time);
 }
 
+// Hide youtube logo from the top right
+function logoHideShow() {
+  document.querySelector('ytlr-redux-connect-ytlr-logo-entity').style.opacity =
+    configRead('hideLogo') ? '0' : '1';
+}
+
 setTimeout(() => {
   showNotification('Press [GREEN] to open YTAF configuration screen');
+  logoHideShow();
 }, 2000);
+
+logoHideShow();
+setTimeout(() => {
+  logoHideShow();
+}, 4000);
