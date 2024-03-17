@@ -7,7 +7,8 @@ const defaultConfig = {
   enableSponsorBlockOutro: true,
   enableSponsorBlockInteraction: true,
   enableSponsorBlockSelfPromo: true,
-  enableSponsorBlockMusicOfftopic: true
+  enableSponsorBlockMusicOfftopic: true,
+  enablePreviewMute: false
 };
 
 let localConfig;
