@@ -197,7 +197,7 @@ export function showNotification(text, time = 3000) {
 
   const elm = document.createElement('div');
   const elmInner = document.createElement('div');
-  elmInner.innerText = text;
+  elmInner.innerHTML = text;
   elmInner.classList.add('message');
   elmInner.classList.add('message-hidden');
   elm.appendChild(elmInner);
@@ -214,7 +214,18 @@ export function showNotification(text, time = 3000) {
   }, time);
 }
 
+function remoteBtnBox(key) {
+  const el = document.createElement('span');
+  el.classList.add('ytaf-remote-button', `ytaf-remote-button-${key}`);
+
+  return el.outerHTML;
+}
+
 setTimeout(() => {
-  showNotification('Press 🟩 to open YTAF configuration screen');
-  showNotification('Press 🟥 to toggle on/off SponsorBlock');
+  showNotification(
+    `Press ${remoteBtnBox('green')} GREEN to open YTAF configuration screen`
+  );
+  showNotification(
+    `Press ${remoteBtnBox('red')} RED to toggle on/off SponsorBlock`
+  );
 }, 2000);
