@@ -1,7 +1,7 @@
 {
   "name": "youtube-webos",
-  "version": "0.3.1",
-  "description": "Youtube App without ADs",
+  "version": "0.3.2",
+  "description": "Ad-free YouTube app for webOS",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -12,15 +12,9 @@
     "version": "node tools/sync-version.js && git add assets/appinfo.json",
     "prepare": "husky install"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/webosbrew/youtube-webos.git"
-  },
-  "author": "",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/webosbrew/youtube-webos/issues"
-  },
+  "repository": "github:webosbrew/youtube-webos",
+  "license": "GPL-3.0-only",
+  "bugs": "https://github.com/webosbrew/youtube-webos/issues",
   "homepage": "https://github.com/webosbrew/youtube-webos#readme",
   "dependencies": {
     "@babel/runtime": "^7.16.7",
@@ -33,7 +27,7 @@
     "@babel/core": "^7.16.7",
     "@babel/plugin-transform-runtime": "^7.16.8",
     "@babel/preset-env": "^7.16.8",
-    "@webosose/ares-cli": "^2.2.0",
+    "@webos-tools/cli": "^3.0.2",
     "babel-loader": "^8.2.3",
     "babel-plugin-polyfill-corejs3": "^0.5.0",
     "babel-plugin-polyfill-regenerator": "^0.3.0",

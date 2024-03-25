@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- [#103](https://github.com/webosbrew/youtube-webos/pull/103): Fixed SponsorBlock on videos with chapters (@alyyousuf7)
+- [#131](https://github.com/webosbrew/youtube-webos/pull/131): Fixed minor README issue (@ANewDawn)
+
+### Changed
+
+- [#128](https://github.com/webosbrew/youtube-webos/pull/128): Updated workflows and dependencies (@throwaway96)
+
+## [0.3.2] - 2024/03/07
+
+### Added
+
+- [#100](https://github.com/webosbrew/youtube-webos/pull/100): Blocked "Sponsored" tiles (@alyyousuf7)
+
+### Fixed
+
+- [#95](https://github.com/webosbrew/youtube-webos/pull/95): Fixed the appearance of YouTube in the app (@0xBADEAFFE)
+- [#96](https://github.com/webosbrew/youtube-webos/pull/96): Fixed launch functionality broken by #95 (@fire332)
+- [#102](https://github.com/webosbrew/youtube-webos/pull/102): Fixed minor dev-related stuff (@alyyousuf7)
+- [#106](https://github.com/webosbrew/youtube-webos/pull/106), [#120](https://github.com/webosbrew/youtube-webos/pull/120): Updated outdated documentation (@throwaway96)
+
 ## [0.3.1] - 2022/01/27
 
 ### Fixed

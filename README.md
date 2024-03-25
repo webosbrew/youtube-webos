@@ -49,7 +49,7 @@ constantly in the background, at the cost of increased idle memory usage.
 In order to disable autostart run this:
 
 ```sh
-luna-send -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
+luna-send-pub -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
 
 ## Building

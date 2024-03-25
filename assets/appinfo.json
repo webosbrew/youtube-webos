@@ -1,7 +1,7 @@
 {
   "id": "youtube.leanback.v4",
-  "version": "0.3.1",
-  "vendor": "My Company",
+  "version": "0.3.2",
+  "vendor": "webosbrew.org",
   "type": "web",
   "main": "index.html",
   "title": "YouTube AdFree",
