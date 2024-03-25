@@ -87,8 +87,7 @@ function createOptionsPanel() {
         document.querySelector(':focus').click();
       } else if (evt.keyCode === 27) {
         // Back button
-        elmContainer.style.display = 'none';
-        elmContainer.blur();
+        showOptionsPanel(false);
       }
 
       evt.preventDefault();
@@ -126,6 +125,30 @@ function createOptionsPanel() {
 const optionsPanel = createOptionsPanel();
 document.body.appendChild(optionsPanel);
 
+let optionsPanelVisible = false;
+
+/**
+ * Show or hide the options panel.
+ * @param {boolean} [visible=true] Whether to show the options panel.
+ */
+function showOptionsPanel(visible) {
+  visible ??= true;
+
+  if (visible && !optionsPanelVisible) {
+    console.info('Showing and focusing options panel!');
+    optionsPanel.style.display = 'block';
+    optionsPanel.focus();
+    optionsPanelVisible = true;
+  } else if (!visible && optionsPanelVisible) {
+    console.info('Hiding options panel!');
+    optionsPanel.style.display = 'none';
+    optionsPanel.blur();
+    optionsPanelVisible = false;
+  }
+}
+
+window.ytaf_showOptionsPanel = showOptionsPanel;
+
 const eventHandler = (evt) => {
   console.info(
     'Key event:',
@@ -142,15 +165,8 @@ const eventHandler = (evt) => {
     evt.stopPropagation();
 
     if (evt.type === 'keydown') {
-      if (optionsPanel.style.display === 'none') {
-        console.info('Showing and focusing!');
-        optionsPanel.style.display = 'block';
-        optionsPanel.focus();
-      } else {
-        console.info('Hiding!');
-        optionsPanel.style.display = 'none';
-        optionsPanel.blur();
-      }
+      // Toggle visibility.
+      showOptionsPanel(!optionsPanelVisible);
     }
     return false;
   }
