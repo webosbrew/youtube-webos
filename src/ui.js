@@ -8,6 +8,35 @@ window.__spatialNavigation__.keyMode = 'NONE';
 
 const ARROW_KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
 
+// Red, Green, Yellow, Blue
+// 403,   404,    405,  406
+// ---,   172,    170,  191
+const colorCodeMap = new Map([
+  [403, 'red'],
+
+  [404, 'green'],
+  [172, 'green'],
+
+  [405, 'yellow'],
+  [170, 'yellow'],
+
+  [406, 'blue'],
+  [191, 'blue']
+]);
+
+/**
+ * Returns the name of the color button associated with a code or null if not a color button.
+ * @param {number} charCode KeyboardEvent.charCode property from event
+ * @returns {string | null} Color name or null
+ */
+function getKeyColor(charCode) {
+  if (colorCodeMap.has(charCode)) {
+    return colorCodeMap.get(charCode);
+  }
+
+  return null;
+}
+
 function createConfigCheckbox(key) {
   const elmInput = document.createElement('input');
   elmInput.type = 'checkbox';
@@ -46,20 +75,24 @@ function createOptionsPanel() {
     'keydown',
     (evt) => {
       console.info('Options panel key event:', evt.type, evt.charCode);
-      if (evt.charCode !== 404 && evt.charCode !== 172) {
-        if (evt.keyCode in ARROW_KEY_CODE) {
-          navigate(ARROW_KEY_CODE[evt.keyCode]);
-        } else if (evt.keyCode === 13) {
-          // "OK" button
-          document.querySelector(':focus').click();
-        } else if (evt.keyCode === 27) {
-          // Back button
-          elmContainer.style.display = 'none';
-          elmContainer.blur();
-        }
-        evt.preventDefault();
-        evt.stopPropagation();
+
+      if (getKeyColor(evt.charCode) === 'green') {
+        return;
       }
+
+      if (evt.keyCode in ARROW_KEY_CODE) {
+        navigate(ARROW_KEY_CODE[evt.keyCode]);
+      } else if (evt.keyCode === 13) {
+        // "OK" button
+        document.querySelector(':focus').click();
+      } else if (evt.keyCode === 27) {
+        // Back button
+        elmContainer.style.display = 'none';
+        elmContainer.blur();
+      }
+
+      evt.preventDefault();
+      evt.stopPropagation();
     },
     true
   );
@@ -101,10 +134,13 @@ const eventHandler = (evt) => {
     evt.keyCode,
     evt.defaultPrevented
   );
-  if (evt.charCode == 404 || evt.charCode == 172) {
+
+  if (getKeyColor(evt.charCode) === 'green') {
     console.info('Taking over!');
+
     evt.preventDefault();
     evt.stopPropagation();
+
     if (evt.type === 'keydown') {
       if (optionsPanel.style.display === 'none') {
         console.info('Showing and focusing!');
@@ -121,9 +157,6 @@ const eventHandler = (evt) => {
   return true;
 };
 
-// Red, Green, Yellow, Blue
-// 403, 404, 405, 406
-// ---, 172, 170, 191
 document.addEventListener('keydown', eventHandler, true);
 document.addEventListener('keypress', eventHandler, true);
 document.addEventListener('keyup', eventHandler, true);
