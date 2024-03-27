@@ -37,4 +37,7 @@ export function configWrite(key, value) {
   console.info('Setting key', key, 'to', value);
   localConfig[key] = value;
   window.localStorage[CONFIG_KEY] = JSON.stringify(localConfig);
+  if (window.sponsorblock) {
+    window.sponsorblock.updateSkippableCategories();
+  }
 }

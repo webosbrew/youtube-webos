@@ -60,3 +60,33 @@
   padding: 0 1em;
   line-height: 0;
 }
+
+.ytaf-remote-button {
+  display: inline-block;
+  width: 21.34px;
+  height: 21.34px;
+}
+
+.ytaf-remote-button::before {
+  content: '\00a0';
+}
+
+.ytaf-remote-button.ytaf-remote-button-red {
+  background-color: #b30000;
+  color: #b30000;
+}
+
+.ytaf-remote-button.ytaf-remote-button-green {
+  background-color: #006600;
+  color: #006600;
+}
+
+.ytaf-remote-button.ytaf-remote-button-yellow {
+  background-color: #e0e000;
+  color: #e0e000;
+}
+
+.ytaf-remote-button.ytaf-remote-button-blue {
+  background-color: #0000cc;
+  color: #0000cc;
+}
