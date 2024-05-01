@@ -4,10 +4,10 @@
   "vendor": "webosbrew.org",
   "type": "web",
   "main": "index.html",
-  "title": "YouTube AdFree",
+  "title": "YouTube",
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",
-  "iconColor": "#ff0000",
+  "iconColor": "#ffffff",
   "support360Content": true,
   "checkUpdateOnLaunch": false,
   "accessibility": {
