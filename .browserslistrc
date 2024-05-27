@@ -1,4 +1,6 @@
 # WAM uses WebKit on webOS 1 and 2
+safari 7 # [WebKit 537.71] for webOS 1 [WebKit 537.41]
+safari 8 # [WebKit 538.35] for webOS 2 [WebKit 538.2]
 chrome 38 # webOS 3.x
 chrome 53 # webOS 4.x
 chrome 68 # webOS 5
