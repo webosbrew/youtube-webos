@@ -73,40 +73,47 @@ npm run build && npm run package
 
 ## Development TV setup
 
-### Configuring webOS TV CLI tools with Developer Mode App
+These instructions use the [webOS CLI tools](https://github.com/webos-tools/cli).
+See <https://webostv.developer.lge.com/develop/tools/cli-introduction> for more information.
 
-This is partially based on: https://webostv.developer.lge.com/develop/getting-started/developer-mode-app
+### Configuring webOS CLI tools with Developer Mode App
+
+This is partially based on <https://webostv.developer.lge.com/develop/getting-started/developer-mode-app>.
 
 - Install Developer Mode app from Content Store
-- Enable developer mode, enable keyserver
-- Download TV's private key: `http://TV_IP:9991/webos_rsa`
+- Enable Developer Mode
+- Enable key server and download TV's private key: `http://TV_IP:9991/webos_rsa`  
+  The key must be saved under `~/.ssh` (or `%USERPROFILE%\.ssh` on Windows)
 - Configure the device using `ares-setup-device` (`-a` may need to be replaced with `-m` if device named `webos` is already configured)
   - `PASSPHRASE` is the 6-character passphrase printed on screen in developer mode app
+  - `privatekey` path is relative to `${HOME}/.ssh` (Windows: `%USERPROFILE%\.ssh`)
 
 ```sh
-ares-setup-device -a webos -i "username=prisoner" -i "privatekey=/path/to/downloaded/webos_rsa" -i "passphrase=PASSPHRASE" -i "host=TV_IP" -i "port=9922"
+ares-setup-device -a webos -i "username=prisoner" -i "privatekey=webos_rsa" -i "passphrase=PASSPHRASE" -i "host=TV_IP" -i "port=9922"
 ```
 
-### Configuring webOS TV CLI tools with Homebrew Channel / root
+### Configuring webOS CLI tools with Homebrew Channel / root
 
-- Enable sshd in Homebrew Channel app
-- Generate ssh key on developer machine (`ssh-keygen`)
-- Copy the public key (`id_rsa.pub`) to `/home/root/.ssh/authorized_keys` on TV
+- Enable SSH in Homebrew Channel app
+- Generate SSH key on developer machine (`ssh-keygen -t rsa`)
+- Copy the private key (`id_rsa`) to the `~/.ssh` directory (or `%USERPROFILE%\.ssh` on Windows) on the local computer
+- Append the public key (`id_rsa.pub`) to the `/home/root/.ssh/authorized_keys` file on the TV
 - Configure the device using `ares-setup-device` (`-a` may need to be replaced with `-m` if device named `webos` is already configured)
+  - `privatekey` path is relative to `${HOME}/.ssh` (Windows: `%USERPROFILE%\.ssh`)
 
 ```sh
-ares-setup-device -a webos -i "username=root" -i "privatekey=/path/to/id_rsa" -i "passphrase=SSH_KEY_PASSPHRASE" -i "host=TV_IP" -i "port=22"
+ares-setup-device -a webos -i "username=root" -i "privatekey=id_rsa" -i "passphrase=SSH_KEY_PASSPHRASE" -i "host=TV_IP" -i "port=22"
 ```
 
 ## Installation
 
-```
+```sh
 npm run deploy
 ```
 
 ## Launching
 
-- The app will be available in the TV's app list or launch it using ares-cli.
+- The app will be available in the TV's app list. You can also launch it using the webOS CLI tools.
 
 ```sh
 npm run launch
