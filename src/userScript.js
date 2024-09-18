@@ -13,6 +13,7 @@ document.addEventListener(
 );
 
 import './adblock.js';
+import './shorts.js';
 import './sponsorblock.js';
 import './ui.js';
 

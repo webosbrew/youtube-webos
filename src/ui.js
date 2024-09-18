@@ -122,6 +122,7 @@ function createOptionsPanel() {
   elmContainer.appendChild(createConfigCheckbox('enableAdBlock'));
   elmContainer.appendChild(createConfigCheckbox('hideLogo'));
   elmContainer.appendChild(createConfigCheckbox('enableSponsorBlock'));
+  elmContainer.appendChild(createConfigCheckbox('removeShorts'));
 
   const elmBlock = document.createElement('blockquote');
 
