@@ -28,7 +28,7 @@ const configOptions = new Map([
     'enableSponsorBlockMusicOfftopic',
     {
       default: true,
-      desc: 'Skip music and off-topic segments'
+      desc: 'Skip non-music segments in music videos'
     }
   ],
   [
