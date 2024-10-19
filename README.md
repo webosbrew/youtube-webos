@@ -23,7 +23,7 @@ YouTube App with extended functionalities
 - Use [Device Manager app](https://github.com/webosbrew/dev-manager-desktop) - see [Releases](https://github.com/webosbrew/youtube-webos/releases) for a
   prebuilt `.ipk` binary file
 - Use [webOS TV CLI tools](https://webostv.developer.lge.com/develop/tools/cli-installation) -
-  `ares-install youtube...ipk` (For the required webOS CLI tool configuration see [here](https://github.com/webosbrew/youtube-webos?tab=readme-ov-file#development-tv-setup)
+  `ares-install youtube...ipk` (For more information on configuring the webOS CLI tools, see [below](#development-tv-setup))
 
 ## Configuration
 
