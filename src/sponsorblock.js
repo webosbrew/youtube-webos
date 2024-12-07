@@ -379,10 +379,31 @@ class SponsorBlockHandler {
 // shows my lack of understanding of javascript. (or both)
 window.sponsorblock = null;
 
+function uninitializeSponsorblock() {
+  if (!window.sponsorblock) {
+    return;
+  }
+  try {
+    window.sponsorblock.destroy();
+  } catch (err) {
+    console.warn('window.sponsorblock.destroy() failed!', err);
+  }
+  window.sponsorblock = null;
+}
+
 window.addEventListener(
   'hashchange',
   () => {
     const newURL = new URL(location.hash.substring(1), location.href);
+    // uninitialize sponsorblock when not on `/watch` path, to prevent
+    // it from attaching to playback preview video element loaded on
+    // home page
+    if (newURL.pathname !== '/watch' && window.sponsorblock) {
+      console.info('uninitializing sponsorblock on a non-video page');
+      uninitializeSponsorblock();
+      return;
+    }
+
     const videoID = newURL.searchParams.get('v');
     const needsReload =
       videoID &&
@@ -397,14 +418,7 @@ window.addEventListener(
     );
 
     if (needsReload) {
-      if (window.sponsorblock) {
-        try {
-          window.sponsorblock.destroy();
-        } catch (err) {
-          console.warn('window.sponsorblock.destroy() failed!', err);
-        }
-        window.sponsorblock = null;
-      }
+      uninitializeSponsorblock();
 
       if (configRead('enableSponsorBlock')) {
         window.sponsorblock = new SponsorBlockHandler(videoID);
