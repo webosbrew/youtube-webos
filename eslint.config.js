@@ -15,7 +15,7 @@ const __dirname = dirname(__filename);
 const defaultSourceType =
   require(join(__dirname, 'package.json')).type ?? 'commonjs';
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
+/** @type {import('eslint').Linter.Config[]} */
 export default [
   eslintJs.configs.recommended,
   prettierConfig,
