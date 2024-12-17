@@ -4,7 +4,6 @@ import Module from 'node:module';
 
 import eslintJs from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
-// @ts-expect-error No type definitions available for this package. https://github.com/ota-meshi/eslint-plugin-regexp/issues/723
 import * as regexpPlugin from 'eslint-plugin-regexp';
 import globals from 'globals';
 
