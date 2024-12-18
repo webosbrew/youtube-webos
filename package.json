@@ -32,6 +32,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/plugin-transform-runtime": "^7.25.9",
+    "@babel/plugin-transform-typescript": "^7.26.3",
     "@babel/preset-env": "^7.26.0",
     "@eslint/js": "^9.17.0",
     "@stylistic/eslint-plugin": "^2.12.1",

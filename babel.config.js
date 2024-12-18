@@ -24,6 +24,12 @@ function makeConfig(api) {
     },
     plugins: [
       [
+        '@babel/plugin-transform-typescript',
+        {
+          strictMode: true
+        }
+      ],
+      [
         '@babel/plugin-transform-runtime',
         {
           regenerator: false,
