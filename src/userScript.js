@@ -17,3 +17,4 @@ import './shorts.js';
 import './sponsorblock.js';
 import './ui.js';
 import './screensaver-fix';
+import './thumbnail-quality';
