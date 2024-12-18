@@ -16,7 +16,8 @@ import './adblock.js';
 import './shorts.js';
 import './sponsorblock.js';
 import './ui.js';
-import './font-fix.css'
+import './font-fix.css';
+import './thumbnail-quality';
 
 // This IIFE is to keep the video element fill the entire window so that screensaver doesn't kick in.
 (async () => {
