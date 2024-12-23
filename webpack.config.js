@@ -18,13 +18,13 @@ const makeConfig = () => [
     },
 
     resolve: {
-      extensions: ['.mjs', '.cjs', '.js', '.json']
+      extensions: ['.mjs', '.cjs', '.js', '.json', '.ts']
     },
 
     module: {
       rules: [
         {
-          test: /\.[mc]?js$/i,
+          test: /\.[mc]?[jt]s$/i,
 
           loader: 'babel-loader',
           exclude: [
