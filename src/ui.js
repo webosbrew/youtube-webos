@@ -98,10 +98,14 @@ function createOptionsPanel() {
       } else if (evt.keyCode === 13) {
         // "OK" button
 
-        // The YouTube app generates these "OK" events from clicks (including
-        // with the Magic Remote), and we don't want to send a duplicate click
-        // event for those. It seems isTrusted is only true for "real" events.
-        if (evt.isTrusted === true) {
+        /**
+         * The YouTube app generates these "OK" events from clicks (including
+         * with the Magic Remote), and we don't want to send a duplicate click
+         * event for those. Youtube uses the `Event` class instead of
+         * `KeyboardEvent` so we check for that.
+         * See issue #143 and #200 for context.
+         */
+        if (evt instanceof KeyboardEvent) {
           document.activeElement.click();
         }
       } else if (evt.keyCode === 27) {
