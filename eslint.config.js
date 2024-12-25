@@ -1,21 +1,15 @@
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import Module from 'node:module';
-
 import eslintJs from '@eslint/js';
 import prettierConfig from 'eslint-config-prettier';
 import * as regexpPlugin from 'eslint-plugin-regexp';
 import globals from 'globals';
+import pkgJson from './package.json' with { type: 'json' };
 
-const require = Module.createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-/** @type {'module' | 'commonjs'} */
 const defaultSourceType =
-  require(join(__dirname, 'package.json')).type ?? 'commonjs';
+  /**  @type {import('eslint').Linter.SourceType | undefined} */ (
+    pkgJson.type
+  ) ?? 'commonjs';
 
-/** @type {import('eslint').Linter.Config[]} */
+/** @satisfies {import('eslint').Linter.Config[]} */
 export default [
   eslintJs.configs.recommended,
   prettierConfig,
@@ -44,6 +38,9 @@ export default [
       'no-implicit-globals': ['error'],
       'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_' }],
       'no-useless-rename': ['error'],
+      'no-useless-computed-key': 'error',
+      'no-useless-constructor': 'error',
+      'no-useless-return': 'error',
       'arrow-body-style': ['error', 'as-needed'],
       'no-lonely-if': 'error',
       'prefer-object-has-own': 'error',
