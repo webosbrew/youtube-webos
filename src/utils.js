@@ -11,6 +11,8 @@ export function extractLaunchParams() {
 function getYTURL() {
   const ytURL = new URL('https://www.youtube.com/tv#/');
   ytURL.searchParams.append('env_forceFullAnimation', '1');
+  ytURL.searchParams.append('env_enableWebSpeech', '1');
+  ytURL.searchParams.append('env_enableVoice', '1');
   return ytURL;
 }
 
