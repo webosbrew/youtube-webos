@@ -46,7 +46,11 @@ const makeConfig = () => [
           test: /\.css$/i,
           use: [
             { loader: 'style-loader' },
-            { loader: 'css-loader', options: { esModule: false } }
+            {
+              loader: 'css-loader',
+              options: { esModule: false, importLoaders: 1 }
+            },
+            'postcss-loader'
           ]
         }
       ]
