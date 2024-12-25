@@ -1,7 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "checkJs": true
+    "checkJs": true,
+
+    "module": "NodeNext",
+
+    "moduleResolution": "NodeNext"
   },
   "include": [
     "./tools",
@@ -11,6 +15,7 @@
     "eslint.config.js",
     "babel.config.js",
     ".prettierrc.js",
-    "lint-staged.config.js"
+    "lint-staged.config.js",
+    "postcss.config.ts"
   ]
 }

@@ -18,13 +18,13 @@ const makeConfig = () => [
     },
 
     resolve: {
-      extensions: ['.mjs', '.cjs', '.js', '.json']
+      extensions: ['.mjs', '.cjs', '.js', '.json', '.ts']
     },
 
     module: {
       rules: [
         {
-          test: /\.[mc]?js$/i,
+          test: /\.[mc]?[jt]s$/i,
 
           loader: 'babel-loader',
           exclude: [
@@ -46,7 +46,11 @@ const makeConfig = () => [
           test: /\.css$/i,
           use: [
             { loader: 'style-loader' },
-            { loader: 'css-loader', options: { esModule: false } }
+            {
+              loader: 'css-loader',
+              options: { esModule: false, importLoaders: 1 }
+            },
+            'postcss-loader'
           ]
         }
       ]
