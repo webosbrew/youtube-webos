@@ -4,22 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [0.3.5] - xxxx/xx/xx
+## [0.3.5] - 2024/12/27
 
 ### Added
 
 - [#201](https://github.com/webosbrew/youtube-webos/pull/201): Blocked shorts in subscriptions tab (@JaCzekanski)
+- [#236](https://github.com/webosbrew/youtube-webos/pull/236): Add option to upgrade thumbnail quality (@fire332)
 
 ### Fixed
 
 - [#104](https://github.com/webosbrew/youtube-webos/pull/104): Disabled SponsorBlock on previews (@alyyousuf7)
 - [#204](https://github.com/webosbrew/youtube-webos/pull/204): Fixed transparency under UI (@atomjack; thanks to @reisxd)
+- [#239](https://github.com/webosbrew/youtube-webos/pull/239): Fix missing math font (@fire332)
+- [#240](https://github.com/webosbrew/youtube-webos/pull/240): Fix missing voice search (@fire332)
+- [#242](https://github.com/webosbrew/youtube-webos/pull/242): Fix checkbox click in the YTAF config UI (@fire332)
 
 ### Changed
 
 - [#179](https://github.com/webosbrew/youtube-webos/pull/179), [#183](https://github.com/webosbrew/youtube-webos/pull/183): Updated CLI instructions (@throwaway96, @ShalokShalom)
 - [#206](https://github.com/webosbrew/youtube-webos/pull/206): Added old WebKit to targeted browsers (@throwaway96)
 - [#208](https://github.com/webosbrew/youtube-webos/pull/208): Changed description of enableSponsorBlockMusicOfftopic setting (@throwaway96)
+- [#234](https://github.com/webosbrew/youtube-webos/pull/234): Update dependencies (@fire332)
+- [#238](https://github.com/webosbrew/youtube-webos/pull/238): Misc dev changes (@fire332)
 
 ## [0.3.4] - 2024/04/23
 
