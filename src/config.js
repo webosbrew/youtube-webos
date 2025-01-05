@@ -3,7 +3,10 @@ const CONFIG_KEY = 'ytaf-configuration';
 const configOptions = new Map([
   ['enableAdBlock', { default: true, desc: 'Enable ad blocking' }],
   ['upgradeThumbnails', { default: false, desc: 'Upgrade thumbnail quality' }],
-  ['removeShorts', { default: true, desc: 'Remove Shorts from subscriptions' }],
+  [
+    'removeShorts',
+    { default: false, desc: 'Remove Shorts from subscriptions' }
+  ],
   ['enableSponsorBlock', { default: true, desc: 'Enable SponsorBlock' }],
   [
     'enableSponsorBlockSponsor',

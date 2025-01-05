@@ -1,0 +1,31 @@
+/* Fixes transparency effect for the video player */
+.ytlr-watch-default__shadow {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0.8) 90%
+  ) !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  display: block !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  width: 100% !important;
+}
+
+/* Fixes shorts thumbnails */
+.ytlr-tile-header-renderer--shorts {
+  z-index: -1;
+}
+
+/**
+ * Dirty hack to fix offset <video> on shorts on older webOS versions.
+ * This shouldn't work but it does 😵‍💫.
+ * See webosbrew/youtube-webos/pull/235 for insanity.
+ */
+.WEB_PAGE_TYPE_SHORTS video {
+  border: black 1px solid;
+  /* Smallest transparent image */
+  border-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')
+    30%;
+}
