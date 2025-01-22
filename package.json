@@ -24,6 +24,7 @@
   "homepage": "https://github.com/webosbrew/youtube-webos#readme",
   "dependencies": {
     "@babel/runtime-corejs3": "^7.29.2",
+    "@twemoji/api": "^17.0.2",
     "core-js-pure": "^3.49.0",
     "regenerator-runtime": "^0.14.1",
     "tiny-sha256": "^1.0.2",
