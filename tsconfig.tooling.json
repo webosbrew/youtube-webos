@@ -3,6 +3,9 @@
   "compilerOptions": {
     "checkJs": true,
 
+    // Remove when webpack-contrib/copy-webpack-plugin/issues/793 is fixed.
+    "skipLibCheck": true,
+
     "module": "NodeNext",
 
     "moduleResolution": "NodeNext"
@@ -12,7 +15,7 @@
     "./assets/appinfo.json",
     "./package.json",
     "./webpack.config.js",
-    "eslint.config.js",
+    "eslint.config.ts",
     "babel.config.js",
     ".prettierrc.js",
     "lint-staged.config.js",

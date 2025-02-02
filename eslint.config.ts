@@ -1,24 +1,25 @@
+import assert from 'node:assert';
+
 import eslintJs from '@eslint/js';
+import type { ESLint, Linter } from 'eslint';
 import stylistic from '@stylistic/eslint-plugin';
 import prettierConfig from 'eslint-config-prettier';
 import * as regexpPlugin from 'eslint-plugin-regexp';
 import globals from 'globals';
 import pkgJson from './package.json' with { type: 'json' };
 
-const defaultSourceType =
-  /**  @type {import('eslint').Linter.SourceType | undefined} */ (
-    pkgJson.type
-  ) ?? 'commonjs';
+const defaultSourceType: Linter.SourceType = 'module';
+assert(pkgJson.type === defaultSourceType);
 
-/** @satisfies {import('eslint').Linter.Config[]} */
-export default [
+const configs = [
   eslintJs.configs.recommended,
   prettierConfig,
   regexpPlugin.configs['flat/recommended'],
 
   {
     plugins: {
-      '@stylistic': stylistic
+      // Cast needed due to type mismatch even though this is the recommmended way to use the plugin.
+      '@stylistic': stylistic as ESLint.Plugin
     },
 
     linterOptions: {
@@ -61,7 +62,6 @@ export default [
 
       // @stylistic rules - needed as prettier doesn't handle these
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
-      '@stylistic/object-curly-spacing': ['error', 'always'],
 
       /* eslint-plugin-regexp */
       'regexp/prefer-character-class': ['error', { minAlternatives: 2 }],
@@ -103,4 +103,6 @@ export default [
     // `ignores` field must be in the very bottom config.
     ignores: ['dist/**/*', '**/*-polyfill.*']
   }
-];
+] as const satisfies Linter.Config[];
+
+export default configs;
