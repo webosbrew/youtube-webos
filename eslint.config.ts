@@ -62,7 +62,6 @@ const configs = [
 
       // @stylistic rules - needed as prettier doesn't handle these
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
-      '@stylistic/object-curly-spacing': ['error', 'always'],
 
       /* eslint-plugin-regexp */
       'regexp/prefer-character-class': ['error', { minAlternatives: 2 }],
