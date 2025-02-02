@@ -12,7 +12,7 @@
     "./assets/appinfo.json",
     "./package.json",
     "./webpack.config.js",
-    "eslint.config.js",
+    "eslint.config.ts",
     "babel.config.js",
     ".prettierrc.js",
     "lint-staged.config.js",
