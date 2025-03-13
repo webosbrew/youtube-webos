@@ -33,6 +33,11 @@ const barTypes = {
     color: '#ff9900',
     opacity: '0.7',
     name: 'non-music part'
+  },
+  preview: {
+    color: '#008fd6',
+    opacity: '0.7',
+    name: 'recap or preview'
   }
 };
 
@@ -67,7 +72,8 @@ class SponsorBlockHandler {
       'outro',
       'interaction',
       'selfpromo',
-      'music_offtopic'
+      'music_offtopic',
+      'preview'
     ];
     const resp = await fetch(
       `${sponsorblockAPI}/skipSegments/${videoHash}?categories=${encodeURIComponent(
@@ -114,6 +120,9 @@ class SponsorBlockHandler {
     if (configRead('enableSponsorBlockMusicOfftopic')) {
       skippableCategories.push('music_offtopic');
     }
+    if (configRead('enableSponsorBlockPreview')) {
+      skippableCategories.push('preview');
+    }
     return skippableCategories;
   }
 
@@ -156,9 +165,8 @@ class SponsorBlockHandler {
         color: 'blue',
         opacity: 0.7
       };
-      const transform = `translateX(${
-        (start / videoDuration) * 100.0
-      }%) scaleX(${(end - start) / videoDuration})`;
+      const transform = `translateX(${(start / videoDuration) * 100.0
+        }%) scaleX(${(end - start) / videoDuration})`;
       const elm = document.createElement('div');
       elm.classList.add('ytlr-progress-bar__played');
       elm.style['background-color'] = barType.color;
