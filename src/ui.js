@@ -137,6 +137,7 @@ function createOptionsPanel() {
   elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockInteraction'));
   elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockSelfPromo'));
   elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockMusicOfftopic'));
+  elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockPreview'));
 
   elmContainer.appendChild(elmBlock);
 

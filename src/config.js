@@ -36,6 +36,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'enableSponsorBlockPreview',
+    {
+      default: false,
+      desc: 'Skip recaps and previews'
+    }
+  ],
+  [
     'hideLogo',
     {
       default: false,
