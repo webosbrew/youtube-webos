@@ -1,5 +1,5 @@
 /* Fixes transparency effect for the video player */
-.ytLrWatchDefaultShadow{
+.ytLrWatchDefaultShadow {
   background-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0) 0,
@@ -14,7 +14,7 @@
 }
 
 /* Fixes shorts thumbnails */
-.ytlr-tile-header-renderer--shorts {
+.ytLrTileHeaderRendererShorts {
   z-index: -1;
 }
 
