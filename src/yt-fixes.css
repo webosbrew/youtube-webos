@@ -14,7 +14,7 @@
 }
 
 /* Fixes shorts thumbnails */
-.ytlr-tile-header-renderer--shorts {
+.ytLrTileHeaderRendererShorts {
   z-index: -1;
 }
 
