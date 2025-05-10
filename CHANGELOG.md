@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.8] - 2025/05/10
+
+### Fixed
+
+- [#290](https://github.com/webosbrew/youtube-webos/pull/290): Fix "Remove Shorts from subscriptions" feature for new page format (@JaCzekanski)
+
 ## [0.3.7] - 2025/04/05
 
 ### Added
