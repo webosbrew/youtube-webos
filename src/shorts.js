@@ -2,6 +2,8 @@
 /* global fetch:writable */
 import { configRead } from './config';
 
+const SHELF_SHORTS = 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS';
+
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
@@ -21,12 +23,24 @@ JSON.parse = function () {
     removeShorts(gridContinuation);
   }
 
+  // Shelf on subscriptions tab
+  const sectionListRenderer = findFirstObject(r, 'sectionListRenderer');
+  if (sectionListRenderer?.contents) {
+    removeShelvesWithShorts(sectionListRenderer);
+  }
+
   return r;
 };
 
 function removeShorts(container) {
   container.items = container.items.filter(
     (elm) => elm?.tileRenderer?.onSelectCommand?.reelWatchEndpoint == null
+  );
+}
+
+function removeShelvesWithShorts(container) {
+  container.contents = container.contents.filter(
+    (elm) => elm?.shelfRenderer?.tvhtml5ShelfRendererType != SHELF_SHORTS
   );
 }
 
