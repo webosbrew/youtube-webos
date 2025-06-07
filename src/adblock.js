@@ -46,6 +46,12 @@ JSON.parse = function () {
     removeAdSlotRenderer(searchSectionListRenderer);
   }
 
+  if (r?.entries) {
+    r.entries = r?.entries?.filter(
+      (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
+    );
+  }
+
   return r;
 };
 
