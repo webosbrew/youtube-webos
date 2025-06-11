@@ -1,64 +1,66 @@
-import { configRead } from './config';
+import { configRead, configAddChangeListener } from './config';
+import './watch.css';
 
 function setTime(show) {
-
-    if (!show) {
-        const watch = document.querySelector('.webOs-watch');
-        if (watch) {
-            watch.remove();
-        }
-        return;
+  if (!show) {
+    const watch = document.querySelector('.webOs-watch');
+    if (watch) {
+      watch.remove();
     }
+    return;
+  }
 
-    const watch = document.createElement('div');
-    watch.innerHTML = `<div class="webOs-watch"></div>`;
-    const style = document.createElement('style');
+  const watch = document.createElement('div');
+  watch.innerHTML = '<div class="webOs-watch"></div>';
+  document.body.appendChild(watch);
 
-    style.textContent =
-        `.webOs-watch {
-        position: fixed;
-        right: 0;
-        top: 0;
-        margin: 1rem 2rem;
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 0.5rem;
-        padding: 0.4rem;
-        font-size: 1.2rem;
-    }`;
-    document.head.appendChild(style);
-    document.body.appendChild(watch);
-
-    setInterval(() => {
-        const time = new Date();
-        let minutes = time.getMinutes().toString();
-        let houres = time.getHours().toString();
-        minutes = minutes.length < 2 ? '0' + minutes : minutes;
-        houres = houres.length < 2 ? '0' + houres : houres;
-        try {
-
-            const text = houres + ' : ' + minutes;
-            document.querySelector('.webOs-watch').innerText = text;
-
-            const watchDefault = document.querySelector('ytlr-watch-default');
-            const watchControls = document.querySelector('ytlr-watch-metadata');
-            const webOsWatch = document.querySelector('.webOs-watch');
-
-            if (watchDefault && watchDefault.clientHeight > 0 && !(watchControls && window.getComputedStyle(watchControls).display !== 'none')) {
-                webOsWatch.style.display = 'none';
-            } else {
-                webOsWatch.style.display = '';
-            }
-
-        } catch (e) {
-            document.querySelector('.webOs-watch').innerText = `Error`;
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeName === 'YT-LR-WATCH-DEFAULT') {
+            watch.style.display = 'none';
+          }
+        });
+      } else if (mutation.type === 'attributes') {
+        if (mutation.target.nodeName === 'YTLR-WATCH-DEFAULT') {
+          watch.style.display = mutation.target.clientHeight > 0 ? 'none' : '';
+        } else if (mutation.target.nodeName === 'YTLR-WATCH-METADATA') {
+          watch.style.display =
+            window.getComputedStyle(mutation.target).display == 'none'
+              ? 'none'
+              : '';
         }
+      }
+    });
+  });
 
-    }, 500);
-};
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true
+  });
+
+  const nextSeg = 1000 - new Date().getMilliseconds();
+
+  const setTime = () => {
+    window.requestAnimationFrame(() => {
+      document.querySelector('.webOs-watch').innerText =
+        new Intl.DateTimeFormat(navigator.language, {
+          hour: 'numeric',
+          minute: 'numeric'
+        }).format(new Date());
+    });
+  };
+
+  setTimeout(() => {
+    setTime();
+    setInterval(setTime, 60000);
+  }, nextSeg);
+}
 
 setTime(configRead('showWatch'));
 
 configAddChangeListener('showWatch', (evt) => {
-    setTime(evt.detail.newValue);
+  setTime(evt.detail.newValue);
 });
-
