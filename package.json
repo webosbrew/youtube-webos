@@ -37,8 +37,6 @@
     "@eslint/js": "^9.29.0",
     "@stylistic/eslint-plugin": "^4.4.1",
     "@types/babel__core": "^7.20.5",
-    "@types/eslint": "^9.6.1",
-    "@types/eslint__js": "^9.14.0",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/node": "^24.0.1",
     "@webos-tools/cli": "^3.2.1",
