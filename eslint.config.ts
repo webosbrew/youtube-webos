@@ -2,8 +2,9 @@ import assert from 'node:assert';
 
 import eslintJs from '@eslint/js';
 import type { ESLint, Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import stylistic from '@stylistic/eslint-plugin';
-import prettierConfig from 'eslint-config-prettier';
+import prettierConfig from 'eslint-config-prettier/flat';
 import * as regexpPlugin from 'eslint-plugin-regexp';
 import globals from 'globals';
 import pkgJson from './package.json' with { type: 'json' };
@@ -23,19 +24,14 @@ const configs = [
     },
 
     linterOptions: {
-      reportUnusedDisableDirectives: 'error'
+      reportUnusedDisableDirectives: 'error',
+      reportUnusedInlineConfigs: 'error'
     },
 
     languageOptions: {
       sourceType: defaultSourceType,
-      parserOptions: {
-        ecmaFeatures: {
-          impliedStrict: true
-        }
-      },
-      globals: {
-        ...globals.nodeBuiltin
-      }
+      parserOptions: { ecmaFeatures: { impliedStrict: true } },
+      globals: { ...globals.nodeBuiltin }
     },
 
     rules: {
@@ -59,6 +55,8 @@ const configs = [
       'no-constructor-return': 'error',
       'no-unmodified-loop-condition': 'error',
       'no-useless-assignment': 'error',
+      'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
+      'no-unassigned-vars': 'error',
 
       // @stylistic rules - needed as prettier doesn't handle these
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
@@ -74,29 +72,18 @@ const configs = [
     }
   },
 
-  {
-    files: ['src/**/*'],
-    languageOptions: {
-      globals: {
-        ...globals.browser
-      }
-    }
-  },
+  { files: ['src/**/*'], languageOptions: { globals: { ...globals.browser } } },
 
   {
     // Why doesn't ESLint do this by default is beyond me.
     files: ['**/*.cjs'],
-    languageOptions: {
-      sourceType: 'commonjs'
-    }
+    languageOptions: { sourceType: 'commonjs' }
   },
 
   {
     // Why doesn't ESLint do this by default is beyond me.
     files: ['**/*.mjs'],
-    languageOptions: {
-      sourceType: 'module'
-    }
+    languageOptions: { sourceType: 'module' }
   },
 
   {
@@ -105,4 +92,4 @@ const configs = [
   }
 ] as const satisfies Linter.Config[];
 
-export default configs;
+export default defineConfig(configs);
