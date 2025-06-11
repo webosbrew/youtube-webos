@@ -27,7 +27,6 @@ function setTime(show) {
     }`;
     document.head.appendChild(style);
     document.body.appendChild(watch);
-    document.querySelector('.webOs-watch').innerText = 'Okkkkk';
 
     setInterval(() => {
         const time = new Date();
