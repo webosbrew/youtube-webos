@@ -20,6 +20,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
+    // Emit
+    "emitDeclarationOnly": true,
     "outDir": "./node_modules/.cache/tsc_build"
   }
 }
