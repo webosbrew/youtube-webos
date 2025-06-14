@@ -1,0 +1,11 @@
+.webOs-watch {
+  position: fixed;
+  right: 0;
+  top: 0;
+  margin: 1rem 2rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  font-size: 1.2rem;
+  letter-spacing: 0.05rem;
+}
