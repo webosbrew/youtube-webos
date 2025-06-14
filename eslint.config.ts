@@ -76,13 +76,13 @@ const configs = [
 
   {
     // Why doesn't ESLint do this by default is beyond me.
-    files: ['**/*.cjs'],
+    files: ['**/*.c[jt]s'],
     languageOptions: { sourceType: 'commonjs' }
   },
 
   {
     // Why doesn't ESLint do this by default is beyond me.
-    files: ['**/*.mjs'],
+    files: ['**/*.m[jt]s'],
     languageOptions: { sourceType: 'module' }
   },
 
