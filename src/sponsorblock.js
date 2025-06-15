@@ -159,96 +159,60 @@ class SponsorBlockHandler {
     const videoDuration = this.video.duration;
 
     this.sliderSegmentsOverlay = document.createElement('div');
+    this.sliderSegmentsOverlay.className =
+      'ytaf-sponsorblock-segment-container';
+
     this.segments.forEach((segment) => {
       const [start, end] = segment.segment;
       const barType = barTypes[segment.category] || {
-        color: 'blue',
-        opacity: 0.7
+        color: 'blue'
       };
-      const transform = `translateX(${
-        (start / videoDuration) * 100.0
-      }%) scaleX(${(end - start) / videoDuration})`;
       const elm = document.createElement('div');
-      elm.classList.add('ytlr-progress-bar__played');
+      elm.className = 'ytaf-sponsorblock-segment';
       elm.style['background-color'] = barType.color;
-      elm.style['opacity'] = barType.opacity;
-      elm.style['-webkit-transform'] = transform;
-      console.info('Generated element', elm, 'from', segment, transform);
+      elm.style['left'] = `${(start / videoDuration) * 100.0}%`;
+      elm.style['width'] = `${((end - start) / videoDuration) * 100.0}%`;
       this.sliderSegmentsOverlay.appendChild(elm);
     });
 
-    const getSliderType = () => {
-      if (!this.slider) {
-        return null;
-      }
-
-      return this.slider.classList.contains(
-        'ytlr-multi-markers-player-bar-renderer'
-      )
-        ? 'multi-markers-player-bar'
-        : 'progress-bar';
-    };
-
-    const addSliderObserver = () => {
-      this.sliderObserver.observe(this.slider.parentNode, {
+    const addSliderObserver = (ele) => {
+      this.sliderObserver.observe(ele, {
         childList: true,
         subtree: true
       });
     };
 
     const addSliderOverlay = () => {
-      const sliderType = getSliderType();
-
-      // remove all styles from overlay
-      this.sliderSegmentsOverlay.removeAttribute('style');
-      this.sliderSegmentsOverlay.className = '';
-
-      switch (sliderType) {
-        case 'multi-markers-player-bar':
-          if (this.slider.parentNode) {
-            this.sliderSegmentsOverlay.style.top = '1.5rem';
-            this.sliderSegmentsOverlay.classList.add(
-              'ytlr-multi-markers-player-bar-renderer'
-            );
-            this.sliderSegmentsOverlay.classList.add(
-              'ytlr-multi-markers-player-bar-renderer__slider'
-            );
-
-            // add overlay just before playhead, so
-            // it is between the chapter layer and playhead
-            this.slider.parentNode.insertBefore(
-              this.sliderSegmentsOverlay,
-              document.querySelector('.ytlr-playhead')
-            );
-          } else {
-            console.info('slider without parent? video must have ended.');
-          }
-          break;
-
-        case 'progress-bar':
-          this.slider.appendChild(this.sliderSegmentsOverlay);
-          break;
-
-        default:
-          console.info('unknown slider type');
-          break;
-      }
+      this.slider.appendChild(this.sliderSegmentsOverlay);
     };
 
     const watchForSlider = () => {
       if (this.sliderInterval) clearInterval(this.sliderInterval);
 
       this.sliderInterval = setInterval(() => {
-        this.slider = document.querySelector(
-          '.ytlr-progress-bar__slider, .ytlr-multi-markers-player-bar-renderer'
-        );
-        if (this.slider) {
-          console.info('slider found...', this.slider);
-          clearInterval(this.sliderInterval);
-          this.sliderInterval = null;
-          addSliderObserver();
-          addSliderOverlay();
+        const nodes = document.querySelectorAll('[idomkey=progress-bar]');
+        const last = nodes[nodes.length - 1];
+        switch (nodes.length) {
+          case 3: {
+            // Slider has chapter markers.
+            this.slider = last;
+            break;
+          }
+          case 2: {
+            // Slider has no markers or auto-markers
+            this.slider = last.querySelector('[idomkey=slider]');
+            break;
+          }
+          default: {
+            return; // no slider found yet
+          }
         }
+
+        console.info('slider found...', this.slider);
+        clearInterval(this.sliderInterval);
+        this.sliderInterval = null;
+        addSliderObserver(last);
+        addSliderOverlay();
       }, 100);
     };
 

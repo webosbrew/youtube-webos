@@ -60,3 +60,41 @@
   padding: 0 1em;
   line-height: 0;
 }
+
+.ytaf-sponsorblock-segment-container {
+  top: 0%;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  position: absolute;
+  overflow: hidden;
+}
+
+// Fix: progress bar w/ chapter markers uses a different layout
+[idomkey='player-bar-renderer']
+  :not([idomkey='slider'])
+  .ytaf-sponsorblock-segment-container {
+  top: 25%;
+  height: 50%;
+}
+
+// Expand to overflow progress bar when focused
+[idomkey='progress-bar'].zylon-focus .ytaf-sponsorblock-segment-container {
+  top: -25%;
+  height: 150%;
+}
+
+.ytaf-sponsorblock-segment {
+  opacity: 0.7;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  border-radius: 9001px;
+  display: inline-block;
+}
+
+// Allow overlay segments to overflow
+[idomkey='slider'],
+[idomkey='progress-bar'] {
+  overflow: unset !important;
+}
