@@ -48,6 +48,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Hide YouTube logo'
     }
+  ],
+  [
+    'showWatch',
+    {
+      default: false,
+      desc: 'Display time in UI'
+    }
   ]
 ]);
 
