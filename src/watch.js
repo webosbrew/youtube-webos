@@ -1,66 +1,112 @@
 import { configRead, configAddChangeListener } from './config';
 import './watch.css';
 
-function setTime(show) {
-  if (!show) {
-    const watch = document.querySelector('.webOs-watch');
-    if (watch) {
-      watch.remove();
-    }
-    return;
+class Watch {
+  #watch;
+  #timer;
+  #domObserver;
+  #attrChanges;
+  #PLAYER_SELECTOR = 'ytlr-watch-default';
+
+  constructor() {
+    this.createElement();
+    this.startClock();
   }
 
-  const watch = document.createElement('div');
-  watch.innerHTML = '<div class="webOs-watch"></div>';
-  document.body.appendChild(watch);
+  createElement() {
+    this.#watch = document.createElement('div');
+    this.#watch.className = 'webOs-watch';
+    document.body.appendChild(this.#watch);
+  }
 
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeName === 'YT-LR-WATCH-DEFAULT') {
-            watch.style.display = 'none';
+  startClock() {
+    const nextSeg = (60 - new Date().getSeconds()) * 1000;
+
+    const setTime = () => {
+      this.#watch.innerText = new Intl.DateTimeFormat(navigator.language, {
+        hour: 'numeric',
+        minute: 'numeric'
+      }).format(new Date());
+    };
+
+    setTime();
+    setTimeout(() => {
+      setTime();
+      this.#timer = setInterval(setTime, 60000);
+    }, nextSeg);
+
+    const video = document.querySelector(this.#PLAYER_SELECTOR);
+
+    if (video === null) {
+      this.waitingVideo();
+    } else {
+      this.playerAppear(video);
+    }
+  }
+
+  playerAppear(video) {
+    this.#watch.style.display =
+      video.getAttribute('hybridnavfocusable') === 'true' ? 'none' : 'block';
+    this.playerObserver(video);
+  }
+
+  waitingVideo() {
+    this.#domObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (
+            node.nodeType === Node.ELEMENT_NODE &&
+            node.matches(this.#PLAYER_SELECTOR)
+          ) {
+            this.#domObserver.disconnect();
+            this.playerAppear(node);
           }
-        });
-      } else if (mutation.type === 'attributes') {
-        if (mutation.target.nodeName === 'YTLR-WATCH-DEFAULT') {
-          watch.style.display = mutation.target.clientHeight > 0 ? 'none' : '';
-        } else if (mutation.target.nodeName === 'YTLR-WATCH-METADATA') {
-          watch.style.display =
-            window.getComputedStyle(mutation.target).display == 'none'
-              ? 'none'
-              : '';
         }
       }
     });
-  });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true
-  });
-
-  const nextSeg = 1000 - new Date().getMilliseconds();
-
-  const setTime = () => {
-    window.requestAnimationFrame(() => {
-      document.querySelector('.webOs-watch').innerText =
-        new Intl.DateTimeFormat(navigator.language, {
-          hour: 'numeric',
-          minute: 'numeric'
-        }).format(new Date());
+    this.#domObserver.observe(document.body, {
+      childList: true,
+      subtree: true
     });
-  };
+  }
 
-  setTimeout(() => {
-    setTime();
-    setInterval(setTime, 60000);
-  }, nextSeg);
+  playerObserver(node) {
+    this.#attrChanges = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        const value = mutation.target.getAttribute('hybridnavfocusable');
+        // Hide watch when player is focused
+        this.#watch.style.display = value === 'true' ? 'none' : 'block';
+      }
+    });
+
+    this.#attrChanges.observe(node, {
+      attributes: true,
+      attributeFilter: ['hybridnavfocusable']
+    });
+  }
+
+  destroy() {
+    clearInterval(this.#timer);
+    this.#watch?.remove();
+    this.#domObserver?.disconnect();
+    this.#attrChanges?.disconnect();
+  }
 }
 
-setTime(configRead('showWatch'));
+let watchInstance = null;
+
+function toggleWatch(show) {
+  if (show) {
+    watchInstance = watchInstance ? watchInstance : new Watch();
+  } else {
+    watchInstance?.destroy();
+    watchInstance = null;
+  }
+}
+
+toggleWatch(configRead('showWatch'));
 
 configAddChangeListener('showWatch', (evt) => {
-  setTime(evt.detail.newValue);
+  toggleWatch(evt.detail.newValue);
 });
