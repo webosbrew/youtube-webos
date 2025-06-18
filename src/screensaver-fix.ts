@@ -8,7 +8,7 @@ import { waitForChildAdd } from './utils';
 /**
  * document.querySelector but waits for the Element to be added if it doesn't already exist.
  */
-async function requireElement<E extends typeof Element>(
+export async function requireElement<E extends typeof Element>(
   cssSelectors: string,
   expected: E
 ): Promise<InstanceType<E>> {

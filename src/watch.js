@@ -1,16 +1,17 @@
 import { configRead, configAddChangeListener } from './config';
 import './watch.css';
+import { requireElement } from './screensaver-fix.ts';
 
 class Watch {
   #watch;
   #timer;
-  #domObserver;
   #attrChanges;
   #PLAYER_SELECTOR = 'ytlr-watch-default';
 
   constructor() {
     this.createElement();
     this.startClock();
+    this.playerEvents();
   }
 
   createElement() {
@@ -22,11 +23,13 @@ class Watch {
   startClock() {
     const nextSeg = (60 - new Date().getSeconds()) * 1000;
 
+    const formater = new Intl.DateTimeFormat(navigator.language, {
+      hour: 'numeric',
+      minute: 'numeric'
+    });
+
     const setTime = () => {
-      this.#watch.innerText = new Intl.DateTimeFormat(navigator.language, {
-        hour: 'numeric',
-        minute: 'numeric'
-      }).format(new Date());
+      this.#watch.innerText = formater.format(new Date());
     };
 
     setTime();
@@ -34,49 +37,27 @@ class Watch {
       setTime();
       this.#timer = setInterval(setTime, 60000);
     }, nextSeg);
-
-    const video = document.querySelector(this.#PLAYER_SELECTOR);
-
-    if (video === null) {
-      this.waitingVideo();
-    } else {
-      this.playerAppear(video);
-    }
   }
 
   playerAppear(video) {
-    this.#watch.style.display =
-      video.getAttribute('hybridnavfocusable') === 'true' ? 'none' : 'block';
+    this.changeVisibility(video);
     this.playerObserver(video);
   }
 
-  waitingVideo() {
-    this.#domObserver = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (
-            node.nodeType === Node.ELEMENT_NODE &&
-            node.matches(this.#PLAYER_SELECTOR)
-          ) {
-            this.#domObserver.disconnect();
-            this.playerAppear(node);
-          }
-        }
-      }
-    });
+  changeVisibility(video) {
+    const focused = video.getAttribute('hybridnavfocusable') === 'true';
+    this.#watch.style.display = focused ? 'none' : 'block';
+  }
 
-    this.#domObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+  async playerEvents() {
+    const player = await requireElement(this.#PLAYER_SELECTOR, HTMLElement);
+    this.playerAppear(player);
   }
 
   playerObserver(node) {
     this.#attrChanges = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        const value = mutation.target.getAttribute('hybridnavfocusable');
-        // Hide watch when player is focused
-        this.#watch.style.display = value === 'true' ? 'none' : 'block';
+        this.changeVisibility(mutation.target);
       }
     });
 
@@ -89,7 +70,6 @@ class Watch {
   destroy() {
     clearInterval(this.#timer);
     this.#watch?.remove();
-    this.#domObserver?.disconnect();
     this.#attrChanges?.disconnect();
   }
 }
