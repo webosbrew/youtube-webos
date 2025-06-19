@@ -23,13 +23,13 @@ class Watch {
   startClock() {
     const nextSeg = (60 - new Date().getSeconds()) * 1000;
 
-    const formater = new Intl.DateTimeFormat(navigator.language, {
+    const formatter = new Intl.DateTimeFormat(navigator.language, {
       hour: 'numeric',
       minute: 'numeric'
     });
 
     const setTime = () => {
-      this.#watch.innerText = formater.format(new Date());
+      this.#watch.innerText = formatter.format(new Date());
     };
 
     setTime();
