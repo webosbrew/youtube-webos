@@ -55,10 +55,8 @@ class Watch {
   }
 
   playerObserver(node) {
-    this.#attrChanges = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        this.changeVisibility(mutation.target);
-      }
+    this.#attrChanges = new MutationObserver(() => {
+      this.changeVisibility(node);
     });
 
     this.#attrChanges.observe(node, {
