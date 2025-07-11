@@ -55,6 +55,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Display time in UI'
     }
+  ],
+  [
+    'enableScrollSeek',
+    {
+      default: true,
+      desc: 'Enable scroll seeking on the video'
+    }
   ]
 ]);
 
