@@ -1,46 +1,63 @@
-// src/scroll-seek-controls.js
-console.log('Module loaded');
-(function autoInitScrollSeek() {
-  let isScrollSeekInitialized = false;
+import { configAddChangeListener, configRead } from './config.js';
 
-  function setupScrollSeek() {
+// console.log('[ScrollSeek] Module loaded');
+
+(function initScrollSeekModule() {
+  let isInitialized = false;
+  let observer = null;
+  let video = null;
+  let onScroll = null;
+  let updateProgressUI = null;
+  let hideTimeout = null;
+
+  const DEBUG = false; // Set to true for verbose logs
+
+  function log(...args) {
+    if (DEBUG) console.log('[ScrollSeek]', ...args);
+  }
+
+  function getDynamicScrollStep() {
+    const duration = video?.duration || 600;
+    const percent = 0.01;
+    return Math.min(15, Math.max(3, duration * percent));
+  }
+
+  function isCarouselVisible() {
+    const visibleContainers = [
+      ...document.querySelectorAll('.ytVirtualListContainer')
+    ].filter((el) => {
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      return (
+        style.display !== 'none' &&
+        rect.width > 0 &&
+        rect.height > 0 &&
+        style.visibility !== 'hidden'
+      );
+    });
+    return visibleContainers.length > 0;
+  }
+
+  function enableScrollSeek() {
+    if (isInitialized) return;
+
     const container = document.querySelector('ytlr-progress-bar');
     const playhead = container?.querySelector('ytlr-playhead');
     const playedBar = container?.querySelector('.ytLrProgressBarPlayed');
     const slider = container?.querySelector('#slider');
-    let video = document.querySelector('video');
-    let hideTimeout = null;
+    video = document.querySelector('video');
 
     if (!container || !video) {
-      console.warn('[ScrollSeek] Missing video or progress bar');
-      return false;
-    }
-
-    if (isScrollSeekInitialized) {
-      return true;
-    }
-
-    function getDynamicScrollStep() {
-      const duration = video?.duration || 600;
-      const percent = 0.01;
-      const step = duration * percent;
-      return Math.min(15, Math.max(3, step));
-    }
-
-    function isCarouselVisible() {
-      const visibleContainers = [
-        ...document.querySelectorAll('.ytVirtualListContainer')
-      ].filter((el) => {
-        const style = window.getComputedStyle(el);
-        const rect = el.getBoundingClientRect();
-        return (
-          style.display !== 'none' &&
-          rect.width > 0 &&
-          rect.height > 0 &&
-          style.visibility !== 'hidden'
-        );
-      });
-      return visibleContainers.length > 0;
+      log('Missing elements, setting up observer...');
+      if (!observer) {
+        observer = new MutationObserver(() => {
+          if (!isInitialized && document.querySelector('video')) {
+            enableScrollSeek();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+      return;
     }
 
     function isProgressVisible() {
@@ -48,7 +65,7 @@ console.log('Module loaded');
       return playhead && style?.opacity !== '0' && style?.display !== 'none';
     }
 
-    function updateProgressUI() {
+    updateProgressUI = function () {
       if (!video || !isFinite(video.currentTime) || !isFinite(video.duration))
         return;
 
@@ -74,9 +91,9 @@ console.log('Module loaded');
         if (playedBar) playedBar.style.opacity = '0';
         if (slider) slider.style.opacity = '0';
       }, 2000);
-    }
+    };
 
-    function onScroll(event) {
+    onScroll = function (event) {
       if (!video || !isFinite(video.duration)) return;
 
       const carouselVisible = isCarouselVisible();
@@ -90,39 +107,59 @@ console.log('Module loaded');
 
       const step = getDynamicScrollStep();
       const delta = event.deltaY > 0 ? -step : step;
-
-      const newTime = Math.min(
+      video.currentTime = Math.min(
         Math.max(video.currentTime + delta, 0),
         video.duration
       );
-      video.currentTime = newTime;
 
       updateProgressUI();
-    }
+    };
 
     video.addEventListener('timeupdate', updateProgressUI);
     video.addEventListener('ended', updateProgressUI);
     document.addEventListener('wheel', onScroll, { passive: false });
 
-    isScrollSeekInitialized = true;
-    console.log('[✅] Scroll-seek initialized');
-    return true;
+    isInitialized = true;
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+
+    log('Scroll-seek enabled');
   }
 
-  // Run initially
-  if (!setupScrollSeek()) {
-    // Setup observer for dynamic video loading
-    const observer = new MutationObserver(() => {
-      if (!isScrollSeekInitialized && setupScrollSeek()) {
-        observer.disconnect(); // Stop observing once setup is successful
-      }
-    });
+  function disableScrollSeek() {
+    if (!isInitialized) return;
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    document.removeEventListener('wheel', onScroll, { passive: false });
+    if (video) {
+      video.removeEventListener('timeupdate', updateProgressUI);
+      video.removeEventListener('ended', updateProgressUI);
+    }
 
-    console.log('[⏳] Waiting for video to appear...');
+    clearTimeout(hideTimeout);
+
+    isInitialized = false;
+    video = null;
+    onScroll = null;
+    updateProgressUI = null;
+    hideTimeout = null;
+
+    log('Scroll-seek disabled');
   }
+
+  if (configRead('enableScrollSeek')) {
+    enableScrollSeek();
+  } else {
+    log('Scroll-seek is disabled at startup');
+  }
+
+  configAddChangeListener('enableScrollSeek', (evt) => {
+    const value = evt.detail?.newValue;
+    if (value) {
+      enableScrollSeek();
+    } else {
+      disableScrollSeek();
+    }
+  });
 })();
