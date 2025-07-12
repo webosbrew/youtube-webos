@@ -67,7 +67,7 @@ const configOptions = new Map([
     'enableScrollSeek',
     {
       default: true,
-      desc: 'Enable scroll seeking on the video'
+      desc: 'Enable video seeking with scroll-wheel'
     }
   ]
 ]);
