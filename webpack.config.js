@@ -1,13 +1,13 @@
 import CopyPlugin from 'copy-webpack-plugin';
 
-/** @type {(env: Record<string, string>) => (import('webpack').Configuration)[]} */
-const makeConfig = () => [
+/** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
+const makeConfig = (_env, argv) => [
   {
     /**
      * NOTE: Builds with devtool = 'eval' contain very big eval chunks which seem
      * to cause segfaults (at least) on nodeJS v0.12.2 used on webOS 3.x.
      */
-    devtool: 'source-map',
+    devtool: argv.mode === 'development' ? 'inline-source-map' : 'source-map',
 
     entry: {
       index: './src/index.js',

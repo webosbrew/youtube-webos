@@ -66,13 +66,18 @@ function rewriteURL(url: URL) {
   return url;
 }
 
-function parseCSSUrl(value: string) {
-  return new URL(value.slice(4, -1).replace(/["']/g, ''));
+function parseCSSUrl(value: string): URL | undefined {
+  try {
+    return new URL(value.slice(4, -1).replace(/["']/g, ''));
+  } catch (e) {
+    return undefined; // Not a valid URL
+  }
 }
 
 async function upgradeBgImg(element: HTMLElement) {
   const style = element.style;
   const old = parseCSSUrl(style.backgroundImage);
+  if (!old) return;
 
   const target = rewriteURL(old);
   if (!target) return;
@@ -85,6 +90,7 @@ async function upgradeBgImg(element: HTMLElement) {
     if (lazyLoader.naturalHeight === 90) return;
 
     const curr = parseCSSUrl(style.backgroundImage);
+    if (!curr) return;
 
     // Don't swap out element image if it has been changed while target image was loading.
     if (curr.href !== old.href) return;
