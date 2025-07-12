@@ -57,6 +57,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'forceHighResVideo',
+    {
+      default: false,
+      desc: 'Force max resolution video playback'
+    }
+  ],
+  [
     'enableScrollSeek',
     {
       default: true,
