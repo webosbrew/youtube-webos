@@ -1,7 +1,7 @@
 import { configAddChangeListener, configRead } from './config.js';
+import { requireElement } from './screensaver-fix.ts';
 
 class ScrollSeek {
-  #observer = null;
   #video = null;
   #onScroll = null;
   #updateProgressUI = null;
@@ -9,10 +9,7 @@ class ScrollSeek {
   #initialized = false;
 
   constructor() {
-    if (configRead('enableScrollSeek')) {
-      this.enable();
-    }
-
+    if (configRead('enableScrollSeek')) this.enable();
     configAddChangeListener('enableScrollSeek', (evt) => {
       evt.detail?.newValue ? this.enable() : this.disable();
     });
@@ -25,121 +22,104 @@ class ScrollSeek {
 
   #getDynamicScrollStep() {
     const duration = this.#video?.duration || 600;
-    const percent = 0.01;
-    return Math.min(15, Math.max(3, duration * percent));
+    return Math.min(15, Math.max(3, duration * 0.01));
   }
 
   #isCarouselVisible() {
-    const visibleContainers = [
-      ...document.querySelectorAll('.ytVirtualListContainer')
-    ].filter((el) => {
-      const style = window.getComputedStyle(el);
-      const rect = el.getBoundingClientRect();
-      return (
-        style.display !== 'none' &&
-        rect.width > 0 &&
-        rect.height > 0 &&
-        style.visibility !== 'hidden'
-      );
-    });
-    return visibleContainers.length > 0;
+    return [...document.querySelectorAll('.ytVirtualListContainer')].some(
+      (el) => {
+        const style = window.getComputedStyle(el);
+        const rect = el.getBoundingClientRect();
+        return (
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      }
+    );
   }
 
   #isProgressVisible(playhead) {
-    const style = playhead && window.getComputedStyle(playhead);
-    return playhead && style?.opacity !== '0' && style?.display !== 'none';
+    if (!playhead) return false;
+    const style = window.getComputedStyle(playhead);
+    return style.opacity !== '0' && style.display !== 'none';
   }
 
-  enable() {
+  async enable() {
     if (this.#initialized) return;
 
-    const container = document.querySelector('ytlr-progress-bar');
-    const playhead = container?.querySelector('ytlr-playhead');
-    const playedBar = container?.querySelector('.ytLrProgressBarPlayed');
-    const slider = container?.querySelector('#slider');
-    this.#video = document.querySelector('video');
+    try {
+      this.#video = await requireElement('video', HTMLVideoElement);
+      const container = await requireElement('ytlr-progress-bar', HTMLElement);
 
-    if (!container || !this.#video) {
-      this.#log('Missing elements, setting up observer...');
-      if (!this.#observer) {
-        this.#observer = new MutationObserver(() => {
-          if (!this.#initialized && document.querySelector('video')) {
-            this.enable();
-          }
-        });
-        this.#observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
-      }
-      return;
+      const playhead = container.querySelector('ytlr-playhead');
+      const playedBar = container.querySelector('.ytLrProgressBarPlayed');
+      const slider = container.querySelector('#slider');
+
+      this.#updateProgressUI = () => {
+        if (
+          !this.#video ||
+          !isFinite(this.#video.currentTime) ||
+          !isFinite(this.#video.duration)
+        ) {
+          return;
+        }
+
+        const percent = this.#video.currentTime / this.#video.duration;
+        const px = (container.offsetWidth || 1000) * percent;
+
+        if (playhead) {
+          playhead.style.transform = `translateX(${px}px)`;
+          playhead.style.opacity = '1';
+        }
+        if (playedBar) {
+          playedBar.style.transform = `translateX(0) scaleX(${percent})`;
+          playedBar.style.opacity = '1';
+        }
+        if (slider) {
+          slider.style.opacity = '1';
+        }
+
+        clearTimeout(this.#hideTimeout);
+        this.#hideTimeout = setTimeout(() => {
+          if (playhead) playhead.style.opacity = '0';
+          if (playedBar) playedBar.style.opacity = '0';
+          if (slider) slider.style.opacity = '0';
+        }, 2000);
+      };
+
+      this.#onScroll = (event) => {
+        if (!this.#video || !isFinite(this.#video.duration)) return;
+
+        const carouselVisible = this.#isCarouselVisible();
+        const progressVisible = this.#isProgressVisible(playhead);
+
+        if (carouselVisible && !progressVisible) return;
+
+        event.preventDefault();
+
+        const delta =
+          event.deltaY > 0
+            ? -this.#getDynamicScrollStep()
+            : this.#getDynamicScrollStep();
+        this.#video.currentTime = Math.min(
+          Math.max(this.#video.currentTime + delta, 0),
+          this.#video.duration
+        );
+
+        this.#updateProgressUI();
+      };
+
+      this.#video.addEventListener('timeupdate', this.#updateProgressUI);
+      this.#video.addEventListener('ended', this.#updateProgressUI);
+      document.addEventListener('wheel', this.#onScroll, { passive: false });
+
+      this.#initialized = true;
+      this.#log('ScrollSeek enabled');
+    } catch (err) {
+      this.#log('ScrollSeek failed to initialize:', err);
     }
-
-    this.#updateProgressUI = () => {
-      if (
-        !this.#video ||
-        !isFinite(this.#video.currentTime) ||
-        !isFinite(this.#video.duration)
-      )
-        return;
-
-      const percent = this.#video.currentTime / this.#video.duration;
-      const barWidth = container.offsetWidth || 1000;
-      const px = barWidth * percent;
-
-      if (playhead) {
-        playhead.style.transform = `translateX(${px}px)`;
-        playhead.style.opacity = '1';
-      }
-      if (playedBar) {
-        playedBar.style.transform = `translateX(0rem) scaleX(${percent})`;
-        playedBar.style.opacity = '1';
-      }
-      if (slider) {
-        slider.style.opacity = '1';
-      }
-
-      clearTimeout(this.#hideTimeout);
-      this.#hideTimeout = setTimeout(() => {
-        if (playhead) playhead.style.opacity = '0';
-        if (playedBar) playedBar.style.opacity = '0';
-        if (slider) slider.style.opacity = '0';
-      }, 2000);
-    };
-
-    this.#onScroll = (event) => {
-      if (!this.#video || !isFinite(this.#video.duration)) return;
-
-      const carouselVisible = this.#isCarouselVisible();
-      const progressVisible = this.#isProgressVisible(playhead);
-
-      if (carouselVisible && !progressVisible) return;
-
-      event.preventDefault();
-
-      const step = this.#getDynamicScrollStep();
-      const delta = event.deltaY > 0 ? -step : step;
-
-      this.#video.currentTime = Math.min(
-        Math.max(this.#video.currentTime + delta, 0),
-        this.#video.duration
-      );
-
-      this.#updateProgressUI();
-    };
-
-    this.#video.addEventListener('timeupdate', this.#updateProgressUI);
-    this.#video.addEventListener('ended', this.#updateProgressUI);
-    document.addEventListener('wheel', this.#onScroll, { passive: false });
-
-    this.#initialized = true;
-
-    if (this.#observer) {
-      this.#observer.disconnect();
-      this.#observer = null;
-    }
-
-    this.#log('Scroll-seek enabled');
   }
 
   disable() {
@@ -154,27 +134,25 @@ class ScrollSeek {
 
     clearTimeout(this.#hideTimeout);
 
-    this.#initialized = false;
     this.#video = null;
     this.#onScroll = null;
     this.#updateProgressUI = null;
     this.#hideTimeout = null;
+    this.#initialized = false;
 
-    this.#log('Scroll-seek disabled');
+    this.#log('ScrollSeek disabled');
   }
 }
 
-// Singleton-like instance management
 let scrollSeekInstance = null;
 
 function toggleScrollSeek(enable) {
   if (enable) {
-    scrollSeekInstance = scrollSeekInstance ?? new ScrollSeek();
+    if (!scrollSeekInstance) scrollSeekInstance = new ScrollSeek();
   } else {
     scrollSeekInstance?.disable();
     scrollSeekInstance = null;
   }
 }
 
-// Initial setup
 toggleScrollSeek(configRead('enableScrollSeek'));
