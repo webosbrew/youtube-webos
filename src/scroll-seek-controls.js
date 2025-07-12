@@ -26,7 +26,7 @@ class ScrollSeek {
   }
 
   #getStep = () =>
-    Math.min(45, Math.max(3, (this.#video?.duration || 600) * 0.01)); // 1% of duration, capped between 3 and 45 seconds
+    Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 1% of duration, capped between 3 and 100 seconds, remove the first arg if uncap MAX limit
 
   #updateUI = () => {
     if (!this.#video?.duration || !isFinite(this.#video.currentTime)) return;
