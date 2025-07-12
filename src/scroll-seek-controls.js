@@ -56,12 +56,8 @@ class ScrollSeek {
     }, 2000);
   };
 
-  #isVideoListVisible = () =>
-    !!document.querySelector('ytlr-section-list-renderer[aria-hidden="false"]');
-
   #handleScroll = (e) => {
     const now = Date.now();
-    if (this.#isVideoListVisible()) return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -96,10 +92,10 @@ class ScrollSeek {
     };
 
     const check = () => {
-      const focused = this.#container.classList.contains(
+      const isFocused = this.#container.classList.contains(
         'ytLrProgressBarFocused'
       );
-      if (focused) {
+      if (isFocused) {
         attach();
       } else {
         detach();
