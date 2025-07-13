@@ -21,13 +21,6 @@ class ScrollSeek {
   #containerWidth = 1000;
   #opts = { passive: false, capture: true };
 
-  constructor() {
-    if (configRead('enableScrollSeek')) this.enable();
-    configAddChangeListener('enableScrollSeek', (e) =>
-      e.detail?.newValue ? this.enable() : this.disable()
-    );
-  }
-
   #getStep = () =>
     Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 3% of video duration, capped between 3–100 seconds
 
@@ -63,14 +56,17 @@ class ScrollSeek {
     if (!this.#container) return;
 
     const attach = () => {
-      if (this.#scrollAttached) return;
-      window.addEventListener('wheel', this.#handleScroll, this.#opts);
-      this.#scrollAttached = true;
+      if (!this.#scrollAttached) {
+        window.addEventListener('wheel', this.#handleScroll, this.#opts);
+        this.#scrollAttached = true;
+      }
     };
+
     const detach = () => {
-      if (!this.#scrollAttached) return;
-      window.removeEventListener('wheel', this.#handleScroll, this.#opts);
-      this.#scrollAttached = false;
+      if (this.#scrollAttached) {
+        window.removeEventListener('wheel', this.#handleScroll, this.#opts);
+        this.#scrollAttached = false;
+      }
     };
 
     const check = () => {
@@ -102,10 +98,10 @@ class ScrollSeek {
       ]);
 
       this.#elPlayheadStyle =
-        this.#container.querySelector('ytlr-playhead').style;
+        this.#container.querySelector('ytlr-playhead')?.style;
       this.#elProgressBarStyle = this.#container.querySelector(
         '.ytLrProgressBarPlayed'
-      ).style;
+      )?.style;
 
       [this.#elPlayheadStyle, this.#elProgressBarStyle].forEach((elstyle) => {
         if (elstyle) elstyle.willChange = 'transform';
@@ -139,14 +135,18 @@ class ScrollSeek {
     }
 
     this.#observer?.disconnect();
+    this.#observer = null;
 
     ['timeupdate', 'ended'].forEach((ev) => {
       this.#video?.removeEventListener(ev, this.#updateUI);
     });
 
-    this.#video = this.#container = null;
-    this.#elPlayheadStyle = this.#elProgressBarStyle = null;
-    this.#scrollAttached = false;
+    this.#video = null;
+    this.#container = null;
+    this.#elPlayheadStyle = null;
+    this.#elProgressBarStyle = null;
+    this.#wasFocused = null;
+
     this.#initialized = false;
   }
 }
@@ -155,7 +155,10 @@ let scrollSeekInstance = null;
 
 export function toggleScrollSeek(enable) {
   if (enable) {
-    scrollSeekInstance ??= new ScrollSeek();
+    if (!scrollSeekInstance) {
+      scrollSeekInstance = new ScrollSeek();
+    }
+    scrollSeekInstance.enable();
   } else {
     scrollSeekInstance?.disable();
     scrollSeekInstance = null;
@@ -163,3 +166,7 @@ export function toggleScrollSeek(enable) {
 }
 
 toggleScrollSeek(configRead('enableScrollSeek'));
+
+configAddChangeListener('enableScrollSeek', (e) =>
+  toggleScrollSeek(e.detail?.newValue)
+);
