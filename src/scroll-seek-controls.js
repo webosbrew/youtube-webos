@@ -20,6 +20,7 @@ class ScrollSeek {
   #wasFocused = null;
   #containerWidth = 1000;
   #opts = { passive: false, capture: true };
+  #videoEvents = ['timeupdate', 'ended'];
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -124,7 +125,7 @@ class ScrollSeek {
       );
     }
 
-    ['timeupdate', 'ended'].forEach((ev) => {
+    this.#videoEvents.forEach((ev) => {
       this.#video.addEventListener(ev, this.#updateUI);
     });
 
@@ -132,7 +133,6 @@ class ScrollSeek {
     this.#watchProgressBarFocus();
 
     this.#initialized = true;
-    console.debug('[ScrollSeek] Enabled');
   }
 
   disable() {
@@ -143,7 +143,7 @@ class ScrollSeek {
     this.#observer?.disconnect();
     this.#observer = null;
 
-    ['timeupdate', 'ended'].forEach((ev) => {
+    this.#videoEvents.forEach((ev) => {
       this.#video?.removeEventListener(ev, this.#updateUI);
     });
 
@@ -154,7 +154,6 @@ class ScrollSeek {
     this.#wasFocused = null;
 
     this.#initialized = false;
-    console.debug('[ScrollSeek] Disabled');
   }
 }
 
