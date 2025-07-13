@@ -19,6 +19,7 @@ class ScrollSeek {
   #scrollAttached = false;
   #wasFocused = null;
   #containerWidth = 1000;
+  #opts = { passive: false, capture: true };
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -61,15 +62,14 @@ class ScrollSeek {
   #watchProgressBarFocus = () => {
     if (!this.#container) return;
 
-    const opts = { passive: false, capture: true };
     const attach = () => {
       if (this.#scrollAttached) return;
-      window.addEventListener('wheel', this.#handleScroll, opts);
+      window.addEventListener('wheel', this.#handleScroll, this.#opts);
       this.#scrollAttached = true;
     };
     const detach = () => {
       if (!this.#scrollAttached) return;
-      window.removeEventListener('wheel', this.#handleScroll, opts);
+      window.removeEventListener('wheel', this.#handleScroll, this.#opts);
       this.#scrollAttached = false;
     };
 
@@ -133,8 +133,10 @@ class ScrollSeek {
   disable() {
     if (!this.#initialized) return;
 
-    const opts = { passive: false, capture: true };
-    window.removeEventListener('wheel', this.#handleScroll, opts);
+    if (this.#scrollAttached) {
+      window.removeEventListener('wheel', this.#handleScroll, this.#opts);
+      this.#scrollAttached = false;
+    }
 
     this.#observer?.disconnect();
 
@@ -146,7 +148,6 @@ class ScrollSeek {
     this.#elPlayheadStyle = this.#elProgressBarStyle = null;
     this.#scrollAttached = false;
     this.#initialized = false;
-    this.#wasFocused = null;
   }
 }
 
