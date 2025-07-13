@@ -18,6 +18,7 @@ class ScrollSeek {
   #elPlayhead = null;
   #elProgressBar = null;
   #elSlider = null;
+  #scrollAttached = false;
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -54,7 +55,7 @@ class ScrollSeek {
     e.stopPropagation();
     e.stopImmediatePropagation?.();
 
-    if (now - this.#lastScroll < 100 || !this.#video?.duration) return;
+    if (now - this.#lastScroll < 250 || !this.#video?.duration) return; // debounce 250ms
     this.#lastScroll = now;
 
     const step = this.#getStep();
@@ -74,25 +75,26 @@ class ScrollSeek {
 
     const opts = { passive: false, capture: true };
     const attach = () => {
+      if (this.#scrollAttached) return;
       window.addEventListener('wheel', this.#handleScroll, opts);
+      this.#scrollAttached = true;
     };
     const detach = () => {
+      if (!this.#scrollAttached) return;
       window.removeEventListener('wheel', this.#handleScroll, opts);
+      this.#scrollAttached = false;
     };
 
     const check = () => {
       const isFocused = this.#container.classList.contains(
         'ytLrProgressBarFocused'
       );
-      if (isFocused) {
-        attach();
-      } else {
-        detach();
-      }
+      isFocused ? attach() : detach();
     };
 
     check();
 
+    this.#observer?.disconnect();
     this.#observer = new MutationObserver(check);
     this.#observer.observe(this.#container, {
       attributes: true,
@@ -137,7 +139,6 @@ class ScrollSeek {
 
     const opts = { passive: false, capture: true };
     window.removeEventListener('wheel', this.#handleScroll, opts);
-    document.removeEventListener('wheel', this.#handleScroll, opts);
 
     this.#observer?.disconnect();
 
@@ -147,6 +148,7 @@ class ScrollSeek {
 
     this.#video = this.#container = null;
     this.#elPlayhead = this.#elProgressBar = this.#elSlider = null;
+    this.#scrollAttached = false;
     this.#initialized = false;
   }
 }
