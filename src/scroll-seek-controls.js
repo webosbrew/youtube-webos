@@ -13,12 +13,12 @@ class ScrollSeek {
   #video = null;
   #container = null;
   #initialized = false;
-  #lastScroll = 0;
   #observer = null;
-  #elPlayhead = null;
-  #elProgressBar = null;
-  #elSlider = null;
+  #elPlayheadStyle = null;
+  #elProgressBarStyle = null;
   #scrollAttached = false;
+  #wasFocused = null;
+  #containerWidth = 1000;
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -28,35 +28,24 @@ class ScrollSeek {
   }
 
   #getStep = () =>
-    Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 3% of video duration, capped at 3 - 100 seconds
+    Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 3% of video duration, capped between 3–100 seconds
 
   #updateUI = () => {
     if (!this.#video?.duration || !isFinite(this.#video.currentTime)) return;
 
     const pct = this.#video.currentTime / this.#video.duration;
-    const px = (this.#container.offsetWidth || 1000) * pct;
+    const px = this.#containerWidth * pct;
 
-    const style = (el, transform) => {
-      if (el) {
-        el.style.transform = transform;
-        el.style.opacity = '1';
-      }
-    };
-
-    style(this.#elPlayhead, `translateX(${px}px)`);
-    style(this.#elProgressBar, `translateX(0) scaleX(${pct})`);
-    style(this.#elSlider, '');
+    this.#elPlayheadStyle.transform = `translateX(${px}px)`;
+    this.#elProgressBarStyle.transform = `translateX(0) scaleX(${pct})`;
   };
 
   #handleScroll = (e) => {
-    const now = Date.now();
-
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation?.();
 
-    if (now - this.#lastScroll < 250 || !this.#video?.duration) return; // debounce 250ms
-    this.#lastScroll = now;
+    if (!this.#video?.duration) return;
 
     const step = this.#getStep();
     const direction = e.deltaY > 0 ? -step : step;
@@ -67,7 +56,6 @@ class ScrollSeek {
     );
 
     this.#updateUI();
-    document.activeElement?.blur?.();
   };
 
   #watchProgressBarFocus = () => {
@@ -89,7 +77,10 @@ class ScrollSeek {
       const isFocused = this.#container.classList.contains(
         'ytLrProgressBarFocused'
       );
-      isFocused ? attach() : detach();
+      if (isFocused !== this.#wasFocused) {
+        this.#wasFocused = isFocused;
+        isFocused ? attach() : detach();
+      }
     };
 
     check();
@@ -110,11 +101,15 @@ class ScrollSeek {
         requireElement('ytlr-progress-bar', HTMLElement)
       ]);
 
-      this.#elPlayhead = this.#container.querySelector('ytlr-playhead');
-      this.#elProgressBar = this.#container.querySelector(
+      this.#elPlayheadStyle =
+        this.#container.querySelector('ytlr-playhead').style;
+      this.#elProgressBarStyle = this.#container.querySelector(
         '.ytLrProgressBarPlayed'
-      );
-      this.#elSlider = this.#container.querySelector('#slider');
+      ).style;
+
+      [this.#elPlayheadStyle, this.#elProgressBarStyle].forEach((elstyle) => {
+        if (elstyle) elstyle.willChange = 'transform';
+      });
 
       if (!isFinite(this.#video.duration)) {
         await new Promise((res) =>
@@ -126,6 +121,7 @@ class ScrollSeek {
         this.#video.addEventListener(ev, this.#updateUI);
       });
 
+      this.#containerWidth = this.#container.offsetWidth || 1000;
       this.#watchProgressBarFocus();
 
       this.#initialized = true;
@@ -147,9 +143,10 @@ class ScrollSeek {
     });
 
     this.#video = this.#container = null;
-    this.#elPlayhead = this.#elProgressBar = this.#elSlider = null;
+    this.#elPlayheadStyle = this.#elProgressBarStyle = null;
     this.#scrollAttached = false;
     this.#initialized = false;
+    this.#wasFocused = null;
   }
 }
 
