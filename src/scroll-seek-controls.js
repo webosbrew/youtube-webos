@@ -12,11 +12,12 @@ import { requireElement } from './player-api.ts';
 class ScrollSeek {
   #video = null;
   #container = null;
-  #hideTimeout = null;
   #initialized = false;
   #lastScroll = 0;
   #observer = null;
-  #videoObserver = null;
+  #elPlayhead = null;
+  #elProgressBar = null;
+  #elSlider = null;
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -26,14 +27,13 @@ class ScrollSeek {
   }
 
   #getStep = () =>
-    Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 1% of duration, capped between 3 and 100 seconds, remove the first arg if uncap MAX limit
+    Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 3% of video duration, capped at 3 - 100 seconds
 
   #updateUI = () => {
     if (!this.#video?.duration || !isFinite(this.#video.currentTime)) return;
 
     const pct = this.#video.currentTime / this.#video.duration;
     const px = (this.#container.offsetWidth || 1000) * pct;
-    const q = (sel) => this.#container.querySelector(sel);
 
     const style = (el, transform) => {
       if (el) {
@@ -42,18 +42,9 @@ class ScrollSeek {
       }
     };
 
-    style(q('ytlr-playhead'), `translateX(${px}px)`);
-    style(q('.ytLrProgressBarPlayed'), `translateX(0) scaleX(${pct})`);
-    style(q('#slider'), '');
-
-    clearTimeout(this.#hideTimeout);
-    this.#hideTimeout = setTimeout(() => {
-      ['ytlr-playhead', '.ytLrProgressBarPlayed', '#slider']
-        .map(q)
-        .forEach((el) => {
-          if (el) el.style.opacity = '0';
-        });
-    }, 2000);
+    style(this.#elPlayhead, `translateX(${px}px)`);
+    style(this.#elProgressBar, `translateX(0) scaleX(${pct})`);
+    style(this.#elSlider, '');
   };
 
   #handleScroll = (e) => {
@@ -84,11 +75,9 @@ class ScrollSeek {
     const opts = { passive: false, capture: true };
     const attach = () => {
       window.addEventListener('wheel', this.#handleScroll, opts);
-      document.addEventListener('wheel', this.#handleScroll, opts);
     };
     const detach = () => {
       window.removeEventListener('wheel', this.#handleScroll, opts);
-      document.removeEventListener('wheel', this.#handleScroll, opts);
     };
 
     const check = () => {
@@ -111,43 +100,6 @@ class ScrollSeek {
     });
   };
 
-  #watchVideoChanges = () => {
-    const checkVideo = async () => {
-      const el = await requireElement('video', HTMLVideoElement);
-      if (el === this.#video) return;
-
-      ['timeupdate', 'ended'].forEach((ev) => {
-        this.#video?.removeEventListener(ev, this.#updateUI);
-      });
-
-      this.#video = el;
-
-      if (!isFinite(this.#video.duration)) {
-        await new Promise((res) =>
-          this.#video.addEventListener('loadedmetadata', res, { once: true })
-        );
-      }
-
-      ['timeupdate', 'ended'].forEach((ev) => {
-        this.#video.addEventListener(ev, this.#updateUI);
-      });
-    };
-
-    const debouncedCheck = (() => {
-      let timeout = null;
-      return () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(checkVideo, 100);
-      };
-    })();
-
-    this.#videoObserver = new MutationObserver(debouncedCheck);
-    this.#videoObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  };
-
   async enable() {
     if (this.#initialized) return;
     try {
@@ -155,6 +107,12 @@ class ScrollSeek {
         requireElement('video', HTMLVideoElement),
         requireElement('ytlr-progress-bar', HTMLElement)
       ]);
+
+      this.#elPlayhead = this.#container.querySelector('ytlr-playhead');
+      this.#elProgressBar = this.#container.querySelector(
+        '.ytLrProgressBarPlayed'
+      );
+      this.#elSlider = this.#container.querySelector('#slider');
 
       if (!isFinite(this.#video.duration)) {
         await new Promise((res) =>
@@ -167,7 +125,6 @@ class ScrollSeek {
       });
 
       this.#watchProgressBarFocus();
-      this.#watchVideoChanges();
 
       this.#initialized = true;
     } catch (err) {
@@ -183,15 +140,13 @@ class ScrollSeek {
     document.removeEventListener('wheel', this.#handleScroll, opts);
 
     this.#observer?.disconnect();
-    this.#videoObserver?.disconnect();
-    this.#observer = this.#videoObserver = null;
 
     ['timeupdate', 'ended'].forEach((ev) => {
       this.#video?.removeEventListener(ev, this.#updateUI);
     });
 
-    clearTimeout(this.#hideTimeout);
     this.#video = this.#container = null;
+    this.#elPlayhead = this.#elProgressBar = this.#elSlider = null;
     this.#initialized = false;
   }
 }
