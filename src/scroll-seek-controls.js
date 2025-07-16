@@ -9,6 +9,8 @@ import { requireElement } from './player-api.ts';
  * based on the scroll direction and updates the UI accordingly.
  */
 
+const VIDEO_EVENTS = ['timeupdate', 'ended'];
+
 class ScrollSeek {
   #video = null;
   #container = null;
@@ -20,7 +22,6 @@ class ScrollSeek {
   #wasFocused = null;
   #containerWidth = 1000;
   #opts = { passive: false, capture: true };
-  #videoEvents = ['timeupdate', 'ended'];
 
   constructor() {
     if (configRead('enableScrollSeek')) this.enable();
@@ -44,7 +45,6 @@ class ScrollSeek {
 
   #handleScroll = (e) => {
     e.preventDefault();
-    e.stopPropagation();
     e.stopImmediatePropagation();
 
     if (!this.#video?.duration) return;
@@ -89,7 +89,6 @@ class ScrollSeek {
 
     this.#checkFocus();
 
-    this.#observer?.disconnect();
     this.#observer = new MutationObserver(this.#checkFocus);
     this.#observer.observe(this.#container, {
       attributes: true,
@@ -125,7 +124,7 @@ class ScrollSeek {
       );
     }
 
-    this.#videoEvents.forEach((ev) => {
+    VIDEO_EVENTS.forEach((ev) => {
       this.#video.addEventListener(ev, this.#updateUI);
     });
 
@@ -143,7 +142,7 @@ class ScrollSeek {
     this.#observer?.disconnect();
     this.#observer = null;
 
-    this.#videoEvents.forEach((ev) => {
+    VIDEO_EVENTS.forEach((ev) => {
       this.#video?.removeEventListener(ev, this.#updateUI);
     });
 
@@ -164,7 +163,6 @@ function toggleScrollSeek(enable) {
     if (!scrollSeekInstance) {
       scrollSeekInstance = new ScrollSeek();
     }
-    scrollSeekInstance.enable();
   } else {
     scrollSeekInstance?.disable();
     scrollSeekInstance = null;
