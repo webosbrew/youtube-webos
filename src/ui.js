@@ -7,6 +7,7 @@ import {
   configGetDesc
 } from './config.js';
 import './ui.css';
+import { requireElement } from './player-api.ts';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
@@ -26,7 +27,7 @@ const colorCodeMap = new Map([
   [170, 'yellow'],
 
   [406, 'blue'],
-  [191, 'blue']
+  [167, 'blue']
 ]);
 
 /**
@@ -188,7 +189,7 @@ const eventHandler = (evt) => {
   );
 
   if (getKeyColor(evt.charCode) === 'green') {
-    console.info('Taking over!');
+    console.info('Taking over : Options panel');
 
     evt.preventDefault();
     evt.stopPropagation();
@@ -198,6 +199,18 @@ const eventHandler = (evt) => {
       showOptionsPanel(!optionsPanelVisible);
     }
     return false;
+  }
+
+  if (getKeyColor(evt.charCode) === 'blue') {
+    console.info('Taking over : Audio Only mode');
+
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    if (evt.type === 'keydown') {
+      // Toggle Audio-Only mode.
+      initAudioOnlyToggle();
+    }
   }
   return true;
 };
@@ -279,6 +292,19 @@ function applyUIFixes() {
     });
   } catch (e) {
     console.error('error setting up <body> class observer:', e);
+  }
+}
+
+async function initAudioOnlyToggle() {
+  try {
+    const elVideo = await requireElement('video', HTMLVideoElement);
+    const elVideoVisi = elVideo.style.visibility === 'hidden';
+    elVideo.style.visibility = elVideoVisi ? '' : 'hidden';
+    const s = elVideoVisi ? 'Disabled' : 'Enabled';
+    console.log('Audio-only mode:', s);
+    showNotification('Audio-only mode: ' + s, 2000);
+  } catch {
+    console.warn('Failed to toggle audio-only mode');
   }
 }
 
