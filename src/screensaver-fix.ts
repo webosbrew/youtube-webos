@@ -3,7 +3,7 @@
  * the entire screen, the screensaver can be kick in.
  */
 
-import { requireElement } from './player-api';
+import { requireElement } from './player_api/helpers';
 
 function isPlayerHidden(video: HTMLVideoElement) {
   // Youtube uses display none sometimes along with a negative top to hide the HTMLVideoElement.
