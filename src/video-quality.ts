@@ -1,39 +1,38 @@
 import { configRead } from './config';
-import { getPlayer, PlayerState } from './player-api';
+import { getPlayerManager, PlayerMode } from './player_api';
+import type { EventMapOf, PlayerManager, VideoID } from './player_api';
 import { showNotification } from './ui';
 
-let player = await getPlayer();
-let timeout: number | null = null;
-let shouldNotify: boolean = false;
+const playerManager = await getPlayerManager();
 
-// `showNotification` with a debounce
-function notify(message: string) {
-  if (timeout) clearTimeout(timeout);
-
-  timeout = window.setTimeout(() => {
-    showNotification(message);
-    timeout = null;
-  }, 750);
+function shouldForce() {
+  return (
+    configRead('forceHighResVideo') &&
+    playerManager.playerMode !== PlayerMode.PREVIEW
+  );
 }
 
-function handlePlayerStateChange(state: PlayerState) {
-  if (!configRead('forceHighResVideo')) return;
+type EventMap = EventMapOf<PlayerManager>;
 
-  switch (state) {
-    case PlayerState.CUED:
-      shouldNotify = true;
-      player.setPlaybackQualityRange('highres', 'highres');
-      break;
-    case PlayerState.PLAYING: {
-      if (!shouldNotify) return;
+function handleNewVideo(this: PlayerManager, _: EventMap['newVideo']) {
+  if (!shouldForce()) return;
 
-      const selected = player.getPlaybackQualityLabel();
-      const max = player.getAvailableQualityData()[0]?.qualityLabel;
-      notify(`${selected} selected (Max ${max})`);
-      shouldNotify = false;
-      break;
-    }
-  }
+  this.player.setPlaybackQualityRange('highres', 'highres');
 }
 
-player.addEventListener('onStateChange', handlePlayerStateChange);
+function handlePlaybackStart(
+  this: PlayerManager,
+  _: EventMap['playbackStart']
+) {
+  if (!shouldForce()) return;
+
+  const player = this.player;
+
+  const selected = player.getPlaybackQualityLabel();
+  const max = player.getAvailableQualityData()[0]?.qualityLabel;
+
+  showNotification(`${selected} selected (Max ${max})`, 3000);
+}
+
+playerManager.addEventListener('newVideo', handleNewVideo);
+playerManager.addEventListener('playbackStart', handlePlaybackStart);

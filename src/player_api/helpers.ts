@@ -1,40 +1,6 @@
-import { waitForChildAdd } from './utils';
+import { waitForChildAdd } from '../utils';
 
-export enum PlayerState {
-  UNSTARTED = -1,
-  ENDED = 0,
-  PLAYING = 1,
-  PAUSED = 2,
-  BUFFERING = 3,
-  CUED = 5
-}
-
-interface YTPlayerEventMap extends HTMLElementEventMap {
-  onStateChange: PlayerState;
-}
-
-interface VideoQualityData {
-  formatId: string | undefined;
-  qualityLabel: string;
-  quality: string;
-  isPlayable: boolean;
-  paygatedQualityDetails?: unknown;
-}
-
-export interface YTPlayer extends HTMLElement {
-  addEventListener<K extends keyof YTPlayerEventMap>(
-    type: K,
-    listener: (this: YTPlayer, ev: YTPlayerEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
-  ): void;
-  // Player API does not support `removeEventListener`
-
-  getPlaybackQualityLabel(): string;
-
-  getAvailableQualityData(): VideoQualityData[];
-
-  setPlaybackQualityRange(min: string, max: string, formatId?: string): void;
-}
+import type { YTPlayer } from './yt-api';
 
 /**
  * document.querySelector but waits for the Element to be added if it doesn't already exist.
