@@ -76,8 +76,8 @@
 [idomkey='player-bar-renderer']
   :not([idomkey='slider'])
   .ytaf-sponsorblock-segment-container {
-  top: 25%;
-  height: 50%;
+  top: 0.1875rem;
+  height: 75%;
 }
 
 /* Expand to overflow progress bar when focused */
