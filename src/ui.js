@@ -7,7 +7,7 @@ import {
   configGetDesc
 } from './config.js';
 import './ui.css';
-import { requireElement } from './player-api.ts';
+import { requireElement } from './player_api/helpers';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
@@ -27,6 +27,7 @@ const colorCodeMap = new Map([
   [170, 'yellow'],
 
   [406, 'blue'],
+  [191, 'blue'],
   [167, 'blue']
 ]);
 
