@@ -23,13 +23,6 @@ class ScrollSeek {
   #containerWidth = 1000;
   #opts = { passive: false, capture: true };
 
-  constructor() {
-    if (configRead('enableScrollSeek')) this.enable();
-    configAddChangeListener('enableScrollSeek', (e) =>
-      e.detail?.newValue ? this.enable() : this.disable()
-    );
-  }
-
   #getStep = () =>
     Math.min(100, Math.max(3, (this.#video?.duration || 600) * 0.03)); // 3% of video duration, capped between 3–100 seconds
 
