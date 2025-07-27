@@ -1,6 +1,6 @@
 import { configRead, configAddChangeListener } from './config';
 import './watch.css';
-import { requireElement } from './player-api.ts';
+import { requireElement } from './player_api/helpers';
 
 class Watch {
   #watch;

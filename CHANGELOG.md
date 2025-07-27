@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.0] - 2025/07/25
+
+### Fixed
+
+- [#298](https://github.com/webosbrew/youtube-webos/pull/298): Remove ads from shorts reel (@pwNBait)
+- [#302](https://github.com/webosbrew/youtube-webos/pull/302): Fix sponsorblock segment overlay (@fire332)
+- [#304](https://github.com/webosbrew/youtube-webos/pull/304): Fix appearance of YTAF settings menu (@jesvijonathan)
+- [#308](https://github.com/webosbrew/youtube-webos/pull/308): Fix video quality not upgraded after transition from preview -> watch (@fire332)
+- [#305](https://github.com/webosbrew/youtube-webos/pull/305): Fix exceptions for new gradient cards in library tab (@fire332)
+- [#305](https://github.com/webosbrew/youtube-webos/pull/305): Fix exceptions in adblock.js (@fire332)
+
+### Added
+
+- [#299](https://github.com/webosbrew/youtube-webos/pull/299): Add option to display time in UI (@ChTosar)
+- [#305](https://github.com/webosbrew/youtube-webos/pull/305): Add option to force max video quality playback (@fire332)
+
 ## [0.3.8] - 2025/05/10
 
 ### Fixed
