@@ -1,7 +1,7 @@
 // src/scroll-seek-controls.js
 
 import { configAddChangeListener, configRead } from './config.js';
-import { requireElement } from './player-api.ts';
+import { requireElement } from './player_api/helpers';
 
 /**
  * ScrollSeek class to handle scroll seeking functionality in video players.
