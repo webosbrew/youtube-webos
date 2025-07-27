@@ -13,6 +13,10 @@
   width: 100% !important;
 }
 
+.ytLrWatchDefault2025Shadow {
+  background-color: rgba(11, 11, 11, 0.5) !important;
+}
+
 /* Fixes shorts thumbnails */
 .ytLrTileHeaderRendererShorts {
   z-index: -1;
