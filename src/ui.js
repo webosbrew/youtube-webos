@@ -27,8 +27,8 @@ const colorCodeMap = new Map([
   [170, 'yellow'],
 
   [406, 'blue'],
-  [191, 'blue'],
-  [167, 'blue']
+  [167, 'blue'],
+  [191, 'blue']
 ]);
 
 /**
