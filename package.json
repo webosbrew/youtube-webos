@@ -58,6 +58,7 @@
     "postcss-preset-env": "^10.2.3",
     "prettier": "^3.5.3",
     "style-loader": "^4.0.0",
+    "transform-async-modules-webpack-plugin": "^1.1.1",
     "typescript": "^5.8.3",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
