@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.4.1] - 2025/07/28
+
+### Fixed
+
+- [#313](https://github.com/webosbrew/youtube-webos/pull/313): Fix `async` keyword leaking into bundle (@fire332)
+
 ## [0.4.0] - 2025/07/25
 
 ### Fixed
