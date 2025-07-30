@@ -12,6 +12,7 @@ document.addEventListener(
   true
 );
 
+import './app_api/index';
 import './adblock.js';
 import './shorts.js';
 import './sponsorblock.js';
@@ -22,3 +23,4 @@ import './screensaver-fix';
 import './yt-fixes.css';
 import './watch.js';
 import './video-quality';
+import './lang-settings-fix';
