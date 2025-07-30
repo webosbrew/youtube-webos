@@ -1,0 +1,20 @@
+name: Other Issue
+description: My issue does not fit into any of the other categories.
+labels: ['needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **WARNING: Please read this carefully to avoid having your issue closed without a response.**
+
+        This form is for issues with youtube-webos (YTAF) that do not fit into any of the other categories.
+
+        If your issue is a bug or feature request, please use the appropriate form or your issue may be closed, and you will be asked to open a new issue with the correct form.
+  - type: textarea
+    id: other_description
+    attributes:
+      label: Description
+      description: Describe your issue in detail.
+      placeholder: I have a problem and it is not a bug or feature request...
+    validations:
+      required: true

@@ -1,0 +1,20 @@
+name: Feature Request
+description: There's a behavior in the default YouTube app that you would like to see modified, or you would like new functionality added to youtube-webos.
+labels: ['needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **WARNING: Please read this carefully to avoid having your issue closed without a response.**
+
+        This form is for requesting features or changes to youtube-webos (YTAF). That is, either (unwanted) behavior that occurs in the stock YouTube app that you would like to see modified by YTAF, or new functionality that you would like to see added to YTAF.
+
+        This form is not for reporting differences between what the stock YouTube app does and what YTAF does, or for reporting bugs in YTAF. For those, please use the [bug report form](https://github.com/webosbrew/youtube-webos/issues/new?template=1-bug.yml).
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Description
+      description: Describe the feature you would like to request in detail.
+      placeholder: It would be great if YTAF could...
+    validations:
+      required: true
