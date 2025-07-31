@@ -1,0 +1,105 @@
+name: Bug Report
+description: There's an issue/bug with functionality provided by youtube-webos, or there's a mismatch between what the stock YouTube app does and what youtube-webos does.
+labels: ['needs triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **WARNING: Please read this carefully to avoid submitting useless bug reports that will be closed without a response.**
+
+        This form is for reporting bugs or issues with youtube-webos (YTAF). That is, either features provided by youtube-webos (e.g. ad blocking, sponsorblock, etc.), or behavior that differs from the stock YouTube app.
+
+        This form is not for requesting changes to unwanted behavior that (also) occurs in the stock YouTube app. For that, please use the [feature request form](https://github.com/webosbrew/youtube-webos/issues/new?template=2-feature-req.yml).
+
+        Check existing issues to see if there is already one covering your problem.
+
+        The more information you include, the better.
+
+        If you do not include at least the YTAF version and enough information to determine your webOS version, your issue may be closed without a response.
+
+        However, you must include *at least* the YTAF (YouTube Ad-Free) version and:
+        - webOS version, or
+        - firmware version *and* either OTAID (preferred) or SoC
+  - type: input
+    id: ytaf_version
+    attributes:
+      label: YTAF Version
+      description: The version of the YTAF app you are using.
+      placeholder: e.g. 0.4.1
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        This information can all be found in /var/run/nyx/device_info.json and /var/run/nyx/os_info.json.
+
+        In `device_info.json`:
+          * SoC: `device_name`
+          * OTAID: `hardware_id`
+          * model: `product_id`
+
+        In `os_info.json`:
+          * webOS version: `core_os_release`
+          * firmware version: `webos_manufacturing_version`
+
+        If you do not have access to those files, the webOS version can always be found somewhere in the settings menu.
+  - type: input
+    id: webos_version
+    attributes:
+      label: webOS Version
+      description: This typically only contains a single digit between each dot and doesn't start with a zero.
+      placeholder: e.g. 6.3.2
+    validations:
+      required: false
+  - type: input
+    id: firmware_version
+    attributes:
+      label: Firmware Version
+      description: Sometimes referred to as "software version" in the TV's settings. This typically starts with a zero and contains two digits between each dot.
+      placeholder: e.g. 03.34.65
+    validations:
+      required: false
+  - type: input
+    id: otaid
+    attributes:
+      label: OTAID
+      placeholder: e.g. HE_DTV_W21P_AFADATAA
+    validations:
+      required: false
+  - type: input
+    id: soc
+    attributes:
+      label: SoC
+      description: The System on Chip (SoC) used in your TV.
+      placeholder: e.g. k7lp
+    validations:
+      required: false
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: The model of your TV.
+      placeholder: e.g. 50UP7670PUC
+    validations:
+      required: false
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Description
+      description: |
+        Describe the bug/issue and how to reproduce it. Provide as much information as possible. For example, include screenshots or links to videos that trigger the problem.
+
+        Please also check whether you are able to open the YTAF options panel using the green button and include that information here.
+    validations:
+      required: true
+  - type: dropdown
+    id: bug_priority
+    validations:
+      required: true
+    attributes:
+      label: Priority
+      description: How much does this bug affect you?
+      options:
+        - Barely noticeable, but still not nice.
+        - Annoying, but I can live with it.
+        - I'd rather use stock YouTube than deal with this.
