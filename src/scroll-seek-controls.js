@@ -155,6 +155,7 @@ function toggleScrollSeek(enable) {
   if (enable) {
     if (!scrollSeekInstance) {
       scrollSeekInstance = new ScrollSeek();
+      scrollSeekInstance.enable();
     }
   } else {
     scrollSeekInstance?.disable();
