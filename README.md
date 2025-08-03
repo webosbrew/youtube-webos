@@ -1,182 +1,212 @@
-# [Youtube-WebOS](https://github.com/webosbrew/youtube-webos)
+<h1 align="center">
+  <a href="https://github.com/webosbrew/youtube-webos">Youtube-WebOS</a>
+</h1>
 
-YouTube App for LG WebOS with Extended Functionalities
+<p align="center">
+  <img src="https://img.shields.io/github/stars/webosbrew/youtube-webos?style=flat-square&logo=github" alt="GitHub Stars">
+  <img src="https://img.shields.io/github/v/release/webosbrew/youtube-webos?style=flat-square" alt="Latest Release">
+  <br>
+  <img src="https://img.shields.io/github/contributors/webosbrew/youtube-webos?style=flat-square" alt="Contributors">
+  <img src="https://img.shields.io/github/downloads/webosbrew/youtube-webos/total?style=flat-square" alt="Total Downloads">
+  <img src="https://img.shields.io/badge/LG-webOS-000000?logo=webos&logoColor=white&style=flat-square" alt="webOS">
+</p>
+<br>
+<p align="center">
+  YouTube App for LG WebOS with Extended Functionalities
+</p>
+<br>
 
-![Configuration Screen](./screenshots/1_sm.jpg?raw=true)
+![Configuration Screen](./screenshots/1_sm.jpg?raw=true)  
 ![Segment Skipped](./screenshots/2_sm.jpg?raw=true)
+
+---
 
 ## Features
 
-- **Advertisements Blocking**
+- Ad Blocking
 - [SponsorBlock](https://sponsor.ajay.app/) Integration
-- [Autostart](#autostart)
-- Force Max-Video quality
-- Audio-Only Mode (Press 🟦 Blue Button on Remote)
-- Force Full Animation
-- Magic Remote Scroll based Video Seeking
-- YT Shorts Removal
-- Upgraded Thumbnail Quality
-- Display Time in Overlay
-- Remove Youtube Logo
-  <br>
+- [Autostart Support](#autostart)
+- Force highest video quality
+- Audio-Only Mode (🟦 Blue button on remote)
+- Full animation support
+- Magic Remote Scroll-based video seeking
+- Shorts removal
+- Higher-quality thumbnails
+- On-screen clock overlay
+- YouTube logo removal
 
-- **Note:** Configuration screen can be opened by pressing 🟩 GREEN button on the remote.
+> Press the 🟩 **Green** button on your remote to access the configuration screen.
 
-## Pre-Requisites
+---
 
-- Official YouTube app needs to be uninstalled before installation.
+## Requirements
+
+- Uninstall the official YouTube app before installing this one.
+
+---
 
 ## Installation
 
-- Use [WebOS Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel) - App is published in official webosbrew repo
-- Use [Device Manager](https://github.com/webosbrew/dev-manager-desktop) App - See [Releases](https://github.com/webosbrew/youtube-webos/releases) for a
-  prebuilt `.ipk` binary file
-- Use [WebOS TV CLI Tools](https://webostv.developer.lge.com/develop/tools/cli-installation) -
-  `ares-install youtube...ipk` (For more information on configuring the webOS CLI tools, see [below](#development-tv-setup))
+You can install the app using one of the following methods:
 
-## Configuration
+- **[WebOS Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel):**
+  App is available in the official webOSbrew repository.
+- **[Device Manager](https://github.com/webosbrew/dev-manager-desktop):**
+  Use a pre-built `.ipk` file from the [Releases](https://github.com/webosbrew/youtube-webos/releases) page.
+- **[Command Line (webOS CLI)](https://webostv.developer.lge.com/develop/tools/cli-installation):**
 
-Configuration screen can be opened by pressing 🟩 GREEN button on the remote.
+  ```sh
+  ares-install youtube-webos.ipk
+  ```
 
-### Autostart
+---
 
-In order to autostart an application the following command needs to be executed
-via SSH or Telnet:
+## Autostart
+
+To enable autostart, run:
 
 ```sh
 luna-send-pub -n 1 'luna://com.webos.service.eim/addDevice' '{"appId":"youtube.leanback.v4","pigImage":"","mvpdIcon":""}'
 ```
 
-This will make "YouTube AdFree" display as an eligible input application (next to HDMI/Live TV, etc...) and if it was the last selected input, it will be automatically launched when turning on the TV.
+This allows the app to show up as an input source and launch automatically if it was the last used app. It will remain active in the background for faster startup (minor increase in idle memory usage).
 
-This will also greatly increase startup performance, since it will be runnning constantly in the background, at the cost of increased idle memory usage. <small>(So far, relatively unnoticable in normal usage)</small>
-
-In order to disable autostart run this:
+To disable autostart:
 
 ```sh
 luna-send-pub -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
 
-## Building
+---
 
-- Clone the repository & move to project directory.
-
-  ```sh
-  git clone https://github.com/webosbrew/youtube-webos.git
-
-  cd youtube-webos
-  ```
-
-- Install dependencies & Build the App, this will generate a `*.ipk` file.
-
-  ```sh
-  # Install dependencies (need to do this only when updating local  repository / package.json is changed)
-  npm install
-
-  npm run build && npm run package
-  ```
-
-## Development TV setup
-
-These instructions use the [WebOS CLI tools](https://github.com/webos-tools/cli). See <https://webostv.developer.lge.com/develop/tools/cli-introduction> for more information.
-
-### Configuring WebOS CLI tools with Developer Mode App
-
-This is partially based on <https://webostv.developer.lge.com/develop/getting-started/developer-mode-app>.
-
-- Make sure you have webos-cli and tools installed :
-  - Uninstall existing or old unsupported webos-cli's
-    ```sh
-    # Make sure to uninstall existing or old webos-cli's  before installing new one
-    npm uninstall -g @webosose/ares-cli
-    npm install -g @webos-tools/cli
-    ```
-  - Install latest webos-cli from npm
-    ```sh
-    npm install -g @webos-tools/cli
-    ares -V
-    ```
-- Create an [LG Developer Account](https://webostv.developer.lge.com/login) you don't have one.
-- Install 'Developer Mode' app from LG Content Store
-- Navigate to 'Developer Mode' app. Enter your LG Developer Account credentials when propmted :
-  - Enable Developer Mode
-  - Enable key server
-- Configure the device using `ares-setup-device`, it will prompt you step-by-step :
-
-  - Procceed with `add` device, give in a `device_name` & go with default values, change any if required.
-  - When prompted for `IP`; enter the `IP` displayed in 'developer mode' app. Go with default `Port` & `Username`.
-  - Similarly, when prompted for `PASSPHRASE` enter the 6-character passphrase printed on screen in 'developer mode' app
-  - Once done, `save` your configuration & confirm your device entry with `ares-setup-device --list`.<br><br>
-
-  ```sh
-  PS C:\Users\Jesvi Jonathan\Documents\git\youtube-webos\dist> ares-setup-device --list
-  name            deviceinfo                     connection  profile    passphrase
-  --------------  -----------------------------  ----------  -------    ----------
-  mytv (default)  prisoner@192.168.137.102:9922  ssh         tv         EF32E8
-  emulator        developer@127.0.0.1:6622       ssh         tv
-  ```
-
-  <small>The newly configured TV-device should be visible. Yay !</small><br><br>
-
-- To build & launch
-
-  ```sh
-  # Navigate to 'dist' directory
-  cd ./dist
-
-  # remove old builds
-  rm ../*.ipk
-
-  # install dependancies (required only once)
-  npm install
-
-  # build project
-  npm run build
-  npm run package
-
-  # Make sure to modify below attributes <device_name> to a device name from 'ares-device-list'.
-  # & <ipk_file_name> to the actual exported ipk file's name. (Will present in main project directory after build)
-
-  # Install / Sideload IPK on TV
-  ares-install -d <device_name> ../<ipk_file_name>
-  # Launch app on TV
-  ares-launch -d <device_name> youtube.leanback.v4
-  # Debug & Inspect app
-  ares-inspect -d <device_name> --app youtube.leanback.v4
-  ```
-
-<br>
-And just like that, you are pretty much all set for development.
-
-### Configuring webOS CLI tools with Homebrew Channel / root
-
-- Enable SSH in Homebrew Channel app
-- Generate SSH key on developer machine (`ssh-keygen -t rsa`)
-- Copy the private key (`id_rsa`) to the `~/.ssh` directory (or `%USERPROFILE%\.ssh` on Windows) on the local computer
-- Append the public key (`id_rsa.pub`) to the `/home/root/.ssh/authorized_keys` file on the TV
-- Configure the device using `ares-setup-device` (`-a` may need to be replaced with `-m` if device named `webos` is already configured)
-  - `privatekey` path is relative to `${HOME}/.ssh` (Windows: `%USERPROFILE%\.ssh`)
+## Building from Source
 
 ```sh
-ares-setup-device -a webos -i "username=root" -i "privatekey=id_rsa" -i "passphrase=SSH_KEY_PASSPHRASE" -i "host=TV_IP" -i "port=22"
+git clone https://github.com/webosbrew/youtube-webos.git
+cd youtube-webos
+
+# Install dependencies
+npm install
+
+# Build and package the app
+npm run build
+npm run package
 ```
 
-## Installation
+The `.ipk` file will be generated in the main project directory.
+
+---
+
+## Development Setup (TV)
+
+Uses [webOS CLI tools](https://webostv.developer.lge.com/develop/tools/cli-introduction).
+
+### CLI Installation & Setup
+
+Delete any existing or older webOS CLI before installing the new one:
+
+```sh
+npm uninstall -g @webosose/ares-cli
+npm install -g @webos-tools/cli
+ares -V # verify installation
+```
+
+### On the TV
+
+1. Create an [LG Developer account](https://webostv.developer.lge.com/login)
+2. Install the [**Developer Mode** app](https://in.lgappstv.com/main/tvapp/detail?appId=232503) from the LG Content Store
+3. Navigate to the app, Log-in in with LG Developer Credentials and enable:
+   - Developer Mode
+   - Key Server
+
+### Configure CLI with TV
+
+```sh
+ares-setup-device
+```
+
+Follow the prompts:
+
+- Add device
+- Enter IP from the Developer Mode app
+- Use default values unless needed
+- Enter 6-digit passphrase shown on the TV screen
+
+Verify:
+
+```sh
+ares-setup-device --list
+```
+
+Sample output:
+
+```
+name            deviceinfo                     connection  profile    passphrase
+--------------  -----------------------------  ----------  -------    ----------
+mytv (default)  prisoner@192.168.137.102:9922  ssh         tv         EF32E8
+```
+
+---
+
+## Installing and Launching
+
+```sh
+# In project root
+npm install # not required if already done
+npm run build
+npm run package
+
+ares-install -d <device_name> <your_app_file>.ipk
+ares-launch -d <device_name> youtube.leanback.v4
+ares-inspect -d <device_name> --app youtube.leanback.v4
+```
+
+---
+
+## Alternate Setup (Homebrew / Rooted TV)
+
+1. Enable SSH via Homebrew Channel
+2. Generate SSH key:
+   ```sh
+   ssh-keygen -t rsa
+   ```
+3. Copy `id_rsa` to `~/.ssh` (Windows: `%USERPROFILE%\.ssh`)
+4. Append `id_rsa.pub` to `/home/root/.ssh/authorized_keys` on the TV
+5. Set up device:
+
+   ```sh
+   ares-setup-device -a webos \
+     -i "username=root" \
+     -i "privatekey=id_rsa" \
+     -i "passphrase=SSH_KEY_PASSPHRASE" \
+     -i "host=TV_IP" \
+     -i "port=22"
+   ```
+
+---
+
+## Quick Commands
+
+### Install & Launch
 
 ```sh
 npm run deploy
 ```
 
-## Launching
-
-- The app will be available in the TV's app list. You can also launch it using the webOS CLI tools.
+### Manual Launch
 
 ```sh
 npm run launch
 ```
 
-To jump immediately into some specific video use:
+To launch a specific video directly:
 
 ```sh
 npm run launch -- -p '{"contentTarget":"v=F8PGWLvn1mQ"}'
 ```
+
+---
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/webosbrew/youtube-webos.svg?variant=adaptive)](https://starchart.cc/webosbrew/youtube-webos)
