@@ -1,19 +1,19 @@
 # [Youtube-WebOS](https://github.com/webosbrew/youtube-webos)
 
-YouTube App with Extended Functionalities
+YouTube App for LG WebOS with Extended Functionalities
 
 ![Configuration Screen](./screenshots/1_sm.jpg?raw=true)
 ![Segment Skipped](./screenshots/2_sm.jpg?raw=true)
 
 ## Features
 
-- **Advertisements blocking**
-- [SponsorBlock](https://sponsor.ajay.app/) integration
+- **Advertisements Blocking**
+- [SponsorBlock](https://sponsor.ajay.app/) Integration
 - [Autostart](#autostart)
 - Force Max-Video quality
-- Audio-Only Mode (Press 🟩 Blue button on remote)
+- Audio-Only Mode (Press 🟦 Blue Button on Remote)
 - Force Full Animation
-- Magic Remote Scroll based video seeking
+- Magic Remote Scroll based Video Seeking
 - YT Shorts Removal
 - Upgraded Thumbnail Quality
 - Display Time in Overlay
@@ -61,20 +61,20 @@ luna-send-pub -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtub
 
 - Clone the repository & move to project directory.
 
-```sh
-git clone https://github.com/webosbrew/youtube-webos.git
+  ```sh
+  git clone https://github.com/webosbrew/youtube-webos.git
 
-cd youtube-webos
-```
+  cd youtube-webos
+  ```
 
-- Install dependancies & Build the App, this will generate a `*.ipk` file.
+- Install dependencies & Build the App, this will generate a `*.ipk` file.
 
-```sh
-# Install dependencies (need to do this only when updating local repository / package.json is changed)
-npm install
+  ```sh
+  # Install dependencies (need to do this only when updating local  repository / package.json is changed)
+  npm install
 
-npm run build && npm run package
-```
+  npm run build && npm run package
+  ```
 
 ## Development TV setup
 
@@ -88,26 +88,35 @@ This is partially based on <https://webostv.developer.lge.com/develop/getting-st
   - Uninstall existing or old unsupported webos-cli's
     ```sh
     # Make sure to uninstall existing or old webos-cli's  before installing new one
-    npm uninstall webos-cli
-    npm uninstall <>
+    npm uninstall -g @webosose/ares-cli
+    npm install -g @webos-tools/cli
     ```
   - Install latest webos-cli from npm
     ```sh
-    npm install webos-cli
-    ares --version
+    npm install -g @webos-tools/cli
+    ares -V
     ```
-- Create an [LG Developer Account](https://webostv.developer.lge.com/develop/getting-started/developer-mode-app) you don't have one.
+- Create an [LG Developer Account](https://webostv.developer.lge.com/login) you don't have one.
 - Install 'Developer Mode' app from LG Content Store
-- Navigate to 'Developer Mode' app. Enter your LG Developer Account credentials when propmted &
+- Navigate to 'Developer Mode' app. Enter your LG Developer Account credentials when propmted :
   - Enable Developer Mode
   - Enable key server
 - Configure the device using `ares-setup-device`, it will prompt you step-by-step :
 
-  - Procceed with `add` device & go with default values, change any if required.
+  - Procceed with `add` device, give in a `device_name` & go with default values, change any if required.
   - When prompted for `IP`; enter the `IP` displayed in 'developer mode' app. Go with default `Port` & `Username`.
   - Similarly, when prompted for `PASSPHRASE` enter the 6-character passphrase printed on screen in 'developer mode' app
-  - Once done, `save` your configuration & confirm your device entry with `ares-device-list`.
-    <small>The newly configured TV-device should be visible. Yay !</small>
+  - Once done, `save` your configuration & confirm your device entry with `ares-setup-device --list`.<br><br>
+
+  ```sh
+  PS C:\Users\Jesvi Jonathan\Documents\git\youtube-webos\dist> ares-setup-device --list
+  name            deviceinfo                     connection  profile    passphrase
+  --------------  -----------------------------  ----------  -------    ----------
+  mytv (default)  prisoner@192.168.137.102:9922  ssh         tv         EF32E8
+  emulator        developer@127.0.0.1:6622       ssh         tv
+  ```
+
+  <small>The newly configured TV-device should be visible. Yay !</small><br><br>
 
 - To build & launch
 
