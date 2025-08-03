@@ -104,3 +104,11 @@
 .ytaf-ui-sponsor {
   font-size: 0.9rem;
 }
+
+.ytaf-ui-version {
+  font-size: 0.6rem;
+  color: #656565;
+  position: absolute;
+  right: 2rem;
+  bottom: 1rem;
+}
