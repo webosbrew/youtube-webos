@@ -1,7 +1,7 @@
 <h1 align="center">
   <a href="https://github.com/webosbrew/youtube-webos">Youtube-WebOS</a>
 </h1>
-
+<!-- <br> -->
 <p align="center">
   <img src="https://img.shields.io/github/stars/webosbrew/youtube-webos?style=flat-square&logo=github" alt="GitHub Stars">
   <img src="https://img.shields.io/github/v/release/webosbrew/youtube-webos?style=flat-square" alt="Latest Release">
@@ -53,7 +53,7 @@ You can install the app using one of the following methods:
   App is available in the official webOSbrew repository.
 - **[Device Manager](https://github.com/webosbrew/dev-manager-desktop):**
   Use a pre-built `.ipk` file from the [Releases](https://github.com/webosbrew/youtube-webos/releases) page.
-- **[Command Line (webOS CLI)](https://webostv.developer.lge.com/develop/tools/cli-installation):**
+- **[Command Line (webOS CLI)](https://webostv.developer.lge.com/develop/tools/cli-installation):** Configure the tools [below](#development-tv-setup)
 
   ```sh
   ares-install youtube-webos.ipk
