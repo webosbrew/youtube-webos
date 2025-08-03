@@ -223,7 +223,7 @@ const COLOR_MAP = {
   green: 'rgba(0, 162, 0, 0.9)',
   yellow: 'rgba(255, 255, 0, 0.9)',
   blue: 'rgba(0, 128, 255, 0.9)',
-  grey: 'rgba(51, 51, 51, 0.5)',
+  grey: 'rgba(255, 255, 255, 0.5)',
   none: 'rgba(0, 0, 0, 0)'
 };
 
