@@ -1,5 +1,4 @@
-/*global navigate*/
-/* global __YTAF_VERSION__ */
+/* global navigate, __YTAF_VERSION__ */
 import './spatial-navigation-polyfill.js';
 import {
   configAddChangeListener,
