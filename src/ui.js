@@ -218,7 +218,16 @@ document.addEventListener('keydown', eventHandler, true);
 document.addEventListener('keypress', eventHandler, true);
 document.addEventListener('keyup', eventHandler, true);
 
-export function showNotification(text, time = 3000) {
+const COLOR_MAP = {
+  red: 'rgba(255, 0, 0, 0.9)',
+  green: 'rgba(0, 162, 0, 0.9)',
+  yellow: 'rgba(255, 255, 0, 0.9)',
+  blue: 'rgba(0, 128, 255, 0.9)',
+  grey: 'rgba(51, 51, 51, 0.5)',
+  none: 'rgba(0, 0, 0, 0)'
+};
+
+export function showNotification(text, color = 'grey', time = 3000) {
   if (!document.querySelector('.ytaf-notification-container')) {
     console.info('Adding notification container');
     const c = document.createElement('div');
@@ -233,6 +242,7 @@ export function showNotification(text, time = 3000) {
   elmInner.classList.add('message-hidden');
   elm.appendChild(elmInner);
   document.querySelector('.ytaf-notification-container').appendChild(elm);
+  elmInner.style.borderColor = COLOR_MAP[color] || color;
 
   setTimeout(() => {
     elmInner.classList.remove('message-hidden');
@@ -299,12 +309,16 @@ async function initAudioOnlyToggle() {
   const elVideoVisi = elVideo.style.visibility === 'hidden';
   elVideo.style.visibility = elVideoVisi ? '' : 'hidden';
   const s = elVideoVisi ? 'Disabled' : 'Enabled';
-  showNotification('Audio-only mode: ' + s, 2000);
+  showNotification('Audio-only mode: ' + s, 'blue', 2000);
 }
 
 applyUIFixes();
 initHideLogo();
 
 setTimeout(() => {
-  showNotification('Press [GREEN] to open YTAF configuration screen');
-}, 2000);
+  showNotification(
+    'Press [GREEN] to open YTAF configuration screen',
+    'green',
+    2000
+  );
+});
