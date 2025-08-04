@@ -1,7 +1,7 @@
 import CopyPlugin from 'copy-webpack-plugin';
 import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
-import webpack from 'webpack';
+import { DefinePlugin } from 'webpack';
 
 /** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
 const makeConfig = (_env, argv) => [
@@ -75,7 +75,7 @@ const makeConfig = (_env, argv) => [
           version: pkgJson.devDependencies['@babel/plugin-transform-runtime']
         }
       }),
-      new webpack.DefinePlugin({
+      new DefinePlugin({
         __YTAF_VERSION__: JSON.stringify(pkgJson.version)
       })
     ]
