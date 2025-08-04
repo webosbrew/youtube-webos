@@ -1,4 +1,4 @@
-/*global navigate*/
+/*global navigate, __YTAF_VERSION__*/
 import './spatial-navigation-polyfill.js';
 import {
   configAddChangeListener,
@@ -147,6 +147,10 @@ function createOptionsPanel() {
   elmSponsorLink.innerHTML =
     '<small class="ytaf-ui-sponsor">Sponsor segments skipping - https://sponsor.ajay.app</small>';
   elmContainer.appendChild(elmSponsorLink);
+
+  const elmVersion = document.createElement('div');
+  elmVersion.innerHTML = `<div class="ytaf-ui-version">v${__YTAF_VERSION__}</div>`;
+  elmContainer.appendChild(elmVersion);
 
   return elmContainer;
 }

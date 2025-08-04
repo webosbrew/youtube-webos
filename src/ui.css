@@ -4,14 +4,14 @@
   left: 10%;
   right: 10%;
   bottom: 10%;
-
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
+  background: rgba(18, 18, 18, 0.9);
+  backdrop-filter: blur(23px);
   color: white;
   border-radius: 20px;
   padding: 1em;
   font-size: 1.4rem;
   z-index: 1000;
+  border: 0.1rem solid rgb(52 52 52);
 }
 
 .ytaf-ui-container :focus {
@@ -103,4 +103,12 @@
 
 .ytaf-ui-sponsor {
   font-size: 0.9rem;
+}
+
+.ytaf-ui-version {
+  font-size: 0.7rem;
+  color: #656565;
+  position: absolute;
+  right: 2rem;
+  bottom: 1rem;
 }
