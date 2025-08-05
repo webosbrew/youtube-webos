@@ -62,6 +62,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Force max resolution video playback'
     }
+  ],
+  [
+    'enableScrollSeek',
+    {
+      default: true,
+      desc: 'Enable video seeking with scroll-wheel'
+    }
   ]
 ]);
 
