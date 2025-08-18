@@ -1,4 +1,4 @@
-/*global navigate*/
+/*global navigate, __YTAF_VERSION__*/
 import './spatial-navigation-polyfill.js';
 import {
   configAddChangeListener,
@@ -120,7 +120,7 @@ function createOptionsPanel() {
   );
 
   const elmHeading = document.createElement('h1');
-  elmHeading.textContent = 'webOS YouTube Extended';
+  elmHeading.textContent = 'WebOS YouTube Extended';
   elmContainer.appendChild(elmHeading);
 
   elmContainer.appendChild(createConfigCheckbox('enableAdBlock'));
@@ -147,6 +147,12 @@ function createOptionsPanel() {
   elmSponsorLink.innerHTML =
     '<small class="ytaf-ui-sponsor">Sponsor segments skipping - https://sponsor.ajay.app</small>';
   elmContainer.appendChild(elmSponsorLink);
+
+  const version = document.createElement('div');
+  version.className = 'ytaf-ui-version';
+  version.textContent = `v${__YTAF_VERSION__ || '.X'}`;
+
+  elmContainer.appendChild(version);
 
   return elmContainer;
 }
