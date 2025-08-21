@@ -41,3 +41,4 @@ import './watch.js';
 import './video-quality';
 import './lang-settings-fix';
 import './remove-endscreen';
+import './scroll-seek-controls.js';

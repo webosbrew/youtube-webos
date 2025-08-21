@@ -69,6 +69,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Remove end screens from video'
     }
+  ],
+  [
+    'enableScrollSeek',
+    {
+      default: true,
+      desc: 'Enable video seeking with scroll-wheel'
+    }
   ]
 ]);
 
