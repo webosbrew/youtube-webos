@@ -83,10 +83,10 @@ class SponsorBlockHandler {
     const results = await resp.json();
 
     const result = results.find((v) => v.videoID === this.videoID);
-    console.info(this.videoID, 'Got it:', result);
+    console.debug(this.videoID, 'Got it:', result);
 
     if (!result || !result.segments || !result.segments.length) {
-      console.info(this.videoID, 'No segments found.');
+      console.debug(this.videoID, 'No segments found.');
       return;
     }
 
@@ -132,12 +132,12 @@ class SponsorBlockHandler {
 
     this.video = document.querySelector('video');
     if (!this.video) {
-      console.info(this.videoID, 'No video yet...');
+      console.debug(this.videoID, 'No video yet...');
       this.attachVideoTimeout = setTimeout(() => this.attachVideo(), 100);
       return;
     }
 
-    console.info(this.videoID, 'Video found, binding...');
+    console.debug(this.videoID, 'Video found, binding...');
 
     this.video.addEventListener('play', this.scheduleSkipHandler);
     this.video.addEventListener('pause', this.scheduleSkipHandler);
@@ -147,12 +147,12 @@ class SponsorBlockHandler {
 
   buildOverlay() {
     if (this.sliderSegmentsOverlay) {
-      console.info('Overlay already built');
+      console.debug('Overlay already built');
       return;
     }
 
     if (!this.video || !this.video.duration) {
-      console.info('No video duration yet');
+      console.debug('No video duration yet');
       return;
     }
 
@@ -208,7 +208,7 @@ class SponsorBlockHandler {
           }
         }
 
-        console.info('slider found...', this.slider);
+        console.debug('slider found...', this.slider);
         clearInterval(this.sliderInterval);
         this.sliderInterval = null;
         addSliderObserver(last);
@@ -221,11 +221,11 @@ class SponsorBlockHandler {
         if (m.removedNodes) {
           for (const node of m.removedNodes) {
             if (node === this.sliderSegmentsOverlay) {
-              console.info('bringing back segments overlay');
+              console.debug('bringing back segments overlay');
               addSliderOverlay();
             }
             if (node === this.slider) {
-              console.info('slider removed, watching again');
+              console.debug('slider removed, watching again');
               this.sliderObserver.disconnect();
               watchForSlider();
             }
@@ -242,12 +242,12 @@ class SponsorBlockHandler {
     this.nextSkipTimeout = null;
 
     if (!this.active) {
-      console.info(this.videoID, 'No longer active, ignoring...');
+      console.debug(this.videoID, 'No longer active, ignoring...');
       return;
     }
 
     if (this.video.paused) {
-      console.info(this.videoID, 'Currently paused, ignoring...');
+      console.debug(this.videoID, 'Currently paused, ignoring...');
       return;
     }
 
@@ -262,13 +262,13 @@ class SponsorBlockHandler {
     nextSegments.sort((s1, s2) => s1.segment[0] - s2.segment[0]);
 
     if (!nextSegments.length) {
-      console.info(this.videoID, 'No more segments');
+      console.debug(this.videoID, 'No more segments');
       return;
     }
 
     const [segment] = nextSegments;
     const [start, end] = segment.segment;
-    console.info(
+    console.debug(
       this.videoID,
       'Scheduling skip of',
       segment,
@@ -279,11 +279,11 @@ class SponsorBlockHandler {
     this.nextSkipTimeout = setTimeout(
       () => {
         if (this.video.paused) {
-          console.info(this.videoID, 'Currently paused, ignoring...');
+          console.debug(this.videoID, 'Currently paused, ignoring...');
           return;
         }
         if (!this.skippableCategories.includes(segment.category)) {
-          console.info(
+          console.debug(
             this.videoID,
             'Segment',
             segment.category,
@@ -293,7 +293,7 @@ class SponsorBlockHandler {
         }
 
         const skipName = barTypes[segment.category]?.name || segment.category;
-        console.info(this.videoID, 'Skipping', segment);
+        console.debug(this.videoID, 'Skipping', segment);
         showNotification(`Skipping ${skipName}`);
         this.video.currentTime = end;
         this.scheduleSkip();
@@ -303,7 +303,7 @@ class SponsorBlockHandler {
   }
 
   destroy() {
-    console.info(this.videoID, 'Destroying');
+    console.debug(this.videoID, 'Destroying');
 
     this.active = false;
 
@@ -372,7 +372,7 @@ window.addEventListener(
     // it from attaching to playback preview video element loaded on
     // home page
     if (newURL.pathname !== '/watch' && window.sponsorblock) {
-      console.info('uninitializing sponsorblock on a non-video page');
+      console.debug('uninitializing sponsorblock on a non-video page');
       uninitializeSponsorblock();
       return;
     }
@@ -382,7 +382,7 @@ window.addEventListener(
       videoID &&
       (!window.sponsorblock || window.sponsorblock.videoID != videoID);
 
-    console.info(
+    console.debug(
       'hashchange',
       videoID,
       window.sponsorblock,
