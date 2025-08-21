@@ -4,26 +4,37 @@ import { configRead } from './config';
 
 /**
  * This is a minimal reimplementation of the following uBlock Origin rule:
- * https://github.com/uBlockOrigin/uAssets/blob/3497eebd440f4871830b9b45af0afc406c6eb593/filters/filters.txt#L116
- *
- * This in turn calls the following snippet:
- * https://github.com/gorhill/uBlock/blob/bfdc81e9e400f7b78b2abc97576c3d7bf3a11a0b/assets/resources/scriptlets.js#L365-L470
- *
- * Seems like for now dropping just the adPlacements is enough for YouTube TV
+ * https://github.com/uBlockOrigin/uAssets/blob/master/filters/filters.txt
  */
 const origParse = JSON.parse;
 JSON.parse = function () {
+  /** @type {unknown} */
   const r = origParse.apply(this, arguments);
+
+  // TODO: add below to a dump-level logger
+  // if (
+  //   !(Object.keys(r).length === 1 && 'data' in r && typeof r.data === 'boolean')
+  // ) {
+  //   console.debug('JSON.parse', r);
+  // }
+
   if (!configRead('enableAdBlock')) {
     return r;
   }
 
-  if (r.adPlacements) {
-    r.adPlacements = [];
+  if (r?.adPlacements) {
+    delete r.adPlacements;
+    console.info('[adblock] Removed adPlacements');
   }
 
-  if (Array.isArray(r.adSlots)) {
-    r.adSlots = [];
+  if (Array.isArray(r?.adSlots)) {
+    delete r.adSlots;
+    console.info('[adblock] Removed adSlots');
+  }
+
+  if (r?.playerAds) {
+    delete r.playerAds;
+    console.info('[adblock] Removed playerAds');
   }
 
   // remove ads from home
@@ -46,7 +57,7 @@ JSON.parse = function () {
     removeAdSlotRenderer(searchSectionListRenderer);
   }
 
-  if (r?.entries instanceof Array) {
+  if (Array.isArray(r?.entries)) {
     r.entries = r.entries.filter(
       (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
     );
