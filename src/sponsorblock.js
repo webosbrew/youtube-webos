@@ -294,7 +294,7 @@ class SponsorBlockHandler {
 
         const skipName = barTypes[segment.category]?.name || segment.category;
         console.debug(this.videoID, 'Skipping', segment);
-        showNotification(`Skipping ${skipName}`);
+        showNotification(`Skipping ${skipName}`, 'indigo', 2000);
         this.video.currentTime = end;
         this.scheduleSkip();
       },

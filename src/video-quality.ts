@@ -31,7 +31,7 @@ function handlePlaybackStart(
   const selected = player.getPlaybackQualityLabel();
   const max = player.getAvailableQualityData()[0]?.qualityLabel;
 
-  showNotification(`${selected} selected (Max ${max})`, 3000);
+  showNotification(`${selected} selected (Max ${max})`, 'grey', 3000);
 }
 
 playerManager.addEventListener('newVideo', handleNewVideo);
