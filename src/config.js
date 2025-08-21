@@ -64,6 +64,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'removeEndscreen',
+    {
+      default: false,
+      desc: 'Remove end screens from video'
+    }
+  ],
+  [
     'enableScrollSeek',
     {
       default: true,

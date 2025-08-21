@@ -14,7 +14,7 @@ const makeConfig = (_env, argv) => [
     entry: {
       index: './src/index.js',
       userScript: {
-        import: './src/userScript.js',
+        import: './src/userScript',
         filename: 'webOSUserScripts/[name].js'
       }
     },
