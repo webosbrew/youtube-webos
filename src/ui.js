@@ -7,15 +7,13 @@ import {
   configGetDesc
 } from './config.js';
 import './ui.css';
+import { requireElement } from './player_api/helpers';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
 
 const ARROW_KEY_CODE = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
 
-// Red, Green, Yellow, Blue
-// 403,   404,    405,  406
-// ---,   172,    170,  191
 const colorCodeMap = new Map([
   [403, 'red'],
 
@@ -26,6 +24,7 @@ const colorCodeMap = new Map([
   [170, 'yellow'],
 
   [406, 'blue'],
+  [167, 'blue'],
   [191, 'blue']
 ]);
 
@@ -199,6 +198,15 @@ const eventHandler = (evt) => {
       showOptionsPanel(!optionsPanelVisible);
     }
     return false;
+  } else if (getKeyColor(evt.charCode) === 'blue') {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    if (evt.type === 'keydown') {
+      // Toggle Audio-Only mode.
+      initAudioOnlyToggle();
+    }
+    return false;
   }
   return true;
 };
@@ -207,7 +215,16 @@ document.addEventListener('keydown', eventHandler, true);
 document.addEventListener('keypress', eventHandler, true);
 document.addEventListener('keyup', eventHandler, true);
 
-export function showNotification(text, time = 3000) {
+const COLOR_MAP = {
+  red: 'rgba(255, 0, 0, 0.9)',
+  green: 'rgba(0, 162, 0, 0.9)',
+  yellow: 'rgba(255, 255, 0, 0.9)',
+  blue: 'rgba(0, 128, 255, 0.9)',
+  grey: 'rgba(255, 255, 255, 0.5)',
+  none: 'rgba(0, 0, 0, 0)'
+};
+
+export function showNotification(text, time = 3000, color = 'grey') {
   if (!document.querySelector('.ytaf-notification-container')) {
     console.debug('Adding notification container');
     const c = document.createElement('div');
@@ -222,6 +239,7 @@ export function showNotification(text, time = 3000) {
   elmInner.classList.add('message-hidden');
   elm.appendChild(elmInner);
   document.querySelector('.ytaf-notification-container').appendChild(elm);
+  elmInner.style.borderColor = COLOR_MAP[color] || color;
 
   setTimeout(() => {
     elmInner.classList.remove('message-hidden');
@@ -283,9 +301,77 @@ function applyUIFixes() {
   }
 }
 
+let audioOnlyEnabled = false;
+let overlayObserver = null;
+
+async function initAudioOnlyToggle() {
+  const elVideo = await requireElement('video', HTMLVideoElement);
+
+  audioOnlyEnabled = !audioOnlyEnabled;
+  elVideo.style.visibility = audioOnlyEnabled ? 'hidden' : '';
+
+  const AUDIO_OVERLAY_SELECTOR = '.ytLrAudioPlayerOverlayAudioMode';
+  const YTAF_OVERLAY_CLASS = 'ytaf-ui-watchControl-overlayMessage';
+
+  const applyAudioOverlayFilter = () => {
+    const node = document.querySelector(AUDIO_OVERLAY_SELECTOR);
+    if (!node) return;
+    if (audioOnlyEnabled) {
+      node.style.setProperty('filter', 'brightness(0)', 'important');
+    } else {
+      node.style.removeProperty('filter');
+    }
+  };
+  applyAudioOverlayFilter();
+
+  showNotification(
+    `Audio-Only mode: ${audioOnlyEnabled ? 'Enabled' : 'Disabled'}`,
+    2000,
+    'blue'
+  );
+
+  const controlsContainer = await requireElement(
+    '[idomkey="controls"]',
+    HTMLElement
+  );
+
+  const updateOverlay = (root = controlsContainer) => {
+    let overlay = root.querySelector(`.${YTAF_OVERLAY_CLASS}`);
+
+    if (!audioOnlyEnabled) {
+      overlay?.remove();
+      return;
+    }
+
+    if (overlay) return;
+
+    overlay = Object.assign(document.createElement('div'), {
+      textContent: 'Audio-Only Mode Enabled - Press [BLUE] to toggle',
+      className: YTAF_OVERLAY_CLASS
+    });
+    root.prepend(overlay);
+  };
+  updateOverlay();
+
+  if (overlayObserver) overlayObserver.disconnect();
+  overlayObserver = new MutationObserver(() => {
+    updateOverlay();
+    applyAudioOverlayFilter();
+  });
+
+  overlayObserver.observe(controlsContainer, {
+    childList: true,
+    subtree: true
+  });
+}
+
 applyUIFixes();
 initHideLogo();
 
 setTimeout(() => {
-  showNotification('Press [GREEN] to open YTAF configuration screen');
-}, 2000);
+  showNotification(
+    'Press [GREEN] to open YTAF configuration screen',
+    2000,
+    'green'
+  );
+});

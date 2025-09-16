@@ -104,3 +104,12 @@
 .ytaf-ui-sponsor {
   font-size: 0.9rem;
 }
+
+.ytaf-ui-watchControl-overlayMessage {
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
