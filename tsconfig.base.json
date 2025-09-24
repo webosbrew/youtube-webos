@@ -14,11 +14,14 @@
     "isolatedModules": true,
 
     // Linting
+    "exactOptionalPropertyTypes": true,
     "noErrorTruncation": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "noUncheckedSideEffectImports": false, // TODO: enable
+    "moduleDetection": "force",
 
     // Emit
     "emitDeclarationOnly": true,
