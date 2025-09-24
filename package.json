@@ -16,7 +16,7 @@
     "prepare": "husky",
     "lint": "eslint --concurrency auto",
     "type-check": "tsc -b",
-    "prettier-check": "prettier --ignore-path .prettierignore --check ."
+    "prettier-check": "prettier --check ."
   },
   "repository": "github:webosbrew/youtube-webos",
   "license": "GPL-3.0-only",
