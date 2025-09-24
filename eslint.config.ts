@@ -57,6 +57,7 @@ const configs = [
       'no-useless-assignment': 'error',
       'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
       'no-unassigned-vars': 'error',
+      'preserve-caught-error': 'error',
 
       // @stylistic rules - needed as prettier doesn't handle these
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],

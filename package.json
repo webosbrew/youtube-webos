@@ -14,7 +14,7 @@
     "manifest": "node tools/gen-manifest.cjs youtube.leanback.v4.manifest.json",
     "version": "node tools/sync-version.cjs && git add assets/appinfo.json",
     "prepare": "husky",
-    "lint": "eslint",
+    "lint": "eslint --concurrency auto",
     "type-check": "tsc -b",
     "prettier-check": "prettier --ignore-path .prettierignore --check ."
   },

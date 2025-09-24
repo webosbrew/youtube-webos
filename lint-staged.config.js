@@ -5,6 +5,6 @@ function globForCode(/** @type {string} */ toolName) {
 /** @type {import('lint-staged').Configuration} */
 export default {
   '*': 'prettier --ignore-unknown --write',
-  [globForCode('eslint')]: 'eslint',
+  [globForCode('eslint')]: 'eslint --concurrency auto',
   [globForCode('tsc')]: () => 'tsc -b'
 };
