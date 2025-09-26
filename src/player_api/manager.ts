@@ -2,7 +2,7 @@ import {
   CustomEventTarget,
   TypedCustomEvent,
   type EventMapOf
-} from './custom-event-target';
+} from '../custom-event-target';
 import { getPlayer } from './helpers';
 import type { PlayerStateObject, VideoID, YTPlayer } from './yt-api';
 
