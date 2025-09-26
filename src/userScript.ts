@@ -3,22 +3,6 @@ import './domrect-polyfill';
 
 import { handleLaunch } from './utils';
 
-type webOSLaunchParams = Record<string, unknown>;
-
-declare global {
-  interface Window {
-    launchParams?: webOSLaunchParams;
-  }
-
-  interface Document {
-    addEventListener(
-      eventName: 'webOSRelaunch',
-      listener: (evt: CustomEvent<webOSLaunchParams>) => void,
-      useCapture?: boolean
-    ): void;
-  }
-}
-
 document.addEventListener(
   'webOSRelaunch',
   (evt) => {
