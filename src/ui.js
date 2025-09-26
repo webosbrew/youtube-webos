@@ -376,93 +376,72 @@ setTimeout(() => {
   );
 });
 
-// Minimal overlay/autoplay: shallow scan + single autoplay retries.
-const OVERLAY_HIDE_ATTR = 'data-ytaf-hidden-overlay';
-const HIDE_Z = 300;
+// Prevent foreign overlays (e.g., Chromecast) from covering this app.
+(() => {
+  const HIDE_ATTR = 'data-overlay-blocked';
+  const APP_ROOT_SELECTOR = '.ytaf-ui-container'; // adjust if needed
+  const Z_MIN = 300; // threshold for "covering" layers
 
-function isOverlayCandidate(el) {
-  if (!(el instanceof Element)) return false;
-  const t = (el.tagName || '').toLowerCase();
-  if (t === 'html' || t === 'body') return false;
-  if (el.closest && el.closest('.ytaf-ui-container')) return false;
-  try {
-    const s = window.getComputedStyle(el);
-    if (
-      (s.position === 'fixed' || s.position === 'absolute') &&
-      (parseInt(s.zIndex || '0', 10) || 0) >= HIDE_Z
-    )
-      return true;
-  } catch {
-    /* ignore */
-  }
-  return false;
-}
+  const isElem = (n) => n && n.nodeType === 1; // Element.ELEMENT_NODE
 
-function hideOverlayElement(el) {
-  if (!(el instanceof Element)) return false;
-  if (el.hasAttribute(OVERLAY_HIDE_ATTR)) return false;
-  try {
-    el.setAttribute(OVERLAY_HIDE_ATTR, '1');
+  const isForeignOverlay = (el) => {
+    if (!isElem(el)) return false;
+    if (el.closest(APP_ROOT_SELECTOR)) return false; // allow own UI
+    const s = getComputedStyle(el);
+    if (!(s.position === 'fixed' || s.position === 'absolute')) return false;
+    const zi = Number.parseInt(s.zIndex || '0', 10) || 0;
+    return zi >= Z_MIN; // likely screen-covering layer
+  };
+
+  const hide = (el) => {
+    if (!isElem(el) || el.hasAttribute(HIDE_ATTR)) return false;
+    el.setAttribute(HIDE_ATTR, '1');
     el.style.setProperty('display', 'none', 'important');
     el.style.setProperty('pointer-events', 'none', 'important');
-  } catch {
-    /* ignore */
-  }
-  return true;
-}
+    return true;
+  };
 
-function scanAndHideOverlays(root = document.body) {
-  let hid = false;
-  for (const c of Array.from(root.children || [])) {
-    if (isOverlayCandidate(c)) {
-      hideOverlayElement(c);
-      hid = true;
-      continue;
-    }
-    for (const cc of Array.from(c.children || []))
-      if (isOverlayCandidate(cc)) {
-        hideOverlayElement(cc);
-        hid = true;
-      }
-  }
-  return hid;
-}
-
-const pending = new Set();
-let scheduled = false;
-function schedule() {
-  if (scheduled) return;
-  scheduled = true;
-  const run = () => {
-    scheduled = false;
-    for (const n of Array.from(pending)) {
-      pending.delete(n);
-      if (n instanceof Element) {
-        if (isOverlayCandidate(n)) hideOverlayElement(n);
-        else
-          for (const ch of Array.from(n.children || []))
-            if (isOverlayCandidate(ch)) hideOverlayElement(ch);
-      }
+  const scanShallow = (root) => {
+    if (!isElem(root)) return;
+    // Check the node itself, then direct children (shallow, cheap)
+    if (isForeignOverlay(root)) hide(root);
+    const kids = root.children;
+    for (let i = 0; i < kids.length; i++) {
+      const c = kids[i];
+      if (isForeignOverlay(c)) hide(c);
     }
   };
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
-  else setTimeout(run, 40);
-}
 
-let overlayObs = null;
-function startOverlayObserver() {
-  try {
-    overlayObs = new MutationObserver((muts) => {
-      for (const m of muts)
-        if (m.type === 'childList')
-          for (const n of Array.from(m.addedNodes || [])) pending.add(n);
-      schedule();
+  // Initial shallow pass (cheap) — avoids full page traversal.
+  scanShallow(document.body); // shallow check body and its children
+
+  // Observe newly added nodes; process in animation frame to batch.
+  const pending = new Set();
+  let raf = 0;
+
+  const flush = () => {
+    raf = 0;
+    pending.forEach((n) => {
+      scanShallow(n); // only inspect added subtree shallowly
     });
-    overlayObs.observe(document.body, { childList: true, subtree: true });
-    scanAndHideOverlays(document.body);
-  } catch {
-    /* ignore */
-  }
-}
+    pending.clear();
+  };
 
-startOverlayObserver();
+  const schedule = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(flush); // batches DOM reads/writes
+  };
+
+  const mo = new MutationObserver((recs) => {
+    for (const r of recs) {
+      if (r.type !== 'childList') continue;
+      r.addedNodes &&
+        r.addedNodes.forEach((n) => {
+          pending.add(n);
+        });
+    }
+    schedule();
+  });
+
+  mo.observe(document.body, { childList: true, subtree: true });
+})();
