@@ -425,32 +425,6 @@ function scanAndHideOverlays(root = document.body) {
         hid = true;
       }
   }
-  if (hid) {
-    setTimeout(() => {
-      const v = document.querySelector('video');
-      if (!v) return;
-      if (!v.paused && !v.ended) return;
-      v.play().catch(() => {
-        try {
-          const prev = v.muted;
-          v.muted = true;
-          v.play()
-            .then(() => {
-              setTimeout(() => {
-                try {
-                  if (!prev) v.muted = false;
-                } catch {
-                  /* ignore */
-                }
-              }, 600);
-            })
-            .catch(() => {});
-        } catch {
-          /* ignore */
-        }
-      });
-    }, 60);
-  }
   return hid;
 }
 
