@@ -376,50 +376,20 @@ setTimeout(() => {
   );
 });
 
-// Detect and hide transient system overlay controls that steal focus (e.g. Chromecast UI).
-// Strategy: observe added nodes and existing nodes for high z-index, fixed positioning,
-// and not belonging to our YTAF UI, then hide them. Also suppress the 'Up' navigation
-// that switches focus to a background player while overlays are present.
+// Minimal overlay/autoplay: shallow scan + single autoplay retries.
 const OVERLAY_HIDE_ATTR = 'data-ytaf-hidden-overlay';
-const HIDE_Z = 400;
-
-// Simplified, named overlay + autoplay helpers (no anonymous IIFE, functions at module scope).
+const HIDE_Z = 300;
 
 function isOverlayCandidate(el) {
   if (!(el instanceof Element)) return false;
-  const tag = (el.tagName || '').toLowerCase();
-  if (tag === 'html' || tag === 'body') return false;
+  const t = (el.tagName || '').toLowerCase();
+  if (t === 'html' || t === 'body') return false;
   if (el.closest && el.closest('.ytaf-ui-container')) return false;
-  if (el.classList && el.classList.contains('ytaf-notification-container'))
-    return false;
   try {
+    const s = window.getComputedStyle(el);
     if (
-      (el.querySelector && el.querySelector('video')) ||
-      (el.querySelector && el.querySelector('[idomkey="controls"]'))
-    )
-      return false;
-  } catch {
-    //
-  }
-  try {
-    const st = window.getComputedStyle(el);
-    const pos = st.position;
-    const z = parseInt(st.zIndex || '0', 10) || 0;
-    if ((pos === 'fixed' || pos === 'absolute') && z >= HIDE_Z) return true;
-  } catch {
-    /* ignore */
-  }
-  try {
-    const a = (
-      el.getAttribute &&
-      (el.getAttribute('aria-label') || '')
-    ).toLowerCase();
-    const id = (el.id || '').toLowerCase();
-    if (
-      a.includes('cast') ||
-      id.includes('cast') ||
-      a.includes('chromecast') ||
-      id.includes('chromecast')
+      (s.position === 'fixed' || s.position === 'absolute') &&
+      (parseInt(s.zIndex || '0', 10) || 0) >= HIDE_Z
     )
       return true;
   } catch {
@@ -429,106 +399,92 @@ function isOverlayCandidate(el) {
 }
 
 function hideOverlayElement(el) {
+  if (!(el instanceof Element)) return false;
+  if (el.hasAttribute(OVERLAY_HIDE_ATTR)) return false;
   try {
-    if (!(el instanceof Element)) return false;
-    if (el.hasAttribute(OVERLAY_HIDE_ATTR)) return false;
     el.setAttribute(OVERLAY_HIDE_ATTR, '1');
-    try {
-      if (el.dataset)
-        el.dataset.ytafOriginalStyle = el.getAttribute('style') || '';
-    } catch {
-      /* ignore */
-    }
     el.style.setProperty('display', 'none', 'important');
     el.style.setProperty('pointer-events', 'none', 'important');
-    return true;
   } catch {
-    return false;
+    /* ignore */
   }
+  return true;
 }
 
 function scanAndHideOverlays(root = document.body) {
-  try {
-    let hid = false;
-    for (const n of Array.from(root.children || [])) {
-      if (isOverlayCandidate(n)) {
-        if (hideOverlayElement(n)) hid = true;
-        continue;
-      }
-      for (const c of Array.from(n.children || []))
-        if (isOverlayCandidate(c) && hideOverlayElement(c)) hid = true;
+  let hid = false;
+  for (const c of Array.from(root.children || [])) {
+    if (isOverlayCandidate(c)) {
+      hideOverlayElement(c);
+      hid = true;
+      continue;
     }
-    if (hid) {
-      // small delayed resume attempt
-      setTimeout(() => {
+    for (const cc of Array.from(c.children || []))
+      if (isOverlayCandidate(cc)) {
+        hideOverlayElement(cc);
+        hid = true;
+      }
+  }
+  if (hid) {
+    setTimeout(() => {
+      const v = document.querySelector('video');
+      if (!v) return;
+      if (!v.paused && !v.ended) return;
+      v.play().catch(() => {
         try {
-          const v = document.querySelector('video');
-          if (!v || !(v instanceof HTMLVideoElement)) return;
-          if (!v.paused && !v.ended) return;
-          v.play().catch(() => {
-            try {
-              const prev = v.muted;
-              v.muted = true;
-              v.play()
-                .then(() => {
-                  setTimeout(() => {
-                    try {
-                      if (!prev) v.muted = false;
-                    } catch {
-                      /* ignore */
-                    }
-                  }, 600);
-                })
-                .catch(() => {});
-            } catch {
-              /* ignore */
-            }
-          });
+          const prev = v.muted;
+          v.muted = true;
+          v.play()
+            .then(() => {
+              setTimeout(() => {
+                try {
+                  if (!prev) v.muted = false;
+                } catch {
+                  /* ignore */
+                }
+              }, 600);
+            })
+            .catch(() => {});
         } catch {
           /* ignore */
         }
-      }, 80);
-    }
-    return hid;
-  } catch {
-    return false;
+      });
+    }, 60);
   }
+  return hid;
 }
 
-const _pending = new Set();
-let _scheduled = false;
-function scheduleProcess() {
-  if (_scheduled) return;
-  _scheduled = true;
+const pending = new Set();
+let scheduled = false;
+function schedule() {
+  if (scheduled) return;
+  scheduled = true;
   const run = () => {
-    _scheduled = false;
-    const nodes = Array.from(_pending);
-    _pending.clear();
-    for (const n of nodes) {
-      if (!(n instanceof Element)) continue;
-      if (isOverlayCandidate(n)) hideOverlayElement(n);
-      else
-        for (const c of Array.from(n.children || []))
-          if (isOverlayCandidate(c)) hideOverlayElement(c);
+    scheduled = false;
+    for (const n of Array.from(pending)) {
+      pending.delete(n);
+      if (n instanceof Element) {
+        if (isOverlayCandidate(n)) hideOverlayElement(n);
+        else
+          for (const ch of Array.from(n.children || []))
+            if (isOverlayCandidate(ch)) hideOverlayElement(ch);
+      }
     }
   };
   if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
-  else setTimeout(run, 50);
+  else setTimeout(run, 40);
 }
 
-let overlayMutationObserver = null;
+let overlayObs = null;
 function startOverlayObserver() {
   try {
-    overlayMutationObserver = new MutationObserver((mutations) => {
-      for (const m of mutations)
+    overlayObs = new MutationObserver((muts) => {
+      for (const m of muts)
         if (m.type === 'childList')
-          for (const n of Array.from(m.addedNodes || [])) _pending.add(n);
-      scheduleProcess();
+          for (const n of Array.from(m.addedNodes || [])) pending.add(n);
+      schedule();
     });
-    overlayMutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    overlayObs.observe(document.body, { childList: true, subtree: true });
     scanAndHideOverlays(document.body);
   } catch {
     /* ignore */
@@ -536,146 +492,96 @@ function startOverlayObserver() {
 }
 
 function tryAutoPlayVideo(v) {
+  if (!v || !(v instanceof HTMLVideoElement)) return;
+  const src = v.currentSrc || v.src || '';
+  if (v.getAttribute('data-ytaf-autoplay-src') === src) return;
+  v.setAttribute('data-ytaf-autoplay-src', src);
+  if (!v.paused && !v.ended) return;
   try {
-    if (!v || !(v instanceof HTMLVideoElement)) return;
-    const src = v.currentSrc || v.src || '';
-    if (v.getAttribute('data-ytaf-autoplay-src') === src) return;
-    v.setAttribute('data-ytaf-autoplay-src', src);
-    if (!v.paused && !v.ended) return;
-
-    const attempt = () => {
+    v.play().catch(() => {
       try {
-        const p = v.play();
-        if (p && typeof p.then === 'function') {
-          p.catch(() => {
-            try {
-              const prev = v.muted;
-              v.muted = true;
-              const f = v.play();
-              if (f && typeof f.then === 'function')
-                f.then(() => {
-                  setTimeout(() => {
-                    try {
-                      if (!prev) v.muted = false;
-                    } catch {
-                      /* ignore */
-                    }
-                  }, 600);
-                }).catch(() => {});
-            } catch {
-              /* ignore */
-            }
-          });
-        }
+        v.muted = true;
+        v.play().catch(() => {});
       } catch {
         /* ignore */
       }
-    };
-
-    v.addEventListener('canplay', attempt, { once: true, passive: true });
-    v.addEventListener('loadedmetadata', attempt, {
-      once: true,
-      passive: true
     });
-    setTimeout(attempt, 120);
   } catch {
     /* ignore */
   }
 }
 
-let videoMutationObserver = null;
+let videoObs = null;
 function startVideoObserver() {
   try {
-    videoMutationObserver = new MutationObserver((mutations) => {
-      for (const m of mutations) {
+    videoObs = new MutationObserver((muts) => {
+      for (const m of muts) {
         if (m.type === 'childList') {
           for (const n of Array.from(m.addedNodes || [])) {
-            try {
-              if (!n || n.nodeType !== Node.ELEMENT_NODE) continue;
-              const el = n;
-              if (el.tagName && el.tagName.toLowerCase() === 'video') {
-                tryAutoPlayVideo(el);
-                continue;
-              }
-              const vid = el.querySelector && el.querySelector('video');
-              if (vid) tryAutoPlayVideo(vid);
-            } catch {
-              /* ignore */
+            if (!(n instanceof Element)) continue;
+            if (n.tagName && n.tagName.toLowerCase() === 'video') {
+              tryAutoPlayVideo(n);
+              continue;
             }
+            const v = n.querySelector && n.querySelector('video');
+            if (v) tryAutoPlayVideo(v);
           }
-        } else if (
-          m.type === 'attributes' &&
-          m.target instanceof HTMLVideoElement
-        ) {
-          tryAutoPlayVideo(m.target);
         }
       }
     });
-    videoMutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: false
-    });
-    const existing = document.querySelector('video');
-    if (existing) tryAutoPlayVideo(existing);
+    videoObs.observe(document.body, { childList: true, subtree: true });
+    const ex = document.querySelector('video');
+    if (ex) tryAutoPlayVideo(ex);
   } catch {
     /* ignore */
   }
 }
 
-function onNavigationHook() {
+function onNav() {
   setTimeout(() => {
-    try {
-      scanAndHideOverlays(document.body);
-    } catch {
-      /* ignore */
-    }
+    scanAndHideOverlays(document.body);
     const v = document.querySelector('video');
     if (v) tryAutoPlayVideo(v);
-  }, 100);
+  }, 80);
 }
 
-function patchHistoryForNav() {
+function patchHistory() {
   try {
-    const _push = history.pushState;
-    const _replace = history.replaceState;
+    const _p = history.pushState,
+      _r = history.replaceState;
     history.pushState = function () {
       try {
-        const r = _push.apply(this, arguments);
-        onNavigationHook();
-        return r;
+        const res = _p.apply(this, arguments);
+        onNav();
+        return res;
       } catch {
-        return _push.apply(this, arguments);
+        return _p.apply(this, arguments);
       }
     };
     history.replaceState = function () {
       try {
-        const r = _replace.apply(this, arguments);
-        onNavigationHook();
-        return r;
+        const res = _r.apply(this, arguments);
+        onNav();
+        return res;
       } catch {
-        return _replace.apply(this, arguments);
+        return _r.apply(this, arguments);
       }
     };
-    window.addEventListener('popstate', onNavigationHook, true);
+    window.addEventListener('popstate', onNav, true);
     document.addEventListener(
       'click',
       (evt) => {
-        try {
-          if (!evt || !evt.isTrusted) return;
-          let n = evt.target;
-          while (n && n !== document.body) {
-            if (n.tagName && n.tagName.toLowerCase() === 'a') {
-              const href = n.getAttribute('href') || '';
-              if (href.includes('/watch') || href.includes('watch?v=')) {
-                setTimeout(onNavigationHook, 80);
-                return;
-              }
+        if (!evt || !evt.isTrusted) return;
+        let n = evt.target;
+        while (n && n !== document.body) {
+          if (n.tagName && n.tagName.toLowerCase() === 'a') {
+            const href = n.getAttribute('href') || '';
+            if (href.includes('/watch') || href.includes('watch?v=')) {
+              setTimeout(onNav, 60);
+              return;
             }
-            n = n.parentElement;
           }
-        } catch {
-          /* ignore */
+          n = n.parentElement;
         }
       },
       true
@@ -685,7 +591,6 @@ function patchHistoryForNav() {
   }
 }
 
-// Initialize observers and hooks
 startOverlayObserver();
 startVideoObserver();
-patchHistoryForNav();
+patchHistory();
