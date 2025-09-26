@@ -26,3 +26,4 @@ import './video-quality';
 import './lang-settings-fix';
 import './remove-endscreen';
 import './hooks';
+import './block-webos-cast';
