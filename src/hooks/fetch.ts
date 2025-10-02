@@ -65,7 +65,8 @@ export class FetchRegistry extends CustomEventTarget<EventMap> {
     }
 
     const url = new URL(
-      resource instanceof Request ? resource.url : resource.toString()
+      resource instanceof Request ? resource.url : resource.toString(),
+      document.location.href
     );
     const reqAllowed = this.dispatchEvent(
       new TypedCustomEvent('request', {
