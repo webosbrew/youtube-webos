@@ -42,10 +42,9 @@ class PlayerManager
   #player;
   #lastVideoID: VideoID | null = null;
   #lastPlayerState: PlayerStateObject | null = null;
-  #playbackStartFired = false;
 
   #handleNewVideo(videoID: VideoID) {
-    this.#playbackStartFired = false;
+    console.debug('[PlayerManager] new video', videoID);
     this.dispatchEvent(new TypedCustomEvent('newVideo', { detail: videoID }));
   }
 
@@ -57,6 +56,11 @@ class PlayerManager
     );
     this.#lastPlayerState = current;
 
+    // Assume video ID hasn't changed if diff is empty.
+    if (Object.keys(diff).length === 0) return;
+
+    console.debug('[PlayerManager] player state changed', { diff });
+
     const currentVideoID = this.currentVideoID;
     if (this.#lastVideoID !== currentVideoID) {
       if (!currentVideoID) throw new Error('unexpected `null` video ID');
@@ -64,8 +68,7 @@ class PlayerManager
       this.#lastVideoID = currentVideoID;
     }
 
-    if (diff.isPlaying && !this.#playbackStartFired) {
-      this.#playbackStartFired = true;
+    if (diff.isPlaying) {
       this.dispatchEvent(new TypedCustomEvent('playbackStart'));
     }
   };
