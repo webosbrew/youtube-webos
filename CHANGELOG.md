@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.5.0] - 2025/11/10
+
+### Added
+
+- [#331](https://github.com/webosbrew/youtube-webos/pull/331): Add option to remove video end screens (@fire332)
+- [#321](https://github.com/webosbrew/youtube-webos/pull/321): Add audio-only mode and colour-coded toasts (@jesvijonathan)
+- [#372](https://github.com/webosbrew/youtube-webos/pull/372): Allow casting with the TV turned off for newer webOS version (@GAA251)
+
+### Fixed
+
+- [#316](https://github.com/webosbrew/youtube-webos/pull/316): Fix language switching reliability (@fire332; thanks to @reisxd)
+- [#361](https://github.com/webosbrew/youtube-webos/pull/361): Improve reliability of automatic video quality upgrades (@fire332)
+- [#355](https://github.com/webosbrew/youtube-webos/pull/355): Prevent `fetch` hook exceptions when URLs omit a scheme (@fire332)
+- [#346](https://github.com/webosbrew/youtube-webos/pull/346): Block the built-in webOS Chromecast service to fix conflict with Chromecast overlay in newer webOS (@fire332)
+- [#374](https://github.com/webosbrew/youtube-webos/pull/374): Improve CSS selector used by the watch shadow fix (@fire332)
+
+### Changed
+
+- [#344](https://github.com/webosbrew/youtube-webos/pull/344): Update dependencies and development tooling (@fire332)
+- [#330](https://github.com/webosbrew/youtube-webos/pull/330): Misc developer experience improvements (@fire332)
+
 ## [0.4.1] - 2025/07/28
 
 ### Fixed
