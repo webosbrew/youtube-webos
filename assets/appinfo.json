@@ -27,5 +27,6 @@
   "supportQuickStart": true,
   "dialAppName": "YouTube",
   "disableBackHistoryAPI": true,
-  "supportGIP": true
+  "supportGIP": true,
+  "wolwowlan": true
 }
