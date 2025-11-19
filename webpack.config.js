@@ -2,14 +2,17 @@ import CopyPlugin from 'copy-webpack-plugin';
 import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
 import { basename } from 'node:path';
+import { SemVer } from 'semver';
 
-/**
+/** Inject the version from `package.json` with an extreme offset to prevent auto updates.
  * @param input {Buffer<ArrayBufferLike>}
  * @returns {string}
  */
 function transformAppInfo(input) {
   const appInfo = JSON.parse(input.toString());
-  appInfo.version = pkgJson.version;
+  const newVersion = new SemVer(pkgJson.version);
+  newVersion.major += 100;
+  appInfo.version = newVersion.format();
   return JSON.stringify(appInfo, null, 2);
 }
 
