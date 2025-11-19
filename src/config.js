@@ -69,6 +69,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Remove end screens from video'
     }
+  ],
+  [
+    'autoAccountSelect',
+    {
+      default: false,
+      desc: 'Bypass initial account selection on startup'
+    }
   ]
 ]);
 
