@@ -1,6 +1,20 @@
 import CopyPlugin from 'copy-webpack-plugin';
 import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
+import { basename } from 'node:path';
+import { SemVer } from 'semver';
+
+/** Inject the version from `package.json` with an extreme offset to prevent auto updates.
+ * @param input {Buffer<ArrayBufferLike>}
+ * @returns {string}
+ */
+function transformAppInfo(input) {
+  const appInfo = JSON.parse(input.toString());
+  const newVersion = new SemVer(pkgJson.version);
+  newVersion.major += 100;
+  appInfo.version = newVersion.format();
+  return JSON.stringify(appInfo, null, 2);
+}
 
 /** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
 const makeConfig = (_env, argv) => [
@@ -61,7 +75,18 @@ const makeConfig = (_env, argv) => [
     plugins: [
       new CopyPlugin({
         patterns: [
-          { context: 'assets', from: '**/*' },
+          {
+            context: 'assets',
+            from: '**/*',
+            transform: {
+              transformer(input, absolutePath) {
+                if (basename(absolutePath) === 'appinfo.json') {
+                  return transformAppInfo(input);
+                }
+                return input;
+              }
+            }
+          },
           { context: 'src', from: 'index.html' }
         ]
       }),
