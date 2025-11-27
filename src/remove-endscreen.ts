@@ -1,18 +1,14 @@
-import kindOf from 'which-builtin-type';
-
 import { configRead } from './config';
 
-function isObject(value: unknown): value is object {
+function isObject(value) {
   // @ts-expect-error - bad types
-  return kindOf(value) === 'Object';
+  return typeof value === 'object';
 }
 
-type JSONReviver = Parameters<typeof JSON.parse>[1];
+const origParse = JSON.parse;
 
-const originalParse = JSON.parse;
-
-function jsonParse(str: string, reviver?: JSONReviver) {
-  const res = originalParse(str, reviver) as unknown;
+JSON.parse = function () {
+  const res = origParse.apply(this, arguments);
 
   if (!configRead('removeEndscreen')) {
     return res;
@@ -29,6 +25,4 @@ function jsonParse(str: string, reviver?: JSONReviver) {
   }
 
   return res;
-}
-
-JSON.parse = jsonParse;
+};
