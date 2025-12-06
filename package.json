@@ -62,8 +62,7 @@
     "transform-async-modules-webpack-plugin": "^1.1.1",
     "typescript": "^5.9.2",
     "webpack": "^5.101.3",
-    "webpack-cli": "^6.0.1",
-    "which-builtin-type": "^1.2.1"
+    "webpack-cli": "^6.0.1"
   },
   "engines": {
     "node": ">=22"
