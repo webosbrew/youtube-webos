@@ -5,6 +5,8 @@
   "type": "web",
   "main": "index.html",
   "title": "YouTube AdFree",
+  "bgImage":"preview.png",
+  "splashBackground":"splash.png",
   "icon": "icon.png",
   "largeIcon": "largeIcon.png",
   "iconColor": "#ff0000",
