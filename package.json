@@ -17,7 +17,7 @@
     "lint:eslint": "eslint --concurrency auto",
     "lint:tsc": "tsc -b",
     "lint:prettier": "prettier --check .",
-    "lint:all": "npm run lint:tsc && npm run lint:eslint && npm run lint:prettier"
+    "lint:all": "pnpm run \"/^lint:(?!all)/\""
   },
   "repository": "github:webosbrew/youtube-webos",
   "license": "GPL-3.0-only",
@@ -65,7 +65,16 @@
     "webpack-cli": "^6.0.1",
     "which-builtin-type": "^1.2.1"
   },
-  "engines": {
-    "node": ">=22"
-  }
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22",
+      "onFail": "download"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "onFail": "error"
+    }
+  },
+  "packageManager": "pnpm@10.29.2+sha512.bef43fa759d91fd2da4b319a5a0d13ef7a45bb985a3d7342058470f9d2051a3ba8674e629672654686ef9443ad13a82da2beb9eeb3e0221c87b8154fff9d74b8"
 }

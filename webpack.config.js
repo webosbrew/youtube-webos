@@ -69,9 +69,9 @@ const makeConfig = (_env, argv) => [
       // webpack transforms it to async modules.
       // This plugin calls babel again to transform remove the `async` keyword usage after the fact.
       new TransformAsyncModulesPlugin({
-        // @ts-expect-error Bad types
         runtime: {
-          version: pkgJson.devDependencies['@babel/plugin-transform-runtime']
+          version: pkgJson.dependencies['@babel/runtime-corejs3'],
+          absoluteRuntime: './node_modules/@babel/runtime-corejs3'
         }
       })
     ]

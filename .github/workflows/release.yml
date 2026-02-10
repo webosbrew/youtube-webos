@@ -15,17 +15,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-env
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: npm
-
-      - run: npm ci
-      - run: npm run build
-      - run: npm run package
-      - run: npm run manifest
+      - run: pnpm run build
+      - run: pnpm run package
+      - run: pnpm run manifest
 
       - name: Create release
         uses: ncipollo/release-action@v1

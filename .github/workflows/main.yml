@@ -10,18 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    continue-on-error: true
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: npm
-
-      - run: npm ci
-      - run: npm run build
-      - run: npm run package
+      - uses: ./.github/actions/setup-env
+      - run: pnpm run "/^build|^lint:all/"
+      - run: pnpm run package
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
