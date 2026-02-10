@@ -19,6 +19,7 @@
     "babel.config.js",
     ".prettierrc.js",
     "lint-staged.config.js",
-    "postcss.config.ts"
+    "postcss.config.ts",
+    "commitlint.config.ts"
   ]
 }

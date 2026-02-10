@@ -17,6 +17,7 @@
     "lint:eslint": "eslint --concurrency auto",
     "lint:tsc": "tsc -b",
     "lint:prettier": "prettier --check .",
+    "lint:commit-msg": "commitlint --git-log-args='--no-merges' -f origin/main -V",
     "lint:all": "pnpm run \"/^lint:(?!all)/\""
   },
   "repository": "github:webosbrew/youtube-webos",
@@ -35,6 +36,9 @@
     "@babel/plugin-transform-runtime": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@babel/preset-typescript": "^7.28.5",
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "@commitlint/types": "^20.4.0",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.8.0",
     "@types/babel__core": "^7.20.5",
