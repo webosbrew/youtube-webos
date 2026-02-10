@@ -40,7 +40,7 @@
     "@types/babel__core": "^7.20.5",
     "@types/eslint-config-prettier": "^6.11.3",
     "@types/node": "^25.2.2",
-    "@webos-tools/cli": "^3.2.1",
+    "@webos-tools/cli": "github:fire332/webos-cli#9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d",
     "babel-loader": "^10.0.0",
     "babel-plugin-polyfill-corejs3": "^0.14.0",
     "babel-plugin-polyfill-regenerator": "^0.6.6",
