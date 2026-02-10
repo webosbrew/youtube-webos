@@ -24,12 +24,6 @@ function makeConfig(api) {
     },
     plugins: [
       [
-        '@babel/plugin-transform-typescript',
-        {
-          strictMode: true
-        }
-      ],
-      [
         '@babel/plugin-transform-runtime',
         {
           regenerator: false,
@@ -55,6 +49,14 @@ function makeConfig(api) {
         '@babel/preset-env',
         {
           bugfixes: true
+        }
+      ],
+      [
+        '@babel/preset-typescript',
+        {
+          allExtensions: true, // TODO: remove for Babel 8
+          disallowAmbiguousJSXLike: true,
+          rewriteImportExtensions: true
         }
       ]
     ]
