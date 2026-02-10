@@ -26,6 +26,10 @@
   z-index: -1;
 }
 
+ytlr-tile-renderer[style*='width: 12.75rem; height: 21.25rem;'] ytlr-tile-header-renderer {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 50%) !important;
+}
+
 /**
  * Dirty hack to fix offset <video> on shorts on older webOS versions.
  * This shouldn't work but it does 😵‍💫.
