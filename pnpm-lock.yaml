@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@babel/runtime-corejs3':
-        specifier: ^7.29.0
-        version: 7.29.0
+        specifier: ^7.29.2
+        version: 7.29.2
       core-js-pure:
         specifier: ^3.48.0
         version: 3.48.0
@@ -31,8 +31,8 @@ importers:
         specifier: ^7.29.0
         version: 7.29.0(@babel/core@7.29.0)
       '@babel/preset-env':
-        specifier: ^7.29.0
-        version: 7.29.0(@babel/core@7.29.0)
+        specifier: ^7.29.2
+        version: 7.29.2(@babel/core@7.29.0)
       '@babel/preset-typescript':
         specifier: ^7.28.5
         version: 7.28.5(@babel/core@7.29.0)
@@ -55,14 +55,14 @@ importers:
         specifier: github:fire332/webos-cli#9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d
         version: https://codeload.github.com/fire332/webos-cli/tar.gz/9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d(@types/node@25.2.2)
       babel-loader:
-        specifier: ^10.0.0
-        version: 10.0.0(@babel/core@7.29.0)(webpack@5.105.0)
+        specifier: ^10.1.1
+        version: 10.1.1(@babel/core@7.29.0)(webpack@5.105.0)
       babel-plugin-polyfill-corejs3:
-        specifier: ^0.14.0
-        version: 0.14.0(@babel/core@7.29.0)
+        specifier: ^0.14.2
+        version: 0.14.2(@babel/core@7.29.0)
       babel-plugin-polyfill-regenerator:
-        specifier: ^0.6.6
-        version: 0.6.6(@babel/core@7.29.0)
+        specifier: ^0.6.8
+        version: 0.6.8(@babel/core@7.29.0)
       copy-webpack-plugin:
         specifier: ^13.0.1
         version: 13.0.1(webpack@5.105.0)
@@ -113,7 +113,7 @@ importers:
         version: 4.0.0(webpack@5.105.0)
       transform-async-modules-webpack-plugin:
         specifier: ^1.1.1
-        version: 1.1.1(@babel/core@7.29.0)(@babel/plugin-transform-runtime@7.29.0(@babel/core@7.29.0))(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@babel/runtime@7.28.2)(webpack@5.105.0)
+        version: 1.1.1(@babel/core@7.29.0)(@babel/plugin-transform-runtime@7.29.0(@babel/core@7.29.0))(@babel/preset-env@7.29.2(@babel/core@7.29.0))(@babel/runtime@7.28.2)(webpack@5.105.0)
       typescript:
         specifier: ^6.0.2
         version: 6.0.2
@@ -167,6 +167,11 @@ packages:
 
   '@babel/helper-define-polyfill-provider@0.6.6':
     resolution: {integrity: sha512-mOAsxeeKkUKayvZR3HeTYD/fICpCPLJrU5ZjelT/PA6WHtNDBOE436YiaEUvHN454bRM3CebhDsIpieCc4texA==}
+    peerDependencies:
+      '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
+
+  '@babel/helper-define-polyfill-provider@0.6.8':
+    resolution: {integrity: sha512-47UwBLPpQi1NoWzLuHNjRoHlYXMwIJoBf7MFou6viC/sIHWYygpvr0B6IAyh5sBdA2nr2LPIRww8lfaUVQINBA==}
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
 
@@ -621,8 +626,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
 
-  '@babel/preset-env@7.29.0':
-    resolution: {integrity: sha512-fNEdfc0yi16lt6IZo2Qxk3knHVdfMYX33czNb4v8yWhemoBhibCpQK/uYHtSKIiO+p/zd3+8fYVXhQdOVV608w==}
+  '@babel/preset-env@7.29.2':
+    resolution: {integrity: sha512-DYD23veRYGvBFhcTY1iUvJnDNpuqNd/BzBwCvzOTKUnJjKg5kpUBh3/u9585Agdkgj+QuygG7jLfOPWMa2KVNw==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
@@ -638,8 +643,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime-corejs3@7.29.0':
-    resolution: {integrity: sha512-TgUkdp71C9pIbBcHudc+gXZnihEDOjUAmXO1VO4HHGES7QLZcShR0stfKIxLSNIYx2fqhmJChOjm/wkF8wv4gA==}
+  '@babel/runtime-corejs3@7.29.2':
+    resolution: {integrity: sha512-Lc94FOD5+0aXhdb0Tdg3RUtqT6yWbI/BbFWvlaSJ3gAb9Ks+99nHRDKADVqC37er4eCB0fHyWT+y+K3QOvJKbw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.28.2':
@@ -1446,12 +1451,18 @@ packages:
   aws4@1.12.0:
     resolution: {integrity: sha512-NmWvPnx0F1SfrQbYwOi7OeaNGokp9XhzNioJ/CSBs8Qa4vxug81mhJEAVZwxXuBmYB5KDRfMq/F3RR0BIU7sWg==}
 
-  babel-loader@10.0.0:
-    resolution: {integrity: sha512-z8jt+EdS61AMw22nSfoNJAZ0vrtmhPRVi6ghL3rCeRZI8cdNYFiV5xeV3HbE7rlZZNmGH8BVccwWt8/ED0QOHA==}
+  babel-loader@10.1.1:
+    resolution: {integrity: sha512-JwKSzk2kjIe7mgPK+/lyZ2QAaJcpahNAdM+hgR2HI8D0OJVkdj8Rl6J3kaLYki9pwF7P2iWnD8qVv80Lq1ABtg==}
     engines: {node: ^18.20.0 || ^20.10.0 || >=22.0.0}
     peerDependencies:
-      '@babel/core': ^7.12.0
+      '@babel/core': ^7.12.0 || ^8.0.0-beta.1
+      '@rspack/core': ^1.0.0 || ^2.0.0-0
       webpack: '>=5.61.0'
+    peerDependenciesMeta:
+      '@rspack/core':
+        optional: true
+      webpack:
+        optional: true
 
   babel-plugin-polyfill-corejs2@0.4.15:
     resolution: {integrity: sha512-hR3GwrRwHUfYwGfrisXPIDP3JcYfBrW7wKE7+Au6wDYl7fm/ka1NEII6kORzxNU556JjfidZeBsO10kYvtV1aw==}
@@ -1463,13 +1474,13 @@ packages:
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
 
-  babel-plugin-polyfill-corejs3@0.14.0:
-    resolution: {integrity: sha512-AvDcMxJ34W4Wgy4KBIIePQTAOP1Ie2WFwkQp3dB7FQ/f0lI5+nM96zUnYEOE1P9sEg0es5VCP0HxiWu5fUHZAQ==}
+  babel-plugin-polyfill-corejs3@0.14.2:
+    resolution: {integrity: sha512-coWpDLJ410R781Npmn/SIBZEsAetR4xVi0SxLMXPaMO4lSf1MwnkGYMtkFxew0Dn8B3/CpbpYxN0JCgg8mn67g==}
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
 
-  babel-plugin-polyfill-regenerator@0.6.6:
-    resolution: {integrity: sha512-hYm+XLYRMvupxiQzrvXUj7YyvFFVfv5gI0R71AJzudg1g2AI2vyCPPIFEBjk162/wFzti3inBHo7isWFuEVS/A==}
+  babel-plugin-polyfill-regenerator@0.6.8:
+    resolution: {integrity: sha512-M762rNHfSF1EV3SLtnCJXFoQbbIIz0OyRwnCmV0KPC7qosSfCO0QLTSuJX3ayAebubhE6oYBAYPrBA5ljowaZg==}
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
 
@@ -3791,6 +3802,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@babel/helper-define-polyfill-provider@0.6.8(@babel/core@7.29.0)':
+    dependencies:
+      '@babel/core': 7.29.0
+      '@babel/helper-compilation-targets': 7.28.6
+      '@babel/helper-plugin-utils': 7.28.6
+      debug: 4.4.3
+      lodash.debounce: 4.0.8
+      resolve: 1.22.11
+    transitivePeerDependencies:
+      - supports-color
+
   '@babel/helper-globals@7.28.0': {}
 
   '@babel/helper-member-expression-to-functions@7.28.5':
@@ -4224,7 +4246,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.28.6
       babel-plugin-polyfill-corejs2: 0.4.15(@babel/core@7.29.0)
       babel-plugin-polyfill-corejs3: 0.13.0(@babel/core@7.29.0)
-      babel-plugin-polyfill-regenerator: 0.6.6(@babel/core@7.29.0)
+      babel-plugin-polyfill-regenerator: 0.6.8(@babel/core@7.29.0)
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
@@ -4291,7 +4313,7 @@ snapshots:
       '@babel/helper-create-regexp-features-plugin': 7.28.5(@babel/core@7.29.0)
       '@babel/helper-plugin-utils': 7.28.6
 
-  '@babel/preset-env@7.29.0(@babel/core@7.29.0)':
+  '@babel/preset-env@7.29.2(@babel/core@7.29.0)':
     dependencies:
       '@babel/compat-data': 7.29.0
       '@babel/core': 7.29.0
@@ -4360,8 +4382,8 @@ snapshots:
       '@babel/plugin-transform-unicode-sets-regex': 7.28.6(@babel/core@7.29.0)
       '@babel/preset-modules': 0.1.6-no-external-plugins(@babel/core@7.29.0)
       babel-plugin-polyfill-corejs2: 0.4.15(@babel/core@7.29.0)
-      babel-plugin-polyfill-corejs3: 0.14.0(@babel/core@7.29.0)
-      babel-plugin-polyfill-regenerator: 0.6.6(@babel/core@7.29.0)
+      babel-plugin-polyfill-corejs3: 0.14.2(@babel/core@7.29.0)
+      babel-plugin-polyfill-regenerator: 0.6.8(@babel/core@7.29.0)
       core-js-compat: 3.48.0
       semver: 6.3.1
     transitivePeerDependencies:
@@ -4385,7 +4407,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/runtime-corejs3@7.29.0':
+  '@babel/runtime-corejs3@7.29.2':
     dependencies:
       core-js-pure: 3.48.0
 
@@ -5231,10 +5253,11 @@ snapshots:
 
   aws4@1.12.0: {}
 
-  babel-loader@10.0.0(@babel/core@7.29.0)(webpack@5.105.0):
+  babel-loader@10.1.1(@babel/core@7.29.0)(webpack@5.105.0):
     dependencies:
       '@babel/core': 7.29.0
       find-up: 5.0.0
+    optionalDependencies:
       webpack: 5.105.0(webpack-cli@6.0.1)
 
   babel-plugin-polyfill-corejs2@0.4.15(@babel/core@7.29.0):
@@ -5254,18 +5277,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  babel-plugin-polyfill-corejs3@0.14.0(@babel/core@7.29.0):
+  babel-plugin-polyfill-corejs3@0.14.2(@babel/core@7.29.0):
     dependencies:
       '@babel/core': 7.29.0
-      '@babel/helper-define-polyfill-provider': 0.6.6(@babel/core@7.29.0)
+      '@babel/helper-define-polyfill-provider': 0.6.8(@babel/core@7.29.0)
       core-js-compat: 3.48.0
     transitivePeerDependencies:
       - supports-color
 
-  babel-plugin-polyfill-regenerator@0.6.6(@babel/core@7.29.0):
+  babel-plugin-polyfill-regenerator@0.6.8(@babel/core@7.29.0):
     dependencies:
       '@babel/core': 7.29.0
-      '@babel/helper-define-polyfill-provider': 0.6.6(@babel/core@7.29.0)
+      '@babel/helper-define-polyfill-provider': 0.6.8(@babel/core@7.29.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7283,11 +7306,11 @@ snapshots:
       psl: 1.9.0
       punycode: 2.3.1
 
-  transform-async-modules-webpack-plugin@1.1.1(@babel/core@7.29.0)(@babel/plugin-transform-runtime@7.29.0(@babel/core@7.29.0))(@babel/preset-env@7.29.0(@babel/core@7.29.0))(@babel/runtime@7.28.2)(webpack@5.105.0):
+  transform-async-modules-webpack-plugin@1.1.1(@babel/core@7.29.0)(@babel/plugin-transform-runtime@7.29.0(@babel/core@7.29.0))(@babel/preset-env@7.29.2(@babel/core@7.29.0))(@babel/runtime@7.28.2)(webpack@5.105.0):
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-runtime': 7.29.0(@babel/core@7.29.0)
-      '@babel/preset-env': 7.29.0(@babel/core@7.29.0)
+      '@babel/preset-env': 7.29.2(@babel/core@7.29.0)
       '@babel/runtime': 7.28.2
       webpack: 5.105.0(webpack-cli@6.0.1)
 
