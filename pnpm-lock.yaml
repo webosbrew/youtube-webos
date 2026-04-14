@@ -55,8 +55,8 @@ importers:
         specifier: ^25.6.0
         version: 25.6.0
       '@webos-tools/cli':
-        specifier: github:fire332/webos-cli#9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d
-        version: https://codeload.github.com/fire332/webos-cli/tar.gz/9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d(@types/node@25.6.0)
+        specifier: github:fire332/webos-cli#6cfbcf231a0fa1e50519d370ee6e5edc71c4998a
+        version: https://codeload.github.com/fire332/webos-cli/tar.gz/6cfbcf231a0fa1e50519d370ee6e5edc71c4998a(@types/node@25.6.0)
       babel-loader:
         specifier: ^10.1.1
         version: 10.1.1(@babel/core@7.29.0)(webpack@5.106.1)
@@ -1284,9 +1284,9 @@ packages:
   '@webassemblyjs/wast-printer@1.14.1':
     resolution: {integrity: sha512-kPSSXE6De1XOR820C90RIo2ogvZG+c3KiHzqUoO/F34Y2shGzesfqv7o57xrxovZJH/MetF5UjroJ/R/3isoiw==}
 
-  '@webos-tools/cli@https://codeload.github.com/fire332/webos-cli/tar.gz/9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d':
-    resolution: {tarball: https://codeload.github.com/fire332/webos-cli/tar.gz/9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d}
-    version: 3.2.1
+  '@webos-tools/cli@https://codeload.github.com/fire332/webos-cli/tar.gz/6cfbcf231a0fa1e50519d370ee6e5edc71c4998a':
+    resolution: {tarball: https://codeload.github.com/fire332/webos-cli/tar.gz/6cfbcf231a0fa1e50519d370ee6e5edc71c4998a}
+    version: 3.2.3
     engines: {node: '>=22'}
     os: [darwin, linux, win32]
     hasBin: true
@@ -2486,8 +2486,8 @@ packages:
   jsonfile@4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
 
-  jsonschema@1.2.6:
-    resolution: {integrity: sha512-SqhURKZG07JyKKeo/ir24QnS4/BV7a6gQy93bUSe4lUdNp0QNpIz2c9elWJQ9dpc5cQYY6cvCzgRwy0MQCLyqA==}
+  jsonschema@1.5.0:
+    resolution: {integrity: sha512-K+A9hhqbn0f3pJX17Q/7H6yQfD/5OXgdrR5UE12gMXCiN9D5Xq2o5mddV2QEcX/bjla99ASsAAQUyMCCRWAEhw==}
 
   jsprim@1.4.2:
     resolution: {integrity: sha512-P2bSOMAc/ciLz6DzgjVlGJP9+BrJWu5UDGK70C2iweC5QBIeFf0ZXRvGjEj2uYgrY2MkAAhsSWHDWlFtEroZWw==}
@@ -5043,7 +5043,7 @@ snapshots:
       '@webassemblyjs/ast': 1.14.1
       '@xtuc/long': 4.2.2
 
-  '@webos-tools/cli@https://codeload.github.com/fire332/webos-cli/tar.gz/9b53cff5a8db0ac88f96d337a7f1a025e7f7d41d(@types/node@25.6.0)':
+  '@webos-tools/cli@https://codeload.github.com/fire332/webos-cli/tar.gz/6cfbcf231a0fa1e50519d370ee6e5edc71c4998a(@types/node@25.6.0)':
     dependencies:
       ar-async: 0.1.4
       async: 3.2.5
@@ -5065,7 +5065,7 @@ snapshots:
       graceful-fs: 4.2.11
       inherits: 1.0.2
       inquirer: 13.2.2(@types/node@25.6.0)
-      jsonschema: 1.2.6
+      jsonschema: 1.5.0
       mkdirp: 0.5.5
       nopt: 2.1.2
       npmlog: 4.1.2
@@ -6273,7 +6273,7 @@ snapshots:
     optionalDependencies:
       graceful-fs: 4.2.11
 
-  jsonschema@1.2.6: {}
+  jsonschema@1.5.0: {}
 
   jsprim@1.4.2:
     dependencies:
