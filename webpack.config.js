@@ -1,5 +1,6 @@
 import CopyPlugin from 'copy-webpack-plugin';
 import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
 
 /** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
@@ -10,6 +11,14 @@ const makeConfig = (_env, argv) => [
      * to cause segfaults (at least) on nodeJS v0.12.2 used on webOS 3.x.
      */
     devtool: argv.mode === 'development' ? 'inline-source-map' : 'source-map',
+
+    optimization: {
+      /**
+       * terser doesn't pickup browserlist config
+       * See: https://github.com/terser/terser/issues/235
+       */
+      minimizer: [new TerserPlugin({ terserOptions: { ecma: 5 } })]
+    },
 
     entry: {
       index: './src/index.js',
