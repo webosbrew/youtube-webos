@@ -60,6 +60,7 @@
     "postcss-preset-env": "^11.2.1",
     "prettier": "^3.8.2",
     "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.4.0",
     "transform-async-modules-webpack-plugin": "^1.1.1",
     "typescript": "^6.0.2",
     "webpack": "^5.106.1",
