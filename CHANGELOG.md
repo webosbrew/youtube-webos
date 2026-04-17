@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.5.1] - 2026/04/16
+
+### Added
+
+- [#383](https://github.com/webosbrew/youtube-webos/pull/383): Add option to bypass the "Who's Watching?" account selection screen (@fire332)
+- [#435](https://github.com/webosbrew/youtube-webos/pull/435): Add additional image assets (@GA251)
+- [#436](https://github.com/webosbrew/youtube-webos/pull/436): Show YTAF version in the settings menu (@jesvijonathan)
+- [#436](https://github.com/webosbrew/youtube-webos/pull/436): Polish YTAF settings menu visuals (@jesvijonathan)
+
+### Fixed
+
+- [#433](https://github.com/webosbrew/youtube-webos/pull/433): Fix the app failing to load on webOS 3 due to a syntax error in the bundle (@fire332)
+- [#409](https://github.com/webosbrew/youtube-webos/pull/409): Fix blank thumbnails in the Shorts shelf (@LeviSnoot)
+- [#332](https://github.com/webosbrew/youtube-webos/pull/332): Fix adblock bypass caused by server-side backoff producing fake buffering (@fire332)
+
+### Changed
+
+- [#418](https://github.com/webosbrew/youtube-webos/pull/418): Migrate package manager from npm to pnpm (@fire332)
+- [#417](https://github.com/webosbrew/youtube-webos/pull/417), [#432](https://github.com/webosbrew/youtube-webos/pull/432): Update dependencies (@fire332)
+- [#417](https://github.com/webosbrew/youtube-webos/pull/417): Migrate Babel config to `preset-typescript` (@fire332)
+- [#417](https://github.com/webosbrew/youtube-webos/pull/417): Swap `@webos-tools/cli` with a fork that supports Node.js v24 (@fire332)
+- [#434](https://github.com/webosbrew/youtube-webos/pull/434): Format `yt-fixes.css` with Prettier (@fire332)
+- [#438](https://github.com/webosbrew/youtube-webos/pull/438): Generate `appinfo.json` version from `package.json` to streamline releases (@fire332)
+
 ## [0.5.0] - 2025/11/10
 
 ### Added
