@@ -3,6 +3,17 @@ import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plu
 import TerserPlugin from 'terser-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
 import webpack from 'webpack';
+import { basename } from 'node:path';
+
+/**
+ * @param input {Buffer<ArrayBufferLike>}
+ * @returns {string}
+ */
+function transformAppInfo(input) {
+  const appInfo = JSON.parse(input.toString());
+  appInfo.version = pkgJson.version;
+  return JSON.stringify(appInfo, null, 2);
+}
 
 /** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
 const makeConfig = (_env, argv) => [
@@ -71,7 +82,18 @@ const makeConfig = (_env, argv) => [
     plugins: [
       new CopyPlugin({
         patterns: [
-          { context: 'assets', from: '**/*' },
+          {
+            context: 'assets',
+            from: '**/*',
+            transform: {
+              transformer(input, absolutePath) {
+                if (basename(absolutePath) === 'appinfo.json') {
+                  return transformAppInfo(input);
+                }
+                return input;
+              }
+            }
+          },
           { context: 'src', from: 'index.html' }
         ]
       }),
