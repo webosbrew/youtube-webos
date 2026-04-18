@@ -34,7 +34,12 @@ function makeConfig(api) {
         'polyfill-corejs3',
         {
           method: 'usage-pure',
-          version: corejspureVersion
+          version: corejspureVersion,
+          /** TODO: Remove after core rewrite.
+           * The way pure polyfills work completely breaks wrapper chaining.
+           * The new core will only wrap each global once, which will completely side-step the issue.
+           */
+          exclude: ['es.json.parse', 'esnext.json.parse']
         }
       ],
       [
