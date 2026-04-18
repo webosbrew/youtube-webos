@@ -11,9 +11,8 @@ const { version: corejspureVersion } = require('core-js-pure/package.json');
 
 /** @type {import('@babel/core').ConfigFunction} */
 function makeConfig(api) {
-  api.cache.invalidate(() => babelruntimeVersion + corejspureVersion);
-
-  return {
+  /** @satisfies {import('@babel/core').TransformOptions} */
+  const cfg = {
     // Fixes "TypeError: __webpack_require__(...) is not a function"
     // https://github.com/webpack/webpack/issues/9379#issuecomment-509628205
     // https://babel.dev/docs/options#sourcetype
@@ -66,6 +65,12 @@ function makeConfig(api) {
       ]
     ]
   };
+
+  api.cache.invalidate(
+    () => babelruntimeVersion + corejspureVersion + JSON.stringify(cfg)
+  );
+
+  return cfg;
 }
 
 export default makeConfig;
