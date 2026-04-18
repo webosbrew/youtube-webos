@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.5.3] - 2026/04/18
+
+### Fixed
+
+- [#444](https://github.com/webosbrew/youtube-webos/pull/444): Fix YTAF not loading due to YouTube's Trusted Types enforcement (@fire332)
+
 ## [0.5.2] - 2026/04/18
 
 ### Fixed
