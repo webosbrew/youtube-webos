@@ -144,9 +144,10 @@ function createOptionsPanel() {
 
   elmContainer.appendChild(elmBlock);
 
-  const elmSponsorLink = document.createElement('div');
-  elmSponsorLink.innerHTML =
-    '<small class="ytaf-ui-sponsor">Sponsor segments skipping - https://sponsor.ajay.app</small>';
+  const elmSponsorLink = document.createElement('small');
+  elmSponsorLink.className = 'ytaf-ui-sponsor';
+  elmSponsorLink.textContent =
+    'Sponsor segments skipping - https://sponsor.ajay.app';
   elmContainer.appendChild(elmSponsorLink);
 
   const version = document.createElement('div');
