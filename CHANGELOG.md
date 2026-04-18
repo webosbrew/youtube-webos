@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.5.2] - 2026/04/18
+
+### Fixed
+
+- [#443](https://github.com/webosbrew/youtube-webos/pull/443): Fix adblock and Shorts removal (@fire332)
+
+### Changed
+
+- [#443](https://github.com/webosbrew/youtube-webos/pull/443): Invalidate Babel cache on config change (@fire332)
+- [#442](https://github.com/webosbrew/youtube-webos/pull/442): Add syntax compatibility validation for build artifacts (@fire332)
+
 ## [0.5.1] - 2026/04/16
 
 ### Added
