@@ -54,6 +54,9 @@ importers:
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
       '@webos-tools/cli':
         specifier: github:fire332/webos-cli#6cfbcf231a0fa1e50519d370ee6e5edc71c4998a
         version: https://codeload.github.com/fire332/webos-cli/tar.gz/6cfbcf231a0fa1e50519d370ee6e5edc71c4998a(@types/node@25.6.0)
@@ -114,6 +117,9 @@ importers:
       prettier:
         specifier: ^3.8.2
         version: 3.8.2
+      semver:
+        specifier: ^7.7.3
+        version: 7.7.4
       style-loader:
         specifier: ^4.0.0
         version: 4.0.0(webpack@5.106.1)
@@ -1252,6 +1258,9 @@ packages:
 
   '@types/node@25.6.0':
     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+
+  '@types/semver@7.7.1':
+    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
   '@typescript-eslint/types@8.58.2':
     resolution: {integrity: sha512-9TukXyATBQf/Jq9AMQXfvurk+G5R2MwfqQGDR2GzGz28HvY/lXNKGhkY+6IOubwcquikWk5cjlgPvD2uAA7htQ==}
@@ -5024,6 +5033,8 @@ snapshots:
   '@types/node@25.6.0':
     dependencies:
       undici-types: 7.19.2
+
+  '@types/semver@7.7.1': {}
 
   '@typescript-eslint/types@8.58.2': {}
 
