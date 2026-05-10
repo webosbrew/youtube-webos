@@ -1,0 +1,5 @@
+onlyBuiltDependencies:
+  - '@webos-tools/cli'
+  - core-js-pure
+  - cpu-features
+  - ssh2

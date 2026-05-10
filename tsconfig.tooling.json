@@ -1,10 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "types": ["node"],
     "checkJs": true,
-
-    // Remove when webpack-contrib/copy-webpack-plugin/issues/793 is fixed.
-    "skipLibCheck": true,
 
     "module": "NodeNext",
 

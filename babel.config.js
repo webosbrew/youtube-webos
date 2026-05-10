@@ -11,9 +11,8 @@ const { version: corejspureVersion } = require('core-js-pure/package.json');
 
 /** @type {import('@babel/core').ConfigFunction} */
 function makeConfig(api) {
-  api.cache.invalidate(() => babelruntimeVersion + corejspureVersion);
-
-  return {
+  /** @satisfies {import('@babel/core').TransformOptions} */
+  const cfg = {
     // Fixes "TypeError: __webpack_require__(...) is not a function"
     // https://github.com/webpack/webpack/issues/9379#issuecomment-509628205
     // https://babel.dev/docs/options#sourcetype
@@ -23,12 +22,6 @@ function makeConfig(api) {
       noNewArrows: true
     },
     plugins: [
-      [
-        '@babel/plugin-transform-typescript',
-        {
-          strictMode: true
-        }
-      ],
       [
         '@babel/plugin-transform-runtime',
         {
@@ -40,7 +33,12 @@ function makeConfig(api) {
         'polyfill-corejs3',
         {
           method: 'usage-pure',
-          version: corejspureVersion
+          version: corejspureVersion,
+          /** TODO: Remove after core rewrite.
+           * The way pure polyfills work completely breaks wrapper chaining.
+           * The new core will only wrap each global once, which will completely side-step the issue.
+           */
+          exclude: ['es.json.parse', 'esnext.json.parse']
         }
       ],
       [
@@ -56,9 +54,23 @@ function makeConfig(api) {
         {
           bugfixes: true
         }
+      ],
+      [
+        '@babel/preset-typescript',
+        {
+          allExtensions: true, // TODO: remove for Babel 8
+          disallowAmbiguousJSXLike: true,
+          rewriteImportExtensions: true
+        }
       ]
     ]
   };
+
+  api.cache.invalidate(
+    () => babelruntimeVersion + corejspureVersion + JSON.stringify(cfg)
+  );
+
+  return cfg;
 }
 
 export default makeConfig;

@@ -1,4 +1,4 @@
-/*global navigate*/
+/*global navigate, __YTAF_VERSION__*/
 import './spatial-navigation-polyfill.js';
 import {
   configAddChangeListener,
@@ -129,6 +129,7 @@ function createOptionsPanel() {
   elmContainer.appendChild(createConfigCheckbox('removeShorts'));
   elmContainer.appendChild(createConfigCheckbox('forceHighResVideo'));
   elmContainer.appendChild(createConfigCheckbox('removeEndscreen'));
+  elmContainer.appendChild(createConfigCheckbox('autoAccountSelect'));
   elmContainer.appendChild(createConfigCheckbox('enableSponsorBlock'));
 
   const elmBlock = document.createElement('blockquote');
@@ -143,10 +144,17 @@ function createOptionsPanel() {
 
   elmContainer.appendChild(elmBlock);
 
-  const elmSponsorLink = document.createElement('div');
-  elmSponsorLink.innerHTML =
-    '<small class="ytaf-ui-sponsor">Sponsor segments skipping - https://sponsor.ajay.app</small>';
+  const elmSponsorLink = document.createElement('small');
+  elmSponsorLink.className = 'ytaf-ui-sponsor';
+  elmSponsorLink.textContent =
+    'Sponsor segments skipping - https://sponsor.ajay.app';
   elmContainer.appendChild(elmSponsorLink);
+
+  const version = document.createElement('div');
+  version.className = 'ytaf-ui-version';
+  version.textContent = `v${__YTAF_VERSION__}`;
+
+  elmContainer.appendChild(version);
 
   return elmContainer;
 }

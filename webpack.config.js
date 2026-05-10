@@ -1,6 +1,19 @@
 import CopyPlugin from 'copy-webpack-plugin';
 import { TransformAsyncModulesPlugin } from 'transform-async-modules-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import pkgJson from './package.json' with { type: 'json' };
+import webpack from 'webpack';
+import { basename } from 'node:path';
+
+/**
+ * @param input {Buffer<ArrayBufferLike>}
+ * @returns {string}
+ */
+function transformAppInfo(input) {
+  const appInfo = JSON.parse(input.toString());
+  appInfo.version = pkgJson.version;
+  return JSON.stringify(appInfo, null, 2);
+}
 
 /** @type {(env: Record<string, string>, argv: { mode?: string }) => (import('webpack').Configuration)[]} */
 const makeConfig = (_env, argv) => [
@@ -10,6 +23,14 @@ const makeConfig = (_env, argv) => [
      * to cause segfaults (at least) on nodeJS v0.12.2 used on webOS 3.x.
      */
     devtool: argv.mode === 'development' ? 'inline-source-map' : 'source-map',
+
+    optimization: {
+      /**
+       * terser doesn't pickup browserlist config
+       * See: https://github.com/terser/terser/issues/235
+       */
+      minimizer: [new TerserPlugin({ terserOptions: { ecma: 5 } })]
+    },
 
     entry: {
       index: './src/index.js',
@@ -61,7 +82,18 @@ const makeConfig = (_env, argv) => [
     plugins: [
       new CopyPlugin({
         patterns: [
-          { context: 'assets', from: '**/*' },
+          {
+            context: 'assets',
+            from: '**/*',
+            transform: {
+              transformer(input, absolutePath) {
+                if (basename(absolutePath) === 'appinfo.json') {
+                  return transformAppInfo(input);
+                }
+                return input;
+              }
+            }
+          },
           { context: 'src', from: 'index.html' }
         ]
       }),
@@ -69,10 +101,13 @@ const makeConfig = (_env, argv) => [
       // webpack transforms it to async modules.
       // This plugin calls babel again to transform remove the `async` keyword usage after the fact.
       new TransformAsyncModulesPlugin({
-        // @ts-expect-error Bad types
         runtime: {
-          version: pkgJson.devDependencies['@babel/plugin-transform-runtime']
+          version: pkgJson.dependencies['@babel/runtime-corejs3'],
+          absoluteRuntime: './node_modules/@babel/runtime-corejs3'
         }
+      }),
+      new webpack.DefinePlugin({
+        __YTAF_VERSION__: JSON.stringify(pkgJson.version)
       })
     ]
   }

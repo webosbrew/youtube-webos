@@ -5,7 +5,7 @@ import type { ESLint, Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import stylistic from '@stylistic/eslint-plugin';
 import prettierConfig from 'eslint-config-prettier/flat';
-import * as regexpPlugin from 'eslint-plugin-regexp';
+import regexpPlugin from 'eslint-plugin-regexp';
 import globals from 'globals';
 import pkgJson from './package.json' with { type: 'json' };
 

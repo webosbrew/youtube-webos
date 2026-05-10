@@ -1,4 +1,3 @@
-import { get } from 'http';
 import { configRead } from './config';
 import { getPlayerManager, PlayerMode } from './player_api';
 import type { EventMapOf, PlayerManager, VideoID } from './player_api';

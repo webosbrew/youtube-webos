@@ -14,6 +14,7 @@ document.addEventListener(
 
 import './app_api/index';
 import './adblock.js';
+import './hooks/json-stringify';
 import './shorts.js';
 import './sponsorblock.js';
 import './ui.js';
@@ -27,3 +28,4 @@ import './lang-settings-fix';
 import './remove-endscreen';
 import './hooks';
 import './block-webos-cast';
+import './auto-account-select';

@@ -4,8 +4,6 @@
     "target": "ESNext",
     "module": "ESNext",
     "lib": ["ESNext"],
-    "esModuleInterop": true,
-
     // Module handling
     "composite": true,
     "moduleResolution": "bundler",
