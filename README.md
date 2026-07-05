@@ -32,6 +32,7 @@
 - YouTube Logo Removal
 - Remove end screens
 - Bypass account selector screen
+- Automatic live catch-up
 
 > [!NOTE]
 > Press the 🟩 **Green** button on your remote to access the configuration screen.
