@@ -76,6 +76,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Bypass initial account selection on startup'
     }
+  ],
+  [
+    'enableLiveCatchup',
+    {
+      default: false,
+      desc: 'Reduce live stream delay (skip to live edge)'
+    }
   ]
 ]);
 

@@ -23,6 +23,7 @@ export type VideoID = string;
 
 export interface VideoData {
   video_id: VideoID | undefined;
+  isLive?: boolean;
 }
 
 export type PlayerStateKeys =
@@ -78,4 +79,8 @@ export interface YTPlayer extends HTMLElement {
   isInline(): boolean;
 
   getVideoStats(): VideoStats;
+
+  getPlaybackRate(): number;
+
+  setPlaybackRate(rate: number): void;
 }
