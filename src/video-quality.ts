@@ -2,6 +2,7 @@ import { configRead } from './config';
 import { getPlayerManager, PlayerMode } from './player_api';
 import type { EventMapOf, PlayerManager, VideoID } from './player_api';
 import { showNotification } from './ui';
+import { getPreferredVp9FormatId } from './video-codec';
 
 const playerManager = await getPlayerManager();
 
@@ -35,7 +36,10 @@ function setPlaybackQuality(this: PlayerManager, _: unknown) {
   this.removeEventListener('playbackStart', setPlaybackQuality);
 
   const prevQuality = this.player.getPlaybackQualityLabel();
-  this.player.setPlaybackQualityRange('highres', 'highres');
+  const formatId = configRead('forceVp9Codec')
+    ? getPreferredVp9FormatId(this.player.getAvailableQualityData())
+    : undefined;
+  this.player.setPlaybackQualityRange('highres', 'highres', formatId);
 
   if (prevQuality === getMaxQualityLabel(this.player)) {
     notifyPlaybackQuality.call(this);

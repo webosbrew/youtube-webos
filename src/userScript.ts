@@ -1,5 +1,6 @@
 import 'whatwg-fetch';
 import './domrect-polyfill';
+import './video-codec';
 
 import { handleLaunch } from './utils';
 

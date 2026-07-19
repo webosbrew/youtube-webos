@@ -64,6 +64,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'forceVp9Codec',
+    {
+      default: true,
+      desc: 'Force VP09 video codec'
+    }
+  ],
+  [
     'removeEndscreen',
     {
       default: false,
