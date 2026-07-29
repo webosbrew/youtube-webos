@@ -1,9 +1,9 @@
 .ytaf-ui-container {
   position: absolute;
-  top: 10%;
+  top: 5%;
   left: 10%;
   right: 10%;
-  bottom: 10%;
+  bottom: 5%;
 
   background: rgba(18, 18, 18, 0.9);
   backdrop-filter: blur(23px);
@@ -11,7 +11,7 @@
   border: 0.1rem solid rgb(52 52 52);
   border-radius: 20px;
   padding: 1em;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   z-index: 1000;
 }
 
@@ -22,18 +22,22 @@
 
 .ytaf-ui-container h1 {
   margin: 0;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.3em;
   text-align: center;
 }
 
 .ytaf-ui-container input[type='checkbox'] {
-  width: 1.5rem;
-  height: 1.3rem;
+  width: 1.4rem;
+  height: 1.2rem;
 }
 
 .ytaf-ui-container label {
   display: block;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+}
+
+.ytaf-ui-container blockquote {
+  margin: 0.4em 0 0.4em 2em;
 }
 
 .ytaf-notification-container {

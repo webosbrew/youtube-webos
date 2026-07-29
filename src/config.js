@@ -76,6 +76,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Bypass initial account selection on startup'
     }
+  ],
+  [
+    'enableReturnYouTubeDislike',
+    {
+      default: true,
+      desc: 'Show dislike counts (Return YouTube Dislike)'
+    }
   ]
 ]);
 

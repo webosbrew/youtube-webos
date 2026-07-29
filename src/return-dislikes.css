@@ -1,0 +1,53 @@
+.ytaf-ryd-badge {
+  position: fixed;
+  top: 3.5rem;
+  right: 2.5rem;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: rgba(18, 18, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1.2rem;
+  color: #ffffff;
+  font-family: 'Roboto', 'Arial', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  pointer-events: none;
+}
+
+.ytaf-ryd-badge-hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.ytaf-ryd-dislike-icon {
+  color: #ff5555;
+  font-weight: bold;
+}
+
+.ytaf-ryd-ratio {
+  color: #aaaaaa;
+  font-size: 0.85rem;
+  margin-left: 0.2rem;
+}
+
+/* Hide dislike text next to icon by default */
+[idomkey='dislike-button']:not(:focus):not(:hover) .ytaf-ryd-native-label {
+  display: none !important;
+}
+
+/* Show native label cleanly on focus or hover */
+[idomkey='dislike-button']:focus .ytaf-ryd-native-label,
+[idomkey='dislike-button']:hover .ytaf-ryd-native-label,
+[idomkey='dislike-button'] .focused .ytaf-ryd-native-label {
+  display: inline-block !important;
+  font-weight: 500 !important;
+}
