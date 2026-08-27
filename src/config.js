@@ -57,6 +57,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'keepWatchPinned',
+    {
+      default: false,
+      desc: 'Keep Time Pinned'
+    }
+  ],
+  [
     'forceHighResVideo',
     {
       default: false,
