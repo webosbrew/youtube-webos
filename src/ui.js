@@ -126,6 +126,7 @@ function createOptionsPanel() {
   elmContainer.appendChild(createConfigCheckbox('upgradeThumbnails'));
   elmContainer.appendChild(createConfigCheckbox('hideLogo'));
   elmContainer.appendChild(createConfigCheckbox('showWatch'));
+  elmContainer.appendChild(createConfigCheckbox('keepWatchPinned'));
   elmContainer.appendChild(createConfigCheckbox('removeShorts'));
   elmContainer.appendChild(createConfigCheckbox('forceHighResVideo'));
   elmContainer.appendChild(createConfigCheckbox('removeEndscreen'));

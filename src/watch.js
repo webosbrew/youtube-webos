@@ -6,6 +6,8 @@ class Watch {
   #watch;
   #timer;
   #attrChanges;
+  #player = null;
+  #pinned = false;
   #PLAYER_SELECTOR = 'ytlr-watch-default';
 
   constructor() {
@@ -40,23 +42,35 @@ class Watch {
   }
 
   playerAppear(video) {
-    this.changeVisibility(video);
+    this.changeVisibility();
     this.playerObserver(video);
   }
 
-  changeVisibility(video) {
-    const focused = video.getAttribute('hybridnavfocusable') === 'true';
+  changeVisibility() {
+    // When pinned the clock stays visible regardless of whether the player is
+    // focused.
+    if (this.#pinned) {
+      this.#watch.style.display = 'block';
+      return;
+    }
+
+    const focused = this.#player?.getAttribute('hybridnavfocusable') === 'true';
     this.#watch.style.display = focused ? 'none' : 'block';
   }
 
+  setPinned(pinned) {
+    this.#pinned = pinned;
+    this.changeVisibility();
+  }
+
   async playerEvents() {
-    const player = await requireElement(this.#PLAYER_SELECTOR, HTMLElement);
-    this.playerAppear(player);
+    this.#player = await requireElement(this.#PLAYER_SELECTOR, HTMLElement);
+    this.playerAppear(this.#player);
   }
 
   playerObserver(node) {
     this.#attrChanges = new MutationObserver(() => {
-      this.changeVisibility(node);
+      this.changeVisibility();
     });
 
     this.#attrChanges.observe(node, {
@@ -74,17 +88,25 @@ class Watch {
 
 let watchInstance = null;
 
-function toggleWatch(show) {
-  if (show) {
+function refreshWatch() {
+  const pinned = configRead('keepWatchPinned');
+
+  // The clock exists while either the config option is on or it's pinned.
+  if (configRead('showWatch') || pinned) {
     watchInstance = watchInstance ? watchInstance : new Watch();
+    watchInstance.setPinned(pinned);
   } else {
     watchInstance?.destroy();
     watchInstance = null;
   }
 }
 
-toggleWatch(configRead('showWatch'));
+refreshWatch();
 
-configAddChangeListener('showWatch', (evt) => {
-  toggleWatch(evt.detail.newValue);
+configAddChangeListener('showWatch', () => {
+  refreshWatch();
+});
+
+configAddChangeListener('keepWatchPinned', () => {
+  refreshWatch();
 });
