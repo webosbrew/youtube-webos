@@ -4,6 +4,7 @@
  * kept asleep when the app was not started by a cast launch.
  */
 
+import { configRead } from './config';
 import type { webOSLaunchParams } from './globals';
 import { FetchRegistry } from './hooks';
 
@@ -41,6 +42,7 @@ FetchRegistry.getInstance().addEventListener('request', (evt) => {
   const { url } = evt.detail;
 
   if (url.pathname !== '/wake_cast_core') return;
+  if (!configRead('blockWebosCast')) return;
   if (castLaunch) return;
 
   evt.preventDefault();
