@@ -13,6 +13,8 @@
   padding: 1em;
   font-size: 1.4rem;
   z-index: 1000;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .ytaf-ui-container :focus {
