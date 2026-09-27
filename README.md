@@ -25,6 +25,7 @@
 - [Autostart Support](#autostart)
 - Force Highest Video Quality
 - Audio-Only Mode (🟦 Blue button on remote)
+- [Playback Speed](#playback-speed) (🟨 Yellow button on remote)
 - Full Animation Support
 - Shorts Removal
 - Higher-Quality Thumbnails
@@ -71,6 +72,28 @@ To disable autostart:
 ```sh
 luna-send-pub -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtube.leanback.v4"}'
 ```
+
+---
+
+## Playback Speed
+
+Play video at 0.25×–2× through YouTube's own **Settings → Speed** menu, or
+cycle 1 → 1.25 → 1.5 → 1.75 → 2 → 1 with the 🟨 **Yellow** button on the
+remote. Controlled by the `enablePlaybackSpeed` option (on the 🟩 **Green**
+configuration screen).
+
+webOS TVs decode video in hardware at a fixed 1×, so speeding up playback
+needs two independent tricks working together: the video keeps decoding at 1×
+while its MSE timeline is rescaled so the player _thinks_ it's playing faster,
+and the audio track is decoded with WebCodecs and time-stretched with WSOLA
+(pitch preserved) to match. Changing speed reloads the video at the current
+playback position.
+
+The feature needs a `WebCodecs` `AudioDecoder`; on webOS builds where it's
+missing (webOS ≤ 21 / older Chromium), it stays off automatically. E-AC-3
+audio tracks aren't supported by `AudioDecoder` either, so those fall back to
+1× regardless of the setting. Developed against and tested on an LG OLED C4
+(webOS 24); see [#6](https://github.com/webosbrew/youtube-webos/issues/6).
 
 ---
 
