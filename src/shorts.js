@@ -7,8 +7,17 @@ const SHELF_SHORTS = 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS';
 const origParse = JSON.parse;
 JSON.parse = function () {
   const r = origParse.apply(this, arguments);
+  removeShortsFrom(r);
+  return r;
+};
+
+/**
+ * Drop the Shorts from a parsed InnerTube response, in place.
+ * Also used by `early-browse.ts`, for a response parsed before this hook.
+ */
+export function removeShortsFrom(r) {
   if (!configRead('removeShorts')) {
-    return r;
+    return;
   }
 
   // First page of subscriptions tab
@@ -28,9 +37,7 @@ JSON.parse = function () {
   if (sectionListRenderer?.contents) {
     removeShelvesWithShorts(sectionListRenderer);
   }
-
-  return r;
-};
+}
 
 function removeShorts(container) {
   container.items = container.items.filter(

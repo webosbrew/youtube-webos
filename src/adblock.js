@@ -18,8 +18,17 @@ JSON.parse = function () {
   //   console.debug('JSON.parse', r);
   // }
 
+  removeAds(r);
+  return r;
+};
+
+/**
+ * Drop the ads from a parsed InnerTube response, in place.
+ * Also used by `early-browse.ts`, for a response parsed before this hook.
+ */
+export function removeAds(r) {
   if (!configRead('enableAdBlock')) {
-    return r;
+    return;
   }
 
   if (r?.adPlacements) {
@@ -62,9 +71,7 @@ JSON.parse = function () {
       (elm) => !elm?.command?.reelWatchEndpoint?.adClientParams?.isAd
     );
   }
-
-  return r;
-};
+}
 
 // Drop `adSlotRenderer`
 // `adSlotRenderer` can occur as,

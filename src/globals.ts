@@ -4,6 +4,8 @@ declare global {
   interface Window {
     launchParams?: webOSLaunchParams;
     __ytaf_debug__?: boolean;
+    /** Set by YouTube's page: the home screen it fetches before the user script runs */
+    pendingEarlyBrowse?: Promise<{ response?: unknown } | undefined>;
   }
 
   interface Document {
