@@ -13,6 +13,7 @@
     "launch": "ares-launch youtube.leanback.v4",
     "manifest": "node tools/gen-manifest.cjs youtube.leanback.v4.manifest.json",
     "prepare": "husky",
+    "test:launch": "node --test tests/launch.test.js",
     "test:compat": "es-check",
     "lint:eslint": "eslint --concurrency auto",
     "lint:tsc": "tsc -b",

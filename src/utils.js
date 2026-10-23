@@ -16,6 +16,16 @@ function getYTURL() {
   return ytURL;
 }
 
+// Require HTTPS as well as the origin: blob URLs can share an HTTPS origin.
+function parseAllowedYouTubeURL(value, origin) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.origin === origin ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Creates a new URLSearchPrams with the contents of `a` and `b`
  * @param {URLSearchParams} a
@@ -42,9 +52,10 @@ export function handleLaunch(params) {
 
   switch (typeof contentTarget) {
     case 'string': {
-      if (contentTarget.indexOf(ytURL.origin) === 0) {
+      const directURL = parseAllowedYouTubeURL(contentTarget, ytURL.origin);
+      if (directURL) {
         console.info('Launching from direct contentTarget');
-        ytURL = contentTarget;
+        ytURL = directURL;
       } else {
         // Out of app dial launch with second screen on home: { contentTarget: 'pairingCode=<UUID>&theme=cl&dialLaunch=watch' }
         console.info('Launching from partial contentTarget');
