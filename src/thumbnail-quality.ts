@@ -1,156 +1,67 @@
-const webpTestImgs = {
-  lossy: 'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA',
-  lossless: 'UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==',
-  alpha:
-    'UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==',
-  animation:
-    'UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA'
-} as const;
+/**
+ * Upgrade the thumbnails YouTube asks for (320x180 crops of `hqdefault`) to
+ * `sddefault` (640x480) in the InnerTube responses, before they are rendered.
+ *
+ * This used to be done in the DOM: a `MutationObserver` on every style change
+ * under `<body>`, and a second image load for each thumbnail. On a 2017 LG
+ * (webOS 3.9) that made every page switch about 1 s slower (the observer about
+ * 0.6 s, the second loads about 0.5 s). Rewriting the URLs in the data costs a
+ * few ms per response.
+ */
 
-function checkWebpFeature(
-  feature: keyof typeof webpTestImgs,
-  callback: (
-    featureName: keyof typeof webpTestImgs,
-    isSupported: boolean
-  ) => void
-) {
-  const img = new Image();
-  img.onload = function () {
-    const result = img.width > 0 && img.height > 0;
-    callback(feature, result);
-  };
-
-  img.onerror = function () {
-    callback(feature, false);
-  };
-
-  img.src = 'data:image/webp;base64,' + webpTestImgs[feature];
-}
+import { configRead } from './config';
 
 let webpSupported = false;
-checkWebpFeature('lossy', (_, support) => {
-  webpSupported = support;
-});
+const webpTest = new Image();
+webpTest.onload = () => {
+  webpSupported = webpTest.width > 0 && webpTest.height > 0;
+};
+webpTest.src =
+  'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA';
 
-function rewriteURL(url: URL) {
-  const YT_THUMBNAIL_PATHNAME_REGEX =
-    /vi(?:_webp)?(\/.*?\/)([a-z0-9]+?)(_\w*?)?\.[a-z]+$/g;
+// Only i.ytimg.com: the A/B test hosts (i1, i2, ...) are left alone, as before.
+// `_live` thumbnails have their own `sddefault`; the other suffixes
+// (`_custom_1`, ...) do not, so they get the video's own `sddefault`.
+const YT_THUMBNAIL_URL =
+  /^(https:\/\/i\.ytimg\.com)\/vi(?:_webp)?\/([^/]+)\/(?:sd|hq|mq)?default(_live)?(?:_\w+)?\.(?:jpg|webp)(?:\?.*)?$/;
 
-  const YT_TARGET_THUMBNAIL_NAMES = [
-    'sddefault',
-    'hqdefault',
-    'mqdefault',
-    'default'
-  ] as const;
-
-  const isABTest = url.hostname.match(/^i\d/) !== null;
-  // Don't know how to handle A/B test thumbnails so we don't upgrade them.
-  if (isABTest) return null;
-
-  const replacementPathname = url.pathname.replace(
-    YT_THUMBNAIL_PATHNAME_REGEX,
-    (match, p1, p2, p3) => {
-      if (!YT_TARGET_THUMBNAIL_NAMES.includes(p2)) return match; // Only rewrite regular thumbnail URLs. Not shorts, etc.
-      return `${webpSupported ? 'vi_webp' : 'vi'}${p1}sddefault${p3 ?? ''}.${webpSupported ? 'webp' : 'jpg'}`;
-    }
-  );
-  if (url.pathname === replacementPathname)
-    // pathname not changed because not a regular thumbnail or already upgraded.
-    return null;
-
-  url = new URL(url);
-
-  url.pathname = replacementPathname;
-  url.search = '';
-
-  return url;
+function upgradeURL(url: string) {
+  const match = YT_THUMBNAIL_URL.exec(url);
+  if (!match) return null;
+  const [, host, videoId, live = ''] = match;
+  return webpSupported
+    ? `${host}/vi_webp/${videoId}/sddefault${live}.webp`
+    : `${host}/vi/${videoId}/sddefault${live}.jpg`;
 }
 
-function parseCSSUrl(value: string): URL | undefined {
-  try {
-    return new URL(value.slice(4, -1).replace(/["']/g, ''));
-  } catch (e) {
-    return undefined; // Not a valid URL
+function upgradeIn(node: unknown) {
+  if (typeof node !== 'object' || node === null) return;
+  if (Array.isArray(node)) {
+    for (const item of node) upgradeIn(item);
+    return;
   }
+  const obj = node as Record<string, unknown>;
+  if (Array.isArray(obj.thumbnails)) {
+    for (const thumbnail of obj.thumbnails as { url?: unknown }[]) {
+      if (typeof thumbnail?.url !== 'string') continue;
+      const url = upgradeURL(thumbnail.url);
+      if (url) thumbnail.url = url;
+    }
+  }
+  for (const key in obj) upgradeIn(obj[key]);
 }
 
-async function upgradeBgImg(element: HTMLElement) {
-  const style = element.style;
-  const old = parseCSSUrl(style.backgroundImage);
-  if (!old) return;
-
-  const target = rewriteURL(old);
-  if (!target) return;
-
-  const lazyLoader = new Image();
-
-  lazyLoader.onload = () => {
-    // Don't swap if a placeholder thumbnail was provided.
-    // Placeholder thumbnails are the same size as the "default" size.
-    if (lazyLoader.naturalHeight === 90) return;
-
-    const curr = parseCSSUrl(style.backgroundImage);
-    if (!curr) return;
-
-    // Don't swap out element image if it has been changed while target image was loading.
-    if (curr.href !== old.href) return;
-
-    style.backgroundImage = `url(${target.href})`;
-  };
-
-  lazyLoader.src = target.href;
+/** Upgrade the video thumbnails in a parsed InnerTube response, in place. */
+function upgradeThumbnails(r: unknown) {
+  if (!configRead('upgradeThumbnails')) return;
+  if ((r as { responseContext?: unknown } | null)?.responseContext == null)
+    return;
+  upgradeIn(r);
 }
 
-const obs = new MutationObserver((mutations) => {
-  const YT_THUMBNAIL_ELEMENT_TAG = 'ytlr-thumbnail-details';
-
-  const dummy = document.createElement('div');
-
-  // handle backgroundImage change
-  // YT re-uses thumbnail elements in its virtual list implementation.
-  mutations
-    .filter((mut) => mut.type === 'attributes')
-    .map((mut) => [mut.target, mut] as const)
-    .filter((value): value is [HTMLElement, MutationRecord] => {
-      const [node, { oldValue }] = value;
-      dummy.style.cssText = oldValue ?? '';
-
-      return (
-        node instanceof HTMLElement &&
-        node.matches(YT_THUMBNAIL_ELEMENT_TAG) &&
-        node.style.backgroundImage !== '' &&
-        node.style.backgroundImage !== dummy.style.backgroundImage
-      );
-    })
-    .map(([elem]) => elem)
-    .forEach(upgradeBgImg);
-
-  // handle element add
-  mutations
-    .filter((mut) => mut.type === 'childList')
-    .flatMap((mut) => Array.from(mut.addedNodes))
-    .filter((node) => node instanceof HTMLElement)
-    .flatMap((elem) =>
-      Array.from(elem.querySelectorAll<HTMLElement>(YT_THUMBNAIL_ELEMENT_TAG))
-    )
-    .filter((elem) => elem.style.backgroundImage !== '')
-    .forEach(upgradeBgImg);
-});
-
-function enableObserver() {
-  obs.observe(document.body, {
-    subtree: true,
-    childList: true,
-    attributes: true,
-    attributeFilter: ['style'],
-    attributeOldValue: true
-  });
-}
-
-import { configRead, configAddChangeListener } from './config';
-
-if (configRead('upgradeThumbnails')) enableObserver();
-
-configAddChangeListener('upgradeThumbnails', (value) =>
-  value ? enableObserver() : obs.disconnect()
-);
+const origParse = JSON.parse;
+JSON.parse = function (text, reviver) {
+  const r: unknown = origParse.call(JSON, text, reviver);
+  upgradeThumbnails(r);
+  return r;
+};
