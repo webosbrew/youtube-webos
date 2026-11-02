@@ -30,15 +30,13 @@ const colorCodeMap = new Map([
 
 /**
  * Returns the name of the color button associated with a code or null if not a color button.
- * @param {number} charCode KeyboardEvent.charCode property from event
+ * @param {KeyboardEvent} evt Remote keyboard event
  * @returns {string | null} Color name or null
  */
-function getKeyColor(charCode) {
-  if (colorCodeMap.has(charCode)) {
-    return colorCodeMap.get(charCode);
-  }
-
-  return null;
+function getKeyColor(evt) {
+  return (
+    colorCodeMap.get(evt.keyCode) ?? colorCodeMap.get(evt.charCode) ?? null
+  );
 }
 
 function createConfigCheckbox(key) {
@@ -88,7 +86,7 @@ function createOptionsPanel() {
     (evt) => {
       console.debug('Options panel key event:', evt.type, evt.charCode);
 
-      if (getKeyColor(evt.charCode) === 'green') {
+      if (getKeyColor(evt) === 'green') {
         return;
       }
 
@@ -195,20 +193,20 @@ const eventHandler = (evt) => {
     evt.defaultPrevented
   );
 
-  if (getKeyColor(evt.charCode) === 'green') {
+  if (getKeyColor(evt) === 'green') {
     console.debug('Taking over!');
 
     evt.preventDefault();
-    evt.stopPropagation();
+    evt.stopImmediatePropagation();
 
     if (evt.type === 'keydown') {
       // Toggle visibility.
       showOptionsPanel(!optionsPanelVisible);
     }
     return false;
-  } else if (getKeyColor(evt.charCode) === 'blue') {
+  } else if (getKeyColor(evt) === 'blue') {
     evt.preventDefault();
-    evt.stopPropagation();
+    evt.stopImmediatePropagation();
 
     if (evt.type === 'keydown') {
       // Toggle Audio-Only mode.
@@ -219,9 +217,11 @@ const eventHandler = (evt) => {
   return true;
 };
 
-document.addEventListener('keydown', eventHandler, true);
-document.addEventListener('keypress', eventHandler, true);
-document.addEventListener('keyup', eventHandler, true);
+// Intercept remote keys before YouTube translates them into a second event.
+// Otherwise a single green press can toggle the panel open and closed.
+window.addEventListener('keydown', eventHandler, true);
+window.addEventListener('keypress', eventHandler, true);
+window.addEventListener('keyup', eventHandler, true);
 
 const COLOR_MAP = {
   red: 'rgba(255, 0, 0, 0.9)',
