@@ -3,7 +3,10 @@ if (!Element.prototype.matches && Element.prototype.webkitMatchesSelector) {
   Element.prototype.matches = Element.prototype.webkitMatchesSelector;
 }
 
-if (typeof window.CustomEvent !== 'function') {
+// Keep working native constructors, including on newer webOS versions.
+try {
+  new window.CustomEvent('ytaf-compat-check');
+} catch {
   const LegacyCustomEvent = function (type, options) {
     const event = document.createEvent('CustomEvent');
     const init = options || {};
@@ -14,7 +17,9 @@ if (typeof window.CustomEvent !== 'function') {
   window.CustomEvent = LegacyCustomEvent;
 }
 
-if (typeof window.EventTarget !== 'function') {
+try {
+  new window.EventTarget();
+} catch {
   const LegacyEventTarget = function () {
     this.__eventTarget = document.createDocumentFragment();
     this.__eventListeners = [];
