@@ -81,18 +81,18 @@ const configOptions = new Map([
 
 const defaultConfig = (() => {
   let ret = {};
-  for (const [k, v] of configOptions) {
+  configOptions.forEach((v, k) => {
     ret[k] = v.default;
-  }
+  });
   return ret;
 })();
 
 /** @type {Record<string, DocumentFragment>} as const */
 const configFrags = (() => {
   let ret = {};
-  for (const k of configOptions.keys()) {
-    ret[k] = new DocumentFragment();
-  }
+  configOptions.forEach((_v, k) => {
+    ret[k] = document.createDocumentFragment();
+  });
   return ret;
 })();
 

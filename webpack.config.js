@@ -5,6 +5,12 @@ import pkgJson from './package.json' with { type: 'json' };
 import webpack from 'webpack';
 import { basename } from 'node:path';
 
+const asyncRuntime = {
+  version: pkgJson.dependencies['@babel/runtime-corejs3'],
+  moduleName: '@babel/runtime-corejs3',
+  absoluteRuntime: './node_modules/@babel/runtime-corejs3'
+};
+
 /**
  * @param input {Buffer<ArrayBufferLike>}
  * @returns {string}
@@ -101,10 +107,7 @@ const makeConfig = (_env, argv) => [
       // webpack transforms it to async modules.
       // This plugin calls babel again to transform remove the `async` keyword usage after the fact.
       new TransformAsyncModulesPlugin({
-        runtime: {
-          version: pkgJson.dependencies['@babel/runtime-corejs3'],
-          absoluteRuntime: './node_modules/@babel/runtime-corejs3'
-        }
+        runtime: asyncRuntime
       }),
       new webpack.DefinePlugin({
         __YTAF_VERSION__: JSON.stringify(pkgJson.version)

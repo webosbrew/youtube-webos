@@ -1,3 +1,4 @@
+import './legacy-events';
 import 'whatwg-fetch';
 import './domrect-polyfill';
 
