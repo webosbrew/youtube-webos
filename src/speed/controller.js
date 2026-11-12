@@ -169,6 +169,14 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     // accept both.
     const code = evt.keyCode || evt.charCode;
     if (code === 405 || code === 170) {
+      const player = getPlayer();
+      if (
+        evt.defaultPrevented ||
+        !player?.getVideoData?.()?.video_id ||
+        player.isInline?.()
+      ) {
+        return false;
+      }
       if (evt.type === 'keydown') {
         evt.preventDefault();
         if (evt.stopPropagation) evt.stopPropagation();

@@ -22,10 +22,16 @@ export const SPEED_OVERLAY_TYPE = 'CLIENT_OVERLAY_TYPE_VIDEO_PLAYBACK_SPEED';
  * @returns {number} buttons enabled
  */
 export function enableSpeedButton(response) {
-  const renderer =
-    response &&
-    response.transportControls &&
-    response.transportControls.transportControlsRenderer;
+  return (
+    enableRenderer(response?.transportControls?.transportControlsRenderer) +
+    enableRenderer(
+      response?.playerOverlays?.playerOverlayRenderer?.transportControls
+        ?.transportControlsRenderer
+    )
+  );
+}
+
+function enableRenderer(renderer) {
   if (!renderer || typeof renderer !== 'object') return 0;
   let enabled = 0;
   for (const key of Object.keys(renderer)) {
@@ -52,15 +58,14 @@ export function enableSpeedButton(response) {
  * its own reference to `JSON.parse` from startup, so this must run at
  * document-start, like adblock.js (which then wraps this wrapper).
  * @param {Window} win
- * @param {() => boolean} isOn
  * @returns {() => void} restore
  */
-export function installSpeedButtonPatch(win, isOn) {
+export function installSpeedButtonPatch(win) {
   const json = win.JSON || JSON;
   const original = json.parse;
   const patched = function () {
     const r = original.apply(this, arguments);
-    if (r && typeof r === 'object' && r.transportControls && isOn()) {
+    if (r?.transportControls || r?.playerOverlays) {
       enableSpeedButton(r);
     }
     return r;

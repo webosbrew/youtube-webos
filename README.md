@@ -77,23 +77,19 @@ luna-send-pub -n 1 'luna://com.webos.service.eim/deleteDevice' '{"appId":"youtub
 
 ## Playback Speed
 
-Play video at 0.25×–2× through YouTube's own **Settings → Speed** menu, or
-cycle 1 → 1.25 → 1.5 → 1.75 → 2 → 1 with the 🟨 **Yellow** button on the
-remote. Controlled by the `enablePlaybackSpeed` option (on the 🟩 **Green**
-configuration screen).
+Open the configuration screen with the 🟩 **Green** button, enable
+**Experimental playback speed**, then close and reopen the app. Use
+**Settings → Speed** in the YouTube player for 0.25×–2×. During a video, the
+🟨 **Yellow** button cycles through 1×, 1.25×, 1.5×, 1.75× and 2×.
 
-webOS TVs decode video in hardware at a fixed 1×, so speeding up playback
-needs two independent tricks working together: the video keeps decoding at 1×
-while its MSE timeline is rescaled so the player _thinks_ it's playing faster,
-and the audio track is decoded with WebCodecs and time-stretched with WSOLA
-(pitch preserved) to match. Changing speed reloads the video at the current
-playback position.
+The app scales the MSE video timestamps and time-stretches the audio with
+WebCodecs and WSOLA to preserve pitch. Changing speed briefly reloads the video
+at its current position. Above 1.25×, playback is limited to 1080p.
 
-The feature needs a `WebCodecs` `AudioDecoder`; on webOS builds where it's
-missing (webOS ≤ 21 / older Chromium), it stays off automatically. E-AC-3
-audio tracks aren't supported by `AudioDecoder` either, so those fall back to
-1× regardless of the setting. Developed against and tested on an LG OLED C4
-(webOS 24); see [#6](https://github.com/webosbrew/youtube-webos/issues/6).
+The option appears on devices with WebCodecs `AudioDecoder`, Web Audio and MSE.
+Unsupported audio tracks such as E-AC-3 fall back to 1×. The original
+implementation was tested on an LG OLED C4 (webOS 24).
+[Playback speed pull request](https://github.com/webosbrew/youtube-webos/pull/484)
 
 ---
 

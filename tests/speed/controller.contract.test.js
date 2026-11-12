@@ -315,6 +315,15 @@ describe('controller', () => {
     assert.equal(ctl.getSpeed(), 1.25);
   });
 
+  test('yellow is left alone in an inline preview', () => {
+    const player = { ...fakePlayer(), isInline: () => true };
+    const { ctl } = controllerWith({ player });
+    const event = key('keydown', 405);
+    assert.equal(ctl.handleKey(event), false);
+    assert.equal(event.prevented, false);
+    assert.equal(ctl.getSpeed(), 1);
+  });
+
   test('turning the option off makes the next videos play at 1x', () => {
     const config = { enablePlaybackSpeed: true, forceHighResVideo: false };
     const { ctl } = controllerWith({ config });
@@ -389,6 +398,22 @@ describe('wiring', () => {
     });
     assert.equal(r, null);
     assert.equal(win.MediaSource.prototype.addSourceBuffer, before);
+    assert.equal(win.document.listenerCount(), 0);
+  });
+
+  test('installSpeedFeature leaves playback and menu hooks untouched when disabled', () => {
+    const win = domWindow(makeWorld());
+    win.JSON = { parse: JSON.parse };
+    const before = win.MediaSource.prototype.addSourceBuffer;
+    const parse = win.JSON.parse;
+    const result = installSpeedFeature(win, {
+      notify() {},
+      configRead: () => false,
+      getPlayer: () => null
+    });
+    assert.equal(result, null);
+    assert.equal(win.MediaSource.prototype.addSourceBuffer, before);
+    assert.equal(win.JSON.parse, parse);
     assert.equal(win.document.listenerCount(), 0);
   });
 

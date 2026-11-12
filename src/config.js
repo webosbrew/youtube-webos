@@ -80,8 +80,8 @@ const configOptions = new Map([
   [
     'enablePlaybackSpeed',
     {
-      default: true,
-      desc: 'Playback speed (YELLOW button)'
+      default: false,
+      desc: 'Experimental playback speed (restart app to apply)'
     }
   ]
 ]);

@@ -7,12 +7,16 @@ import {
 } from './native-menu.js';
 import { installSpeedButtonPatch } from './speed-button.js';
 
+export function supportsPlaybackSpeed(win) {
+  return (
+    typeof win.AudioDecoder === 'function' &&
+    typeof win.AudioContext === 'function' &&
+    typeof win.MediaSource === 'function'
+  );
+}
+
 export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
-  if (
-    typeof win.AudioDecoder === 'undefined' ||
-    typeof win.AudioContext === 'undefined' ||
-    typeof win.MediaSource === 'undefined'
-  ) {
+  if (!supportsPlaybackSpeed(win) || !configRead('enablePlaybackSpeed')) {
     return null;
   }
 
@@ -20,7 +24,8 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
     win,
     getPlayer,
     notify,
-    configRead
+    // The media and player hooks are installed before YouTube initializes.
+    configRead: (key) => key === 'enablePlaybackSpeed' || configRead(key)
   });
   const mseHook = installMseHook(win, {
     getSpeed: controller.getSpeed,
@@ -34,10 +39,7 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
   // to the controller on every player instance that appears.
   const restoreMenu = enableNativeSpeedMenu(win);
   const restoreRateHook = hookRateAssignments(win, controller);
-  const restoreButton = installSpeedButtonPatch(
-    win,
-    () => configRead('enablePlaybackSpeed') !== false
-  );
+  const restoreButton = installSpeedButtonPatch(win);
   const bindTimer =
     typeof win.setInterval === 'function'
       ? win.setInterval(() => bindPlayerRate(getPlayer(), controller), 1000)
@@ -54,6 +56,7 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
 
   function uninstall() {
     mseHook.uninstall();
+    controller.releaseAudioSink();
     restoreMenu();
     restoreRateHook();
     restoreButton();

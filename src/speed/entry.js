@@ -10,3 +10,7 @@ const speed = installSpeedFeature(window, {
 
 // Reachable from DevTools, like window.ytaf_showOptionsPanel in ui.js.
 window.ytafSpeed = speed ? speed.controller : null;
+
+export function isPlaybackSpeedLimited() {
+  return speed !== null && speed.controller.getSpeed() > 1.25;
+}

@@ -74,13 +74,25 @@ test('responses without transport controls are left alone', () => {
   }
 });
 
-test('the JSON.parse patch applies only while the feature is on, and restores', () => {
+test('the JSON.parse patch enables a speed button nested in player overlays', () => {
+  const { transportControls } = JSON.parse(raw());
+  const response = {
+    playerOverlays: { playerOverlayRenderer: { transportControls } }
+  };
   const win = { JSON: { parse: JSON.parse } };
-  let on = true;
-  const restore = installSpeedButtonPatch(win, () => on);
+  const restore = installSpeedButtonPatch(win);
+  const patched = win.JSON.parse(JSON.stringify(response));
+  assert.equal(
+    speedOf(patched.playerOverlays.playerOverlayRenderer).isDisabled,
+    false
+  );
+  restore();
+});
+
+test('the JSON.parse patch leaves other payloads intact and restores', () => {
+  const win = { JSON: { parse: JSON.parse } };
+  const restore = installSpeedButtonPatch(win);
   assert.equal(speedOf(win.JSON.parse(raw())).isDisabled, false);
-  on = false;
-  assert.equal(speedOf(win.JSON.parse(raw())).isDisabled, true);
   assert.deepEqual(
     win.JSON.parse('[1,{"a":2}]'),
     [1, { a: 2 }],
