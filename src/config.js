@@ -76,6 +76,13 @@ const configOptions = new Map([
       default: false,
       desc: 'Bypass initial account selection on startup'
     }
+  ],
+  [
+    'enablePlaybackSpeed',
+    {
+      default: false,
+      desc: 'Experimental playback speed (restart app to apply)'
+    }
   ]
 ]);
 

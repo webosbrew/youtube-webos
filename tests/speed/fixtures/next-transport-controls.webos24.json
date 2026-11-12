@@ -1,0 +1,1328 @@
+{
+  "transportControls": {
+    "transportControlsRenderer": {
+      "skipPreviousButton": {
+        "buttonRenderer": {
+          "isDisabled": false,
+          "text": {
+            "runs": [
+              {
+                "text": "Indietro"
+              }
+            ]
+          },
+          "icon": {
+            "iconType": "SKIP_PREVIOUS"
+          },
+          "trackingParams": "REDACTED",
+          "command": {
+            "clickTrackingParams": "REDACTED",
+            "signalAction": {
+              "signal": "PLAYER_PLAY_PREVIOUS"
+            }
+          }
+        }
+      },
+      "skipNextButton": {
+        "buttonRenderer": {
+          "isDisabled": false,
+          "text": {
+            "runs": [
+              {
+                "text": "Avanti"
+              }
+            ]
+          },
+          "icon": {
+            "iconType": "SKIP_NEXT"
+          },
+          "trackingParams": "REDACTED",
+          "command": {
+            "clickTrackingParams": "REDACTED",
+            "signalAction": {
+              "signal": "PLAYER_PLAY_NEXT"
+            }
+          }
+        }
+      },
+      "promotedActions": [
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_CHANNEL_BUTTON",
+          "button": {
+            "videoOwnerRenderer": {
+              "thumbnail": {
+                "thumbnails": [
+                  {
+                    "url": "https://yt3.ggpht.com/uI3VE4PVqvCy0xnWLqMJnEzyBUm3T8VHOCp4ee-1RxdHqKXCdUE_qXYQnpf9AfuEoIPactVyDhM=s48-c-k-c0x00ffffff-no-rj",
+                    "width": 48,
+                    "height": 48
+                  },
+                  {
+                    "url": "https://yt3.ggpht.com/uI3VE4PVqvCy0xnWLqMJnEzyBUm3T8VHOCp4ee-1RxdHqKXCdUE_qXYQnpf9AfuEoIPactVyDhM=s88-c-k-c0x00ffffff-no-rj",
+                    "width": 88,
+                    "height": 88
+                  },
+                  {
+                    "url": "https://yt3.ggpht.com/uI3VE4PVqvCy0xnWLqMJnEzyBUm3T8VHOCp4ee-1RxdHqKXCdUE_qXYQnpf9AfuEoIPactVyDhM=s176-c-k-c0x00ffffff-no-rj",
+                    "width": 176,
+                    "height": 176
+                  }
+                ]
+              },
+              "title": {
+                "runs": [
+                  {
+                    "text": "Canale"
+                  }
+                ]
+              },
+              "navigationEndpoint": {
+                "clickTrackingParams": "REDACTED",
+                "showEngagementPanelEndpoint": {
+                  "identifier": {
+                    "tag": "channel-actions-panel"
+                  }
+                }
+              },
+              "trackingParams": "REDACTED"
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_ABOUT_BUTTON",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Descrizione"
+                  }
+                ]
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "changeEngagementPanelVisibilityAction": {
+                  "targetId": "video-description-ep-identifier",
+                  "visibility": "ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_SUBSCRIBE",
+          "button": {
+            "subscribeButtonRenderer": {
+              "buttonText": {
+                "runs": [
+                  {
+                    "text": "Iscriviti"
+                  }
+                ]
+              },
+              "subscribed": false,
+              "enabled": true,
+              "type": "FREE",
+              "channelId": "UC4QobU6STFB0P71PMvOGN5A",
+              "showPreferences": false,
+              "subscribedButtonText": {
+                "runs": [
+                  {
+                    "text": "Iscritto"
+                  }
+                ]
+              },
+              "unsubscribedButtonText": {
+                "runs": [
+                  {
+                    "text": "Iscriviti"
+                  }
+                ]
+              },
+              "trackingParams": "REDACTED",
+              "unsubscribeButtonText": {
+                "runs": [
+                  {
+                    "text": "Annulla"
+                  }
+                ]
+              },
+              "serviceEndpoints": [
+                {
+                  "authDeterminedCommand": {
+                    "authenticatedCommand": {
+                      "clickTrackingParams": "REDACTED",
+                      "subscribeEndpoint": {
+                        "channelIds": ["UC4QobU6STFB0P71PMvOGN5A"],
+                        "params": "EgIIHBgA"
+                      }
+                    },
+                    "unauthenticatedCommand": {
+                      "clickTrackingParams": "REDACTED",
+                      "authRequiredCommand": {
+                        "identityActionContext": {
+                          "eventTrigger": "ACCOUNT_EVENT_TRIGGER_SUBSCRIBE",
+                          "nextEndpoint": {
+                            "clickTrackingParams": "REDACTED",
+                            "commandExecutorCommand": {
+                              "commands": [
+                                {
+                                  "clickTrackingParams": "REDACTED",
+                                  "signalAction": {
+                                    "signal": "CLOSE_POPUP"
+                                  }
+                                },
+                                {
+                                  "clickTrackingParams": "REDACTED",
+                                  "subscribeEndpoint": {
+                                    "channelIds": ["UC4QobU6STFB0P71PMvOGN5A"],
+                                    "params": "EgIIHBgA"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "clickTrackingParams": "REDACTED",
+                  "unsubscribeEndpoint": {
+                    "channelIds": ["UC4QobU6STFB0P71PMvOGN5A"],
+                    "params": "CgIIHBgA"
+                  }
+                }
+              ],
+              "notificationPreferenceButton": {
+                "subscriptionNotificationToggleButtonRenderer": {
+                  "states": [
+                    {
+                      "stateId": 2,
+                      "nextStateId": 2,
+                      "state": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_ACTIVE"
+                          },
+                          "accessibility": {
+                            "label": "L'impostazione attuale è \"Tutte le notifiche\". Tocca per modificare l'impostazione delle notifiche per il canale jawed."
+                          },
+                          "trackingParams": "REDACTED",
+                          "accessibilityData": {
+                            "accessibilityData": {
+                              "label": "L'impostazione attuale è \"Tutte le notifiche\". Tocca per modificare l'impostazione delle notifiche per il canale jawed."
+                            }
+                          }
+                        }
+                      },
+                      "inlineMenuButton": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "text": {
+                            "simpleText": "Tutte"
+                          },
+                          "serviceEndpoint": {
+                            "clickTrackingParams": "REDACTED",
+                            "modifyChannelNotificationPreferenceEndpoint": {
+                              "params": "ChhVQzRRb2JVNlNURkIwUDcxUE12T0dONUESAggCGAAgBA%3D%3D"
+                            }
+                          },
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_ACTIVE"
+                          },
+                          "trackingParams": "REDACTED"
+                        }
+                      },
+                      "notificationState": "SUBSCRIPTION_NOTIFICATION_STATE_ALL"
+                    },
+                    {
+                      "stateId": 3,
+                      "nextStateId": 3,
+                      "state": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_NONE"
+                          },
+                          "accessibility": {
+                            "label": "L'impostazione attuale è Notifiche personalizzate. Tocca per modificare le impostazioni di notifica per jawed."
+                          },
+                          "trackingParams": "REDACTED",
+                          "accessibilityData": {
+                            "accessibilityData": {
+                              "label": "L'impostazione attuale è Notifiche personalizzate. Tocca per modificare le impostazioni di notifica per jawed."
+                            }
+                          }
+                        }
+                      },
+                      "inlineMenuButton": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "text": {
+                            "simpleText": "Personalizzate"
+                          },
+                          "serviceEndpoint": {
+                            "clickTrackingParams": "REDACTED",
+                            "modifyChannelNotificationPreferenceEndpoint": {
+                              "params": "ChhVQzRRb2JVNlNURkIwUDcxUE12T0dONUESAggBGAAgBA%3D%3D"
+                            }
+                          },
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_NONE"
+                          },
+                          "trackingParams": "REDACTED"
+                        }
+                      },
+                      "notificationState": "SUBSCRIPTION_NOTIFICATION_STATE_OCCASIONAL"
+                    },
+                    {
+                      "stateId": 0,
+                      "nextStateId": 0,
+                      "state": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_OFF"
+                          },
+                          "accessibility": {
+                            "label": "L'impostazione attuale è \"Nessuna notifica\". Tocca per modificare l'impostazione delle notifiche per il canale jawed."
+                          },
+                          "trackingParams": "REDACTED",
+                          "accessibilityData": {
+                            "accessibilityData": {
+                              "label": "L'impostazione attuale è \"Nessuna notifica\". Tocca per modificare l'impostazione delle notifiche per il canale jawed."
+                            }
+                          }
+                        }
+                      },
+                      "inlineMenuButton": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "text": {
+                            "simpleText": "Nessuna"
+                          },
+                          "serviceEndpoint": {
+                            "clickTrackingParams": "REDACTED",
+                            "modifyChannelNotificationPreferenceEndpoint": {
+                              "params": "ChhVQzRRb2JVNlNURkIwUDcxUE12T0dONUESAggDGAAgBA%3D%3D"
+                            }
+                          },
+                          "icon": {
+                            "iconType": "NOTIFICATIONS_OFF"
+                          },
+                          "trackingParams": "REDACTED"
+                        }
+                      },
+                      "notificationState": "SUBSCRIPTION_NOTIFICATION_STATE_OFF"
+                    },
+                    {
+                      "state": {
+                        "buttonRenderer": {
+                          "style": "STYLE_TEXT",
+                          "size": "SIZE_DEFAULT",
+                          "isDisabled": false,
+                          "text": {
+                            "runs": [
+                              {
+                                "text": "Annulla"
+                              }
+                            ]
+                          },
+                          "icon": {
+                            "iconType": "PERSON_MINUS"
+                          },
+                          "trackingParams": "REDACTED",
+                          "accessibilityData": {
+                            "accessibilityData": {
+                              "label": "Annulla"
+                            }
+                          },
+                          "command": {
+                            "clickTrackingParams": "REDACTED",
+                            "commandExecutorCommand": {
+                              "commands": [
+                                {
+                                  "clickTrackingParams": "REDACTED",
+                                  "unsubscribeEndpoint": {
+                                    "channelIds": ["UC4QobU6STFB0P71PMvOGN5A"],
+                                    "params": "CgIIHBgA"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "currentStateId": 3,
+                  "trackingParams": "REDACTED",
+                  "onTapBehavior": "ON_TAP_BEHAVIOR_TOGGLE_ICON_WITH_INLINE_MENU",
+                  "command": {
+                    "clickTrackingParams": "REDACTED",
+                    "showEngagementPanelEndpoint": {
+                      "identifier": {
+                        "tag": "channel-notifications-panel"
+                      }
+                    }
+                  },
+                  "targetId": "notification-bell",
+                  "notificationStateEntityKey": "EhhVQzRRb2JVNlNURkIwUDcxUE12T0dONUEgjAEoAQ%3D%3D",
+                  "notificationsLabel": {
+                    "runs": [
+                      {
+                        "text": "Iscritto"
+                      }
+                    ]
+                  }
+                }
+              },
+              "subscribedEntityKey": "EhhVQzRRb2JVNlNURkIwUDcxUE12T0dONUEgMygB"
+            }
+          }
+        }
+      ],
+      "engagementActions": [
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_LIKE_BUTTON",
+          "button": {
+            "likeButtonRenderer": {
+              "target": {
+                "videoId": "jNQXAC9IVRw"
+              },
+              "likeStatus": "INDIFFERENT",
+              "likeCount": 19943234,
+              "likeCountText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "fai clic su Mi piace su questo video come hanno fatto 19 milioni altre persone"
+                  }
+                },
+                "simpleText": "19 Mln"
+              },
+              "likeCountWithLikeText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "19.943.235 Mi piace"
+                  }
+                },
+                "simpleText": "19 Mln"
+              },
+              "likeCountWithUnlikeText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "fai clic su Mi piace su questo video"
+                  }
+                },
+                "simpleText": "Mi piace"
+              },
+              "dislikeCountText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "Metti Non mi piace a questo video"
+                  }
+                },
+                "simpleText": "Non mi piace"
+              },
+              "dislikeCountWithDislikeText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "Metti Non mi piace a questo video"
+                  }
+                },
+                "simpleText": "Non mi piace"
+              },
+              "dislikeCountWithUndislikeText": {
+                "accessibility": {
+                  "accessibilityData": {
+                    "label": "Metti Non mi piace a questo video"
+                  }
+                },
+                "simpleText": "Non mi piace"
+              },
+              "trackingParams": "REDACTED",
+              "likesAllowed": true,
+              "serviceEndpoints": [
+                {
+                  "clickTrackingParams": "REDACTED",
+                  "likeEndpoint": {
+                    "status": "LIKE",
+                    "target": {
+                      "videoId": "jNQXAC9IVRw"
+                    },
+                    "likeParams": "Cg0KC2pOUVhBQzlJVlJ3IAAoATILCLiL5dUGELnb8iQ4Ag%3D%3D"
+                  }
+                },
+                {
+                  "clickTrackingParams": "REDACTED",
+                  "likeEndpoint": {
+                    "status": "DISLIKE",
+                    "target": {
+                      "videoId": "jNQXAC9IVRw"
+                    },
+                    "dislikeParams": "Cg0KC2pOUVhBQzlJVlJ3EAAYASILCLiL5dUGELn98iQoAg%3D%3D"
+                  }
+                },
+                {
+                  "clickTrackingParams": "REDACTED",
+                  "likeEndpoint": {
+                    "status": "INDIFFERENT",
+                    "target": {
+                      "videoId": "jNQXAC9IVRw"
+                    },
+                    "removeLikeParams": "Cg0KC2pOUVhBQzlJVlJ3GAAgASoLCLiL5dUGEL2Q8yQwAg%3D%3D"
+                  }
+                }
+              ],
+              "targetId": "watch-like",
+              "likeStatusEntityKey": "EgtqTlFYQUM5SVZSdyA-KAE%3D",
+              "hideDislikeButton": false
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_COMMENTS",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Commenti"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "COMMENT"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "changeEngagementPanelVisibilityAction": {
+                  "targetId": "comment-item-section",
+                  "visibility": "ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_ADD_TO_PLAYLIST",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Salva"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "BOOKMARK_BORDER"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "authDeterminedCommand": {
+                  "authenticatedCommand": {
+                    "clickTrackingParams": "REDACTED",
+                    "openClientOverlayAction": {
+                      "type": "CLIENT_OVERLAY_TYPE_ADD_TO_PLAYLIST",
+                      "context": "jNQXAC9IVRw"
+                    }
+                  },
+                  "unauthenticatedCommand": {
+                    "clickTrackingParams": "REDACTED",
+                    "authRequiredCommand": {
+                      "identityActionContext": {
+                        "eventTrigger": "ACCOUNT_EVENT_TRIGGER_SAVE_VIDEO",
+                        "nextEndpoint": {
+                          "clickTrackingParams": "REDACTED",
+                          "commandExecutorCommand": {
+                            "commands": [
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "signalAction": {
+                                  "signal": "CLOSE_POPUP"
+                                }
+                              },
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "openClientOverlayAction": {
+                                  "type": "CLIENT_OVERLAY_TYPE_ADD_TO_PLAYLIST",
+                                  "context": "jNQXAC9IVRw"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_SUPER_THANKS",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Super Grazie"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "MONEY_HEART"
+              },
+              "trackingParams": "REDACTED",
+              "accessibilityData": {
+                "accessibilityData": {
+                  "label": "Super Grazie"
+                }
+              },
+              "command": {
+                "authDeterminedCommand": {
+                  "authenticatedCommand": {
+                    "clickTrackingParams": "REDACTED",
+                    "openPopupAction": {
+                      "popup": {
+                        "overlaySectionRenderer": {
+                          "dismissalCommand": {
+                            "clickTrackingParams": "REDACTED",
+                            "signalAction": {
+                              "signal": "CLOSE_POPUP"
+                            }
+                          },
+                          "onOpenCommand": {
+                            "clickTrackingParams": "REDACTED",
+                            "logYpcFlowStartCommand": {
+                              "serializedTransactionFlowLoggingParams": "CAEaGFVDNFFvYlU2U1RGQjBQNzFQTXZPR041QSgMeAOoAQI=",
+                              "flowAttribute": "FLOW_ATTRIBUTE_INITIATE_SECOND_SCREEN"
+                            }
+                          },
+                          "overlay": {
+                            "overlayPanelRenderer": {
+                              "content": {
+                                "twoColumnRenderer": {
+                                  "leftColumn": {
+                                    "entityMetadataRenderer": {
+                                      "title": {
+                                        "simpleText": "Acquista un Super Grazie"
+                                      },
+                                      "buttonLayout": "ENTITY_METADATA_BUTTON_LAYOUT_VERTICAL",
+                                      "trackingParams": "REDACTED",
+                                      "titleArt": {
+                                        "thumbnails": [
+                                          {
+                                            "url": "//www.gstatic.com/youtube/img/branding/livingroom/youtube/wordmark/fullcolor_white_42_v3_2x.png",
+                                            "width": 130,
+                                            "height": 37
+                                          }
+                                        ]
+                                      },
+                                      "messages": [
+                                        {
+                                          "overlayMessageRenderer": {
+                                            "title": {
+                                              "simpleText": "Apri l'app"
+                                            },
+                                            "subtitle": {
+                                              "simpleText": "YouTube"
+                                            },
+                                            "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                            "label": {
+                                              "simpleText": "1"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "overlayMessageRenderer": {
+                                            "title": {
+                                              "simpleText": "Accedi utilizzando il tuo account"
+                                            },
+                                            "subtitle": {
+                                              "simpleText": "user@example.com"
+                                            },
+                                            "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                            "label": {
+                                              "simpleText": "2"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "overlayMessageRenderer": {
+                                            "title": {
+                                              "simpleText": "Cerca"
+                                            },
+                                            "subtitle": {
+                                              "simpleText": "jawed Me at the zoo"
+                                            },
+                                            "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                            "label": {
+                                              "simpleText": "3"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "overlayMessageRenderer": {
+                                            "title": {
+                                              "simpleText": "Acquista"
+                                            },
+                                            "subtitle": {
+                                              "simpleText": "Super Grazie"
+                                            },
+                                            "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                            "label": {
+                                              "simpleText": "4"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "rightColumn": {
+                                    "overlayPanelItemListRenderer": {
+                                      "items": [
+                                        {
+                                          "qrCodeRenderer": {
+                                            "qrCodeImage": {
+                                              "thumbnails": [
+                                                {
+                                                  "url": "data:image/png;base64,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"
+                                                }
+                                              ]
+                                            },
+                                            "style": "QR_CODE_RENDERER_STYLE_TWO_COLUMN",
+                                            "trackingParams": "REDACTED"
+                                          }
+                                        },
+                                        {
+                                          "overlayMessageRenderer": {
+                                            "title": {
+                                              "runs": [
+                                                {
+                                                  "text": "Scansiona il codice QR con la fotocamera del tuo telefono"
+                                                }
+                                              ]
+                                            },
+                                            "style": "OVERLAY_MESSAGE_STYLE_CENTERED"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "style": "TWO_COLUMN_RENDERER_STYLE_TVOD_HANDOFF"
+                                }
+                              },
+                              "trackingParams": "REDACTED"
+                            }
+                          },
+                          "trackingParams": "REDACTED"
+                        }
+                      },
+                      "popupType": "FULLSCREEN_OVERLAY"
+                    }
+                  },
+                  "unauthenticatedCommand": {
+                    "clickTrackingParams": "REDACTED",
+                    "authRequiredCommand": {
+                      "identityActionContext": {
+                        "eventTrigger": "ACCOUNT_EVENT_TRIGGER_SUPER_THANKS",
+                        "nextEndpoint": {
+                          "clickTrackingParams": "REDACTED",
+                          "commandExecutorCommand": {
+                            "commands": [
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "signalAction": {
+                                  "signal": "CLOSE_POPUP"
+                                }
+                              },
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "openPopupAction": {
+                                  "popup": {
+                                    "overlaySectionRenderer": {
+                                      "dismissalCommand": {
+                                        "clickTrackingParams": "REDACTED",
+                                        "signalAction": {
+                                          "signal": "CLOSE_POPUP"
+                                        }
+                                      },
+                                      "onOpenCommand": {
+                                        "clickTrackingParams": "REDACTED",
+                                        "logYpcFlowStartCommand": {
+                                          "serializedTransactionFlowLoggingParams": "CAEaGFVDNFFvYlU2U1RGQjBQNzFQTXZPR041QSgMeAOoAQI=",
+                                          "flowAttribute": "FLOW_ATTRIBUTE_INITIATE_SECOND_SCREEN"
+                                        }
+                                      },
+                                      "overlay": {
+                                        "overlayPanelRenderer": {
+                                          "content": {
+                                            "twoColumnRenderer": {
+                                              "leftColumn": {
+                                                "entityMetadataRenderer": {
+                                                  "title": {
+                                                    "simpleText": "Acquista un Super Grazie"
+                                                  },
+                                                  "buttonLayout": "ENTITY_METADATA_BUTTON_LAYOUT_VERTICAL",
+                                                  "trackingParams": "REDACTED",
+                                                  "titleArt": {
+                                                    "thumbnails": [
+                                                      {
+                                                        "url": "//www.gstatic.com/youtube/img/branding/livingroom/youtube/wordmark/fullcolor_white_42_v3_2x.png",
+                                                        "width": 130,
+                                                        "height": 37
+                                                      }
+                                                    ]
+                                                  },
+                                                  "messages": [
+                                                    {
+                                                      "overlayMessageRenderer": {
+                                                        "title": {
+                                                          "simpleText": "Apri l'app"
+                                                        },
+                                                        "subtitle": {
+                                                          "simpleText": "YouTube"
+                                                        },
+                                                        "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                                        "label": {
+                                                          "simpleText": "1"
+                                                        }
+                                                      }
+                                                    },
+                                                    {
+                                                      "overlayMessageRenderer": {
+                                                        "title": {
+                                                          "simpleText": "Accedi utilizzando il tuo account"
+                                                        },
+                                                        "subtitle": {
+                                                          "simpleText": "user@example.com"
+                                                        },
+                                                        "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                                        "label": {
+                                                          "simpleText": "2"
+                                                        }
+                                                      }
+                                                    },
+                                                    {
+                                                      "overlayMessageRenderer": {
+                                                        "title": {
+                                                          "simpleText": "Cerca"
+                                                        },
+                                                        "subtitle": {
+                                                          "simpleText": "jawed Me at the zoo"
+                                                        },
+                                                        "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                                        "label": {
+                                                          "simpleText": "3"
+                                                        }
+                                                      }
+                                                    },
+                                                    {
+                                                      "overlayMessageRenderer": {
+                                                        "title": {
+                                                          "simpleText": "Acquista"
+                                                        },
+                                                        "subtitle": {
+                                                          "simpleText": "Super Grazie"
+                                                        },
+                                                        "style": "OVERLAY_MESSAGE_STYLE_NUMBERED_SENTENCE",
+                                                        "label": {
+                                                          "simpleText": "4"
+                                                        }
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              },
+                                              "rightColumn": {
+                                                "overlayPanelItemListRenderer": {
+                                                  "items": [
+                                                    {
+                                                      "qrCodeRenderer": {
+                                                        "qrCodeImage": {
+                                                          "thumbnails": [
+                                                            {
+                                                              "url": "data:image/png;base64,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"
+                                                            }
+                                                          ]
+                                                        },
+                                                        "style": "QR_CODE_RENDERER_STYLE_TWO_COLUMN",
+                                                        "trackingParams": "REDACTED"
+                                                      }
+                                                    },
+                                                    {
+                                                      "overlayMessageRenderer": {
+                                                        "title": {
+                                                          "runs": [
+                                                            {
+                                                              "text": "Scansiona il codice QR con la fotocamera del tuo telefono"
+                                                            }
+                                                          ]
+                                                        },
+                                                        "style": "OVERLAY_MESSAGE_STYLE_CENTERED"
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              },
+                                              "style": "TWO_COLUMN_RENDERER_STYLE_TVOD_HANDOFF"
+                                            }
+                                          },
+                                          "trackingParams": "REDACTED"
+                                        }
+                                      },
+                                      "trackingParams": "REDACTED"
+                                    }
+                                  },
+                                  "popupType": "FULLSCREEN_OVERLAY"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "settingActions": [
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_CAPTIONS",
+          "button": {
+            "toggleButtonRenderer": {
+              "isToggled": false,
+              "isDisabled": false,
+              "defaultIcon": {
+                "iconType": "CAPTIONS"
+              },
+              "defaultText": {
+                "runs": [
+                  {
+                    "text": "Sottotitoli"
+                  }
+                ]
+              },
+              "defaultServiceEndpoint": {
+                "clickTrackingParams": "REDACTED",
+                "selectSubtitlesTrackCommand": {
+                  "useDefaultTrack": true
+                }
+              },
+              "toggledText": {
+                "runs": [
+                  {
+                    "text": "Sottotitoli"
+                  }
+                ]
+              },
+              "toggledServiceEndpoint": {
+                "clickTrackingParams": "REDACTED",
+                "selectSubtitlesTrackCommand": {}
+              },
+              "trackingParams": "REDACTED"
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_PLAYBACK_SETTINGS",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Impostazioni"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "SETTINGS"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_PLAYBACK_SETTINGS"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_QUALITY",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Qualità"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "VIDEO_QUALITY"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_VIDEO_QUALITY"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_SURROUND_SOUND",
+          "button": {
+            "toggleButtonRenderer": {
+              "isToggled": false,
+              "isDisabled": false,
+              "defaultIcon": {
+                "iconType": "AUDIO_SURROUND"
+              },
+              "defaultText": {
+                "runs": [
+                  {
+                    "text": "Audio surround"
+                  }
+                ]
+              },
+              "defaultServiceEndpoint": {
+                "clickTrackingParams": "REDACTED",
+                "setClientSettingEndpoint": {
+                  "settingDatas": [
+                    {
+                      "clientSettingEnum": {
+                        "item": "USER_AUDIO_51_PREFERENCE"
+                      },
+                      "boolValue": true
+                    }
+                  ]
+                }
+              },
+              "toggledIcon": {
+                "iconType": "AUDIO_SURROUND"
+              },
+              "toggledText": {
+                "runs": [
+                  {
+                    "text": "Audio surround"
+                  }
+                ]
+              },
+              "toggledServiceEndpoint": {
+                "clickTrackingParams": "REDACTED",
+                "setClientSettingEndpoint": {
+                  "settingDatas": [
+                    {
+                      "clientSettingEnum": {
+                        "item": "USER_AUDIO_51_PREFERENCE"
+                      },
+                      "boolValue": false
+                    }
+                  ]
+                }
+              },
+              "trackingParams": "REDACTED"
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_REPORT_VIDEO",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Segnala"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "FLAG"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_VIDEO_REPORTING"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_FEEDBACK",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Feedback"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "FEEDBACK"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_SEND_FEEDBACK_SECONDARY",
+                  "context": "1"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_STATS_FOR_NERDS",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Statistiche per nerd"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "BUG_REPORT"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "signalAction": {
+                  "signal": "TOGGLE_VIDEO_INFO"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_SPEED_BUTTON",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": true,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Velocità"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "SLOW_MOTION_VIDEO"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_VIDEO_PLAYBACK_SPEED"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_LOOP_BUTTON",
+          "button": {
+            "playlistLoopButtonRenderer": {
+              "states": [
+                {
+                  "playlistLoopButtonStateRenderer": {
+                    "state": "PLAYLIST_LOOP_STATE_NONE",
+                    "button": {
+                      "buttonRenderer": {
+                        "isDisabled": false,
+                        "text": {
+                          "simpleText": "Ripeti"
+                        },
+                        "icon": {
+                          "iconType": "LOOP"
+                        },
+                        "trackingParams": "REDACTED",
+                        "isSelected": false,
+                        "command": {
+                          "clickTrackingParams": "REDACTED",
+                          "commandExecutorCommand": {
+                            "commands": [
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "entityUpdateCommand": {
+                                  "entityBatchUpdate": {
+                                    "mutations": [
+                                      {
+                                        "entityKey": "REDACTED",
+                                        "type": "ENTITY_MUTATION_TYPE_REPLACE",
+                                        "payload": {
+                                          "playlistLoopStateEntity": {
+                                            "key": "REDACTED",
+                                            "state": "PLAYLIST_LOOP_STATE_ONE"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "signalAction": {
+                                  "signal": "PLAYER_LOOP_VIDEO"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "playlistLoopButtonStateRenderer": {
+                    "state": "PLAYLIST_LOOP_STATE_ONE",
+                    "button": {
+                      "buttonRenderer": {
+                        "isDisabled": false,
+                        "text": {
+                          "simpleText": "Ripeti • Attualmente in riproduzione"
+                        },
+                        "icon": {
+                          "iconType": "YT_OUTLINE_ARROW_REPEAT_1_24"
+                        },
+                        "trackingParams": "REDACTED",
+                        "isSelected": true,
+                        "command": {
+                          "clickTrackingParams": "REDACTED",
+                          "commandExecutorCommand": {
+                            "commands": [
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "entityUpdateCommand": {
+                                  "entityBatchUpdate": {
+                                    "mutations": [
+                                      {
+                                        "entityKey": "REDACTED",
+                                        "type": "ENTITY_MUTATION_TYPE_REPLACE",
+                                        "payload": {
+                                          "playlistLoopStateEntity": {
+                                            "key": "REDACTED",
+                                            "state": "PLAYLIST_LOOP_STATE_NONE"
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "clickTrackingParams": "REDACTED",
+                                "signalAction": {
+                                  "signal": "PLAYER_LOOP_OFF"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "currentState": "PLAYLIST_LOOP_STATE_NONE",
+              "playlistLoopStateEntityKey": "EgAg4gIoAQ%3D%3D",
+              "loggingDirectives": {
+                "trackingParams": "REDACTED"
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_AUDIO_TRACKS",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Traccia audio"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "AUDIOTRACK"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_AUDIO_OPTIONS"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_DRC",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Volume stabile"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "VOLUME_STABLE"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "signalAction": {
+                  "signal": "TOGGLE_STABLE_VOLUME"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

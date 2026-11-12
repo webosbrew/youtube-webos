@@ -8,6 +8,7 @@ import {
 } from './config.js';
 import './ui.css';
 import { requireElement } from './player_api/helpers';
+import { supportsPlaybackSpeed } from './speed/index.js';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
@@ -130,6 +131,9 @@ function createOptionsPanel() {
   elmContainer.appendChild(createConfigCheckbox('forceHighResVideo'));
   elmContainer.appendChild(createConfigCheckbox('removeEndscreen'));
   elmContainer.appendChild(createConfigCheckbox('autoAccountSelect'));
+  if (supportsPlaybackSpeed(window)) {
+    elmContainer.appendChild(createConfigCheckbox('enablePlaybackSpeed'));
+  }
   elmContainer.appendChild(createConfigCheckbox('enableSponsorBlock'));
 
   const elmBlock = document.createElement('blockquote');

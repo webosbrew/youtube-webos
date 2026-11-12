@@ -14,6 +14,7 @@
     "manifest": "node tools/gen-manifest.cjs youtube.leanback.v4.manifest.json",
     "prepare": "husky",
     "test:compat": "es-check",
+    "test:speed": "node --test \"tests/speed/**/*.test.js\"",
     "lint:eslint": "eslint --concurrency auto",
     "lint:tsc": "tsc -b",
     "lint:prettier": "prettier --check .",
