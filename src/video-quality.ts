@@ -2,6 +2,7 @@ import { configRead } from './config';
 import { getPlayerManager, PlayerMode } from './player_api';
 import type { EventMapOf, PlayerManager, VideoID } from './player_api';
 import { showNotification } from './ui';
+import { isPlaybackSpeedLimited } from './speed/entry';
 
 const playerManager = await getPlayerManager();
 
@@ -31,8 +32,10 @@ function notifyPlaybackQuality(this: PlayerManager) {
 function setPlaybackQuality(this: PlayerManager, _: unknown) {
   if (this.playerMode === PlayerMode.PREVIEW) return;
 
-  console.debug('[video-quality] setting playback quality');
   this.removeEventListener('playbackStart', setPlaybackQuality);
+  if (isPlaybackSpeedLimited()) return;
+
+  console.debug('[video-quality] setting playback quality');
 
   const prevQuality = this.player.getPlaybackQualityLabel();
   this.player.setPlaybackQualityRange('highres', 'highres');

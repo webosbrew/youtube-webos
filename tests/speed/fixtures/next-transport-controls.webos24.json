@@ -1,0 +1,58 @@
+{
+  "transportControls": {
+    "transportControlsRenderer": {
+      "settingActions": [
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_QUALITY",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": false,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Qualità"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "VIDEO_QUALITY"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_VIDEO_QUALITY"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "TRANSPORT_CONTROLS_BUTTON_TYPE_SPEED_BUTTON",
+          "button": {
+            "buttonRenderer": {
+              "isDisabled": true,
+              "text": {
+                "runs": [
+                  {
+                    "text": "Velocità"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "SLOW_MOTION_VIDEO"
+              },
+              "trackingParams": "REDACTED",
+              "command": {
+                "clickTrackingParams": "REDACTED",
+                "openClientOverlayAction": {
+                  "type": "CLIENT_OVERLAY_TYPE_VIDEO_PLAYBACK_SPEED"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import 'whatwg-fetch';
 import './domrect-polyfill';
+import './speed/entry';
 
 import { handleLaunch } from './utils';
 
