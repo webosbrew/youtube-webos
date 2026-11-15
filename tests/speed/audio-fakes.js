@@ -14,32 +14,7 @@
 
 export const K = 0.01; // ramp slope: sample value = K * content seconds
 
-class Event {
-  constructor(type) {
-    this.type = type;
-  }
-}
-
-class EventTarget {
-  constructor() {
-    this._l = {};
-  }
-  addEventListener(t, f) {
-    (this._l[t] ||= []).push(f);
-  }
-  removeEventListener(t, f) {
-    this._l[t] = (this._l[t] || []).filter((x) => x !== f);
-  }
-  dispatchEvent(e) {
-    if (!(e instanceof Event))
-      throw new TypeError("parameter 1 is not of type 'Event'");
-    for (const f of [...(this._l[e.type] || [])]) f.call(this, e);
-    return true;
-  }
-  listenerCount() {
-    return Object.values(this._l).reduce((n, a) => n + a.length, 0);
-  }
-}
+import { Event, EventTarget } from './fakes.js';
 
 const domError = (name, msg) => Object.assign(new Error(msg || name), { name });
 

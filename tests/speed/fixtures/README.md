@@ -35,13 +35,7 @@ the prefix shorter required no changes to box headers or sizes.
 
 ## `next-transport-controls.webos24.json`
 
-The `transportControls` subtree of a real YouTube `/youtubei/v1/next`
-response, captured on an LG OLED C4 (webOS 24) while watching the same video.
-It drives the tests that check the "Speed" entry of the settings panel
-(`speed-button.test.js`). All `trackingParams`/`clickTrackingParams` values
-and `entityKey`/`key` tokens have been replaced with the constant placeholder
-`"REDACTED"` (they're opaque, single-use analytics tokens; keeping the real
-ones serves no test and they don't decode to anything meaningful). The signed-in
-account's email address, which the raw response embeds twice as a UI label,
-has been replaced with `user@example.com`. Structure, `type`s, `isDisabled`
-flags, commands and visible text labels are otherwise untouched.
+The Speed and Quality entries of `transportControls` from a real YouTube
+`/youtubei/v1/next` response captured on an LG C4. The Speed entry is disabled
+in the capture and the Quality entry checks that other controls stay unchanged.
+Tracking tokens were replaced with `"REDACTED"`.

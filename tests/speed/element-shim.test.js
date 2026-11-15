@@ -48,17 +48,17 @@ describe('element-shim', () => {
     uninstalls.push(shim.detach);
 
     // underlying currentTime 4 -> el.currentTime 6; el.currentTime = 9 -> underlying 6.
-    el._currentTime = 4;
+    el._ct = 4;
     assert.equal(el.currentTime, 6);
 
     el.currentTime = 9;
-    assert.equal(el._currentTime, 6);
+    assert.equal(el._ct, 6);
 
     // duration and buffered are mapped too
-    el._duration = 10;
+    el._dur = 10;
     assert.equal(el.duration, 15);
 
-    el._buffered = { length: 1, start: () => 2, end: () => 4 };
+    el._buf = [[2, 4]];
     assert.equal(el.buffered.length, 1);
     assert.equal(el.buffered.start(0), 3);
     assert.equal(el.buffered.end(0), 6);
@@ -67,9 +67,9 @@ describe('element-shim', () => {
     assert.equal(el.playbackRate, 1.5);
 
     // el.playbackRate = 2 calls onRateRequest(2) and leaves the underlying alone
-    el._playbackRate = 1; // underlying should stay untouched
+    el._rate = 1; // underlying should stay untouched
     el.playbackRate = 2;
-    assert.equal(el._playbackRate, 1);
+    assert.equal(el._rate, 1);
     assert.equal(rateRequests.length, 1);
     assert.equal(rateRequests[0], 2);
   });

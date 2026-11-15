@@ -58,6 +58,36 @@ const key = (type, code) => {
 const settle = (world) => world.advance(RELOAD_DELAY_MS + 50);
 
 describe('controller', () => {
+  test('a failed current-time lookup reloads from the beginning', async () => {
+    const player = fakePlayer();
+    player.getCurrentTime = () => {
+      throw new Error('Cannot get time');
+    };
+    const { ctl, world } = controllerWith({ player });
+    ctl.setSpeed(1.5);
+    await settle(world);
+    assert.equal(ctl.getSpeed(), 1.5);
+    assert.deepEqual(player.calls.at(-1), ['loadVideoById', 'abc123', 0]);
+  });
+
+  test('a player without a video ID is not reloaded', async () => {
+    const player = fakePlayer();
+    player.getVideoData = () => ({});
+    const { ctl, world } = controllerWith({ player });
+    ctl.setSpeed(1.5);
+    await settle(world);
+    assert.equal(ctl.getSpeed(), 1.5);
+    assert.ok(!player.calls.some(([method]) => method === 'loadVideoById'));
+  });
+
+  test('two rapid cycles back to 1x need no reload', async () => {
+    const { ctl, player, world } = controllerWith();
+    for (let i = 0; i < 10; i++) ctl.cycle();
+    await settle(world);
+    assert.equal(ctl.getSpeed(), 1);
+    assert.ok(!player.calls.some(([method]) => method === 'loadVideoById'));
+  });
+
   test('SPEEDS is the yellow-button cycle', () => {
     assert.deepEqual(SPEEDS, [1, 1.25, 1.5, 1.75, 2]);
   });
@@ -364,6 +394,18 @@ describe('controller', () => {
 // --- wiring ------------------------------------------------------------------
 
 describe('wiring', () => {
+  test('uninstall can be called twice', () => {
+    const win = domWindow(makeWorld());
+    const feature = installSpeedFeature(win, {
+      notify() {},
+      configRead: () => true,
+      getPlayer: () => null
+    });
+    feature.uninstall();
+    assert.equal(win.document.listenerCount(), 0);
+    assert.doesNotThrow(() => feature.uninstall());
+  });
+
   test('mse-hook hands the bound element and the speed to createAudioSink', () => {
     const world = makeWorld();
     const win = domWindow(world);

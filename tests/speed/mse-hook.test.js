@@ -53,74 +53,42 @@ function concat(arrays) {
 }
 
 describe('mse-hook', () => {
-  let win, sink, getSpeed, uninstalls, rateRequests, errors;
+  let win, sink, speed, uninstall, originalAddSourceBuffer, errors;
 
   beforeEach(() => {
     win = makeFakeWindow();
+    speed = 1.5;
+    errors = [];
+    originalAddSourceBuffer = win.MediaSource.prototype.addSourceBuffer;
     sink = {
       configures: [],
-      pushCalls: [],
-      discards: [],
-      resetCalls: 0,
-      configureFn(c) {
-        this.configures.push(c);
+      samples: [],
+      configure(config) {
+        this.configures.push(config);
       },
-      pushFn(s) {
-        this.pushCalls.push(s);
-      },
-      discardFn(s, e) {
-        this.discards.push({ start: s, end: e });
-      },
-      resetFn() {
-        this.resetCalls++;
+      push(samples) {
+        this.samples.push(...samples);
       }
     };
-    sink.configureFn = sink.configureFn.bind(sink);
-    sink.pushFn = sink.pushFn.bind(sink);
-    sink.discardFn = sink.discardFn.bind(sink);
-    sink.resetFn = sink.resetFn.bind(sink);
-    sink.configure = sink.configureFn;
-    sink.push = sink.pushFn;
-    sink.discard = sink.discardFn;
-    sink.reset = sink.resetFn;
-
-    let speed = 1.5;
-    getSpeed = () => speed;
-    uninstalls = [];
-    rateRequests = [];
-    errors = [];
-
-    // capture original addSourceBuffer
-    win.MediaSource._originalAddSourceBuffer =
-      win.MediaSource.prototype.addSourceBuffer;
-
-    const hook = installMseHook(win, {
-      getSpeed: () => getSpeed(),
+    ({ uninstall } = installMseHook(win, {
+      getSpeed: () => speed,
       createAudioSink: () => sink,
-      onRateRequest: (r) => rateRequests.push(r),
-      onError: (e) => errors.push(e)
-    });
-    if (hook && hook.uninstall) {
-      uninstalls.push(hook.uninstall);
-    }
+      onError: (error) => errors.push(error)
+    }));
   });
 
-  afterEach(() => {
-    uninstalls.forEach((u) => {
-      u();
-    });
-  });
+  afterEach(() => uninstall());
 
   test('S = 1: addSourceBuffer returns the original SourceBuffer; yt_136.bin bytes arrive identical', () => {
-    getSpeed = () => 1.0;
+    speed = 1;
     const ms = new win.MediaSource();
     const sb = ms.addSourceBuffer('video/mp4; codecs="avc1"');
 
-    assert.equal(Object.getPrototypeOf(sb), win.FakeSourceBuffer.prototype);
+    assert.equal(Object.getPrototypeOf(sb), win.SourceBuffer.prototype);
 
     sb.appendBuffer(yt136);
-    assert.equal(sb.appendedBytes.length, 1);
-    assert.deepEqual(sb.appendedBytes[0], yt136);
+    assert.equal(sb.appended.length, 1);
+    assert.deepEqual(sb.appended[0], yt136);
   });
 
   test('S = 1.5, video MP4: yt_136.bin appended in random chunks, timescale 18432', async () => {
@@ -131,7 +99,7 @@ describe('mse-hook', () => {
     await appendInChunks(sb, yt136, rng);
 
     const underlying = ms.sourceBuffers.item(0);
-    const output = concat(underlying.appendedBytes);
+    const output = concat(underlying.appended);
     assert.equal(output.length, yt136.length);
 
     let diffs = [];
@@ -155,7 +123,7 @@ describe('mse-hook', () => {
 
     sb.appendBuffer(yt247);
     const underlying = ms.sourceBuffers.item(0);
-    const output = underlying.appendedBytes[0];
+    const output = underlying.appended[0];
 
     let diffs = [];
     for (let i = 0; i < yt247.length; i++) {
@@ -176,20 +144,18 @@ describe('mse-hook', () => {
     const underlying = ms.sourceBuffers.item(0);
 
     sb.timestampOffset = 10;
-    assert.equal(underlying._timestampOffset, 10 / 1.5);
+    assert.equal(underlying._ts, 10 / 1.5);
     assert.equal(sb.timestampOffset, 10);
 
     sb.remove(3, 6);
-    assert.equal(underlying.removeCalls.length, 1);
-    assert.equal(underlying.removeCalls[0].start, 2);
-    assert.equal(underlying.removeCalls[0].end, 4);
+    assert.deepEqual(underlying.removed, [[2, 4]]);
 
-    underlying._buffered = { start: () => 0, end: () => 4, length: 1 };
+    underlying._ranges = [[0, 4]];
     assert.equal(sb.buffered.start(0), 0);
     assert.equal(sb.buffered.end(0), 6);
 
     sb.appendWindowEnd = Infinity;
-    assert.equal(underlying._appendWindowEnd, Infinity);
+    assert.equal(underlying._awe, Infinity);
   });
 
   test('Audio MP4 at S = 1.5', async () => {
@@ -199,7 +165,7 @@ describe('mse-hook', () => {
     assert.equal(ms.sourceBuffers.length, 1);
     assert.notEqual(
       Object.getPrototypeOf(ms.sourceBuffers.item(0)),
-      win.FakeSourceBuffer.prototype
+      win.SourceBuffer.prototype
     );
 
     const rng = lcg(42);
@@ -219,13 +185,10 @@ describe('mse-hook', () => {
     const parsed = parseInitInfo(yt140);
     const expected = demuxFragments(yt140, parsed).samples;
 
-    let pushedSamples = [];
-    for (let c of sink.pushCalls) pushedSamples.push(...c);
-
-    assert.equal(pushedSamples.length, expected.length);
-    for (let i = 0; i < expected.length; i++) {
-      assert.equal(pushedSamples[i].pts, expected[i].pts);
-    }
+    assert.deepEqual(
+      sink.samples.map(({ pts }) => pts),
+      expected.map(({ pts }) => pts)
+    );
 
     assert.ok(startCount > 0);
     assert.equal(startCount, updateCount);
@@ -277,7 +240,7 @@ describe('mse-hook', () => {
     ms.addSourceBuffer('video/mp4; codecs="avc1"');
     ms.duration = 30;
     assert.equal(ms.duration, 30);
-    assert.equal(ms._duration, 20);
+    assert.equal(ms._d, 20);
   });
 
   test('a malformed init reports an error and still forwards the bytes', () => {
@@ -290,19 +253,18 @@ describe('mse-hook', () => {
     sb.appendBuffer(junk);
     assert.equal(errors.length, 1);
     const underlying = ms.sourceBuffers.item(0);
-    assert.deepEqual(underlying.appendedBytes[0], junk);
+    assert.deepEqual(underlying.appended[0], junk);
   });
 
   test('uninstall() restores the original addSourceBuffer', () => {
     assert.notEqual(
       win.MediaSource.prototype.addSourceBuffer,
-      win.MediaSource._originalAddSourceBuffer
+      originalAddSourceBuffer
     );
-    uninstalls[0]();
-    uninstalls = [];
+    uninstall();
     assert.equal(
       win.MediaSource.prototype.addSourceBuffer,
-      win.MediaSource._originalAddSourceBuffer
+      originalAddSourceBuffer
     );
   });
 });

@@ -374,152 +374,7 @@ export function installMseHook(
       u8.set(chunk, this.rest.length);
 
       try {
-        if (this.isMp4) {
-          const type = classifyMp4(u8);
-          const moov = parseBoxes(u8, 0, u8.length).find(
-            (b) => b.type === 'moov'
-          );
-          if (moov && moov.truncated) {
-            this.rest = u8; // the init continues in the next append
-          } else if (type === 'init' || type === 'init+media') {
-            const cfg = audioConfigFromInit(u8);
-            if (cfg.unsupported) {
-              const err = new Error('Unsupported audio');
-              err.name = 'NotSupportedError';
-              throw err;
-            }
-            this.sink.configure(cfg);
-            this.initInfo = parseInitInfo(u8);
-            if (type === 'init+media') {
-              const res = demuxFragments(u8, this.initInfo);
-              this.rest = res.rest;
-              if (res.samples.length > 0) {
-                const adjusted = res.samples.map((s) => ({
-                  ...s,
-                  pts: s.pts + this._timestampOffset
-                }));
-                this.sink.push(adjusted);
-                const start = adjusted[0].pts;
-                const end =
-                  adjusted[adjusted.length - 1].pts +
-                  adjusted[adjusted.length - 1].duration;
-                this._addRange(start, end);
-              }
-            } else {
-              let nextBoxOffset = 0;
-              const boxes = parseBoxes(u8, 0, u8.length);
-              if (boxes.length > 0) {
-                nextBoxOffset = boxes[boxes.length - 1].end;
-              }
-              if (boxes[boxes.length - 1].truncated) {
-                this.rest = u8.subarray(boxes[boxes.length - 1].start);
-              } else {
-                this.rest = u8.subarray(nextBoxOffset);
-              }
-            }
-          } else if (type === 'media' && this.initInfo) {
-            const res = demuxFragments(u8, this.initInfo);
-            this.rest = res.rest;
-            if (res.samples.length > 0) {
-              const adjusted = res.samples.map((s) => ({
-                ...s,
-                pts: s.pts + this._timestampOffset
-              }));
-              this.sink.push(adjusted);
-              const start = adjusted[0].pts;
-              const end =
-                adjusted[adjusted.length - 1].pts +
-                adjusted[adjusted.length - 1].duration;
-              this._addRange(start, end);
-            }
-          } else {
-            this.rest = u8;
-          }
-        } else if (this.isWebm) {
-          const type = classifyWebm(u8);
-          if (type === 'init' || type === 'init+media') {
-            const cfg = audioConfigFromWebmInit(u8);
-            if (cfg.unsupported) {
-              const err = new Error('Unsupported audio');
-              err.name = 'NotSupportedError';
-              throw err;
-            }
-            this.sink.configure(cfg);
-            const tcScaleObj = findTimecodeScale(u8);
-            this.initInfo = {
-              timecodeScale: tcScaleObj ? tcScaleObj.value : 1000000,
-              trackNumber: cfg.trackNumber
-            };
-            if (type === 'init+media') {
-              const res = demuxClusters(u8, this.initInfo);
-              this.rest = res.rest;
-              if (res.frames && res.frames.length > 0) {
-                for (let i = 0; i < res.frames.length; i++) {
-                  if (i < res.frames.length - 1) {
-                    res.frames[i].duration =
-                      res.frames[i + 1].pts - res.frames[i].pts;
-                  } else {
-                    res.frames[i].duration =
-                      i > 0 && res.frames[i - 1].duration > 0
-                        ? res.frames[i - 1].duration
-                        : 0.02;
-                  }
-                }
-                const adjusted = res.frames.map((f) => ({
-                  ...f,
-                  pts: f.pts + this._timestampOffset
-                }));
-                this.sink.push(adjusted);
-                const start = adjusted[0].pts;
-                const end =
-                  adjusted[adjusted.length - 1].pts +
-                  adjusted[adjusted.length - 1].duration;
-                this._addRange(start, end);
-              }
-            } else {
-              let nextOffset = 0;
-              const elements = parseElements(u8, 0, u8.length);
-              if (elements.length > 0) {
-                nextOffset = elements[elements.length - 1].end;
-                if (elements[elements.length - 1].truncated) {
-                  this.rest = u8.subarray(elements[elements.length - 1].start);
-                } else {
-                  this.rest = u8.subarray(nextOffset);
-                }
-              } else {
-                this.rest = new Uint8Array(0);
-              }
-            }
-          } else if (type === 'media' && this.initInfo) {
-            const res = demuxClusters(u8, this.initInfo);
-            this.rest = res.rest;
-            if (res.frames && res.frames.length > 0) {
-              for (let i = 0; i < res.frames.length; i++) {
-                if (i < res.frames.length - 1) {
-                  res.frames[i].duration =
-                    res.frames[i + 1].pts - res.frames[i].pts;
-                } else {
-                  res.frames[i].duration =
-                    i > 0 && res.frames[i - 1].duration > 0
-                      ? res.frames[i - 1].duration
-                      : 0.02;
-                }
-              }
-              const adjusted = res.frames.map((f) => ({
-                ...f,
-                pts: f.pts + this._timestampOffset
-              }));
-              this.sink.push(adjusted);
-              const start = adjusted[0].pts;
-              const end =
-                adjusted[adjusted.length - 1].pts +
-                adjusted[adjusted.length - 1].duration;
-              this._addRange(start, end);
-            }
-          } else {
-            this.rest = u8;
-          }
-        }
+        if (this.isMp4 || this.isWebm) this._appendAudio(u8);
       } catch (e) {
         this.rest = new Uint8Array(0);
         if (this.onError) this.onError(e);
@@ -531,6 +386,73 @@ export function installMseHook(
       }
 
       this._finishLater();
+    }
+
+    _appendAudio(data) {
+      const mp4 = this.isMp4;
+      const type = mp4 ? classifyMp4(data) : classifyWebm(data);
+      if (
+        mp4 &&
+        parseBoxes(data, 0, data.length).find((box) => box.type === 'moov')
+          ?.truncated
+      ) {
+        this.rest = data;
+        return;
+      }
+
+      if (type === 'init' || type === 'init+media') {
+        const config = mp4
+          ? audioConfigFromInit(data)
+          : audioConfigFromWebmInit(data);
+        if (config.unsupported) {
+          const error = new Error('Unsupported audio');
+          error.name = 'NotSupportedError';
+          throw error;
+        }
+        this.sink.configure(config);
+        this.initInfo = mp4
+          ? parseInitInfo(data)
+          : {
+              timecodeScale: findTimecodeScale(data)?.value ?? 1000000,
+              trackNumber: config.trackNumber
+            };
+      }
+
+      if (type === 'init') {
+        const elements = mp4
+          ? parseBoxes(data, 0, data.length)
+          : parseElements(data, 0, data.length);
+        const last = elements[elements.length - 1];
+        this.rest = last
+          ? data.subarray(last.truncated ? last.start : last.end)
+          : new Uint8Array(0);
+      } else if (type === 'init+media' || (type === 'media' && this.initInfo)) {
+        const result = mp4
+          ? demuxFragments(data, this.initInfo)
+          : demuxClusters(data, this.initInfo);
+        this.rest = result.rest;
+        const samples = mp4 ? result.samples : result.frames;
+        if (!samples?.length) return;
+
+        if (!mp4) {
+          // The last WebM frame has no next timestamp. Reuse its neighbor's
+          // duration when available, otherwise use an Opus frame of 20 ms.
+          for (let i = 1; i < samples.length; i++) {
+            samples[i - 1].duration = samples[i].pts - samples[i - 1].pts;
+          }
+          const previous = samples[samples.length - 2]?.duration;
+          samples[samples.length - 1].duration = previous > 0 ? previous : 0.02;
+        }
+        const adjusted = samples.map((sample) => ({
+          ...sample,
+          pts: sample.pts + this._timestampOffset
+        }));
+        this.sink.push(adjusted);
+        const last = adjusted[adjusted.length - 1];
+        this._addRange(adjusted[0].pts, last.pts + last.duration);
+      } else {
+        this.rest = data;
+      }
     }
 
     _finishLater() {

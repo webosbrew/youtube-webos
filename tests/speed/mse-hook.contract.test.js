@@ -1,13 +1,8 @@
-// Contract tests for mse-hook.js: the element shim, the fake MediaSource/
-// SourceBuffer session lifecycle, and how init/media segments are handled for
-// both video (rewritten in place) and audio (demuxed into a sink). They use
-// their OWN strict fakes, closer to the DOM than tests/speed/fakes.js:
-// dispatchEvent only accepts real Event instances, the video element is wired
-// through `src = URL.createObjectURL(ms)` like YouTube does, and the real
-// SpeedTimeMap is used.
+// Contract tests for MediaSource, SourceBuffer and the video element shim.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { makeFakeWindow } from './fakes.js';
 import { installMseHook } from '../../src/speed/mse-hook.js';
 import { attachElementShim } from '../../src/speed/element-shim.js';
 import { SpeedTimeMap } from '../../src/speed/timemap.js';
@@ -21,171 +16,6 @@ const dir = new URL('./fixtures/', import.meta.url);
 const load = (n) => new Uint8Array(readFileSync(new URL(n, dir)));
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const MP4V = 'video/mp4; codecs="avc1.4d401f"';
-
-function strictWindow() {
-  class Event {
-    constructor(type) {
-      this.type = type;
-    }
-  }
-  class EventTarget {
-    constructor() {
-      this._l = {};
-    }
-    addEventListener(t, f) {
-      (this._l[t] ||= []).push(f);
-    }
-    removeEventListener(t, f) {
-      this._l[t] = (this._l[t] || []).filter((x) => x !== f);
-    }
-    dispatchEvent(e) {
-      if (!(e instanceof Event))
-        throw new TypeError("parameter 1 is not of type 'Event'");
-      for (const f of this._l[e.type] || []) f.call(this, e);
-      return true;
-    }
-  }
-  const ranges = (arr) => ({
-    length: arr.length,
-    start(i) {
-      if (i < 0 || i >= arr.length) throw new RangeError('index');
-      return arr[i][0];
-    },
-    end(i) {
-      if (i < 0 || i >= arr.length) throw new RangeError('index');
-      return arr[i][1];
-    }
-  });
-  class SourceBuffer extends EventTarget {
-    constructor() {
-      super();
-      this.appended = [];
-      this.removed = [];
-      this._ts = 0;
-      this._aws = 0;
-      this._awe = Infinity;
-      this._ranges = [];
-      this.updating = false;
-    }
-    appendBuffer(d) {
-      const v =
-        d instanceof ArrayBuffer
-          ? new Uint8Array(d)
-          : new Uint8Array(d.buffer, d.byteOffset, d.byteLength);
-      this.appended.push(v.slice());
-      this.updating = true;
-      queueMicrotask(() => {
-        this.updating = false;
-        this.dispatchEvent(new Event('updateend'));
-      });
-    }
-    remove(s, e) {
-      this.removed.push([s, e]);
-    }
-  }
-  for (const [p, f] of [
-    ['timestampOffset', '_ts'],
-    ['appendWindowStart', '_aws'],
-    ['appendWindowEnd', '_awe']
-  ]) {
-    Object.defineProperty(SourceBuffer.prototype, p, {
-      get() {
-        return this[f];
-      },
-      set(v) {
-        this[f] = v;
-      },
-      configurable: true
-    });
-  }
-  Object.defineProperty(SourceBuffer.prototype, 'buffered', {
-    get() {
-      return ranges(this._ranges);
-    },
-    configurable: true
-  });
-  class MediaSource extends EventTarget {
-    constructor() {
-      super();
-      this._sbs = [];
-      this._d = NaN;
-    }
-    addSourceBuffer() {
-      const sb = new SourceBuffer();
-      this._sbs.push(sb);
-      return sb;
-    }
-    get sourceBuffers() {
-      const l = [...this._sbs];
-      l.item = (i) => l[i];
-      return l;
-    }
-  }
-  Object.defineProperty(MediaSource.prototype, 'duration', {
-    get() {
-      return this._d;
-    },
-    set(v) {
-      this._d = v;
-    },
-    configurable: true
-  });
-  class HTMLMediaElement extends EventTarget {
-    constructor() {
-      super();
-      this._src = '';
-      this._ct = 0;
-      this._dur = NaN;
-      this._rate = 1;
-      this._buf = [];
-    }
-  }
-  const acc = (p, f, ro) =>
-    Object.defineProperty(HTMLMediaElement.prototype, p, {
-      get() {
-        return this[f];
-      },
-      set: ro
-        ? undefined
-        : function (v) {
-            this[f] = v;
-          },
-      configurable: true
-    });
-  acc('src', '_src');
-  acc('currentTime', '_ct');
-  acc('duration', '_dur', true);
-  acc('playbackRate', '_rate');
-  Object.defineProperty(HTMLMediaElement.prototype, 'buffered', {
-    get() {
-      return ranges(this._buf);
-    },
-    configurable: true
-  });
-  Object.defineProperty(HTMLMediaElement.prototype, 'seekable', {
-    get() {
-      return ranges(this._buf);
-    },
-    configurable: true
-  });
-  let n = 0;
-  const URL = {
-    createObjectURL() {
-      return `blob:fake/${++n}`;
-    },
-    revokeObjectURL() {}
-  };
-  return {
-    Event,
-    EventTarget,
-    SourceBuffer,
-    MediaSource,
-    HTMLMediaElement,
-    URL,
-    ranges,
-    document: { createElement: () => new HTMLMediaElement() }
-  };
-}
 
 function recorderSink() {
   const s = { configs: [], samples: [], discards: [], resets: 0 };
@@ -206,7 +36,7 @@ function recorderSink() {
 }
 
 function setup(speed = 1.5) {
-  const win = strictWindow();
+  const win = makeFakeWindow();
   const sink = recorderSink();
   const rates = [];
   const errors = [];
@@ -234,7 +64,7 @@ const initOf = (u8) =>
 
 describe('element shim with the real SpeedTimeMap', () => {
   test('setting currentTime maps content -> element time', () => {
-    const win = strictWindow();
+    const win = makeFakeWindow();
     const el = win.document.createElement('video');
     const shim = attachElementShim(el, new SpeedTimeMap(1.5), {
       onRateRequest() {}
@@ -272,12 +102,10 @@ describe('wiring through src = createObjectURL(ms)', () => {
     const { win } = setup(1);
     const ms = new win.MediaSource();
     const el = win.document.createElement('video');
+    const properties = Object.getOwnPropertyNames(el);
     el.src = win.URL.createObjectURL(ms);
     ms.addSourceBuffer(MP4V);
-    assert.deepEqual(
-      Object.getOwnPropertyNames(el).filter((p) => !p.startsWith('_')),
-      []
-    );
+    assert.deepEqual(Object.getOwnPropertyNames(el), properties);
   });
 });
 
@@ -295,7 +123,7 @@ describe('session lifecycle', () => {
   });
 
   test('the speed is decided once per MediaSource (1.5 then 1 -> audio still fake)', () => {
-    const win = strictWindow();
+    const win = makeFakeWindow();
     const speeds = [1.5, 1];
     installMseHook(win, {
       getSpeed: () => speeds.shift() ?? 1,
@@ -310,7 +138,7 @@ describe('session lifecycle', () => {
   });
 
   test('the speed is decided once per MediaSource (1 then 1.5 -> no session at all)', () => {
-    const win = strictWindow();
+    const win = makeFakeWindow();
     const speeds = [1, 1.5];
     installMseHook(win, {
       getSpeed: () => speeds.shift() ?? 1.5,
@@ -332,7 +160,7 @@ describe('session lifecycle', () => {
   });
 
   test('uninstall restores createObjectURL and the src descriptor', () => {
-    const win = strictWindow();
+    const win = makeFakeWindow();
     const origURL = win.URL.createObjectURL;
     const origSrc = Object.getOwnPropertyDescriptor(
       win.HTMLMediaElement.prototype,
