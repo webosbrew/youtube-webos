@@ -26,6 +26,7 @@ import './watch.js';
 import './video-quality';
 import './lang-settings-fix';
 import './remove-endscreen';
+import './remove-shopping-overlays';
 import './hooks';
 import './block-webos-cast';
 import './auto-account-select';

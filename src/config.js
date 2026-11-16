@@ -71,6 +71,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'hideShoppingOverlays',
+    {
+      default: true,
+      desc: 'Hide shopping QR overlays'
+    }
+  ],
+  [
     'autoAccountSelect',
     {
       default: false,

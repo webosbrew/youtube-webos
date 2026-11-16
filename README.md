@@ -31,6 +31,7 @@
 - On-Screen Clock Overlay
 - YouTube Logo Removal
 - Remove end screens
+- Hide shopping QR overlays (ported from [NicholasBly's fork](https://github.com/NicholasBly/youtube-webos))
 - Bypass account selector screen
 
 > [!NOTE]
