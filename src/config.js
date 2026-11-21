@@ -71,6 +71,13 @@ const configOptions = new Map([
     }
   ],
   [
+    'disableYouThere',
+    {
+      default: true,
+      desc: 'Disable "Continue watching?" auto-pause'
+    }
+  ],
+  [
     'autoAccountSelect',
     {
       default: false,
