@@ -510,3 +510,62 @@ describe('wiring', () => {
     assert.equal(win.document.listenerCount(), 0);
   });
 });
+
+describe("YouTube's own speed menu follows the real speed", () => {
+  function menuPlayer() {
+    const player = fakePlayer();
+    let rate = 1;
+    const set = [];
+    player.getPlaybackRate = () => rate;
+    player.__ytafOriginalSetPlaybackRate = function (r) {
+      assert.equal(this, player);
+      set.push(r);
+      rate = r;
+    };
+    return { player, set, reset: () => (rate = 1) };
+  }
+
+  test('a live switch (YELLOW key) updates the menu right away', () => {
+    const { player, set } = menuPlayer();
+    const { ctl } = controllerWith({ player });
+    ctl.setLiveSwitch(
+      () => true,
+      () => {}
+    );
+    ctl.cycle();
+    ctl.cycle();
+    assert.deepEqual(set, [1.25, 1.5]);
+    assert.equal(player.getPlaybackRate(), 1.5);
+    assert.ok(!player.calls.some(([m]) => m === 'loadVideoById'));
+  });
+
+  test('a new video reset to 1x by YouTube is put back at the real speed', () => {
+    const { player, set, reset } = menuPlayer();
+    const { ctl } = controllerWith({ player });
+    ctl.setLiveSwitch(
+      () => true,
+      () => {}
+    );
+    ctl.setSpeed(2);
+    reset();
+    ctl.syncPlayerRate();
+    assert.deepEqual(set, [2, 2]);
+    // Already in line: nothing more is called.
+    ctl.syncPlayerRate();
+    assert.equal(set.length, 2);
+  });
+
+  test('no video or no bound player: nothing is called', () => {
+    const { player, set } = menuPlayer();
+    player.getVideoData = () => ({});
+    const { ctl } = controllerWith({ player });
+    ctl.setLiveSwitch(
+      () => true,
+      () => {}
+    );
+    ctl.setSpeed(2);
+    assert.deepEqual(set, []);
+    const bare = controllerWith();
+    bare.ctl.syncPlayerRate();
+  });
+});

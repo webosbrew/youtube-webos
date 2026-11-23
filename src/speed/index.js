@@ -53,7 +53,11 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
   const restoreButton = installSpeedButtonPatch(win);
   const bindTimer =
     typeof win.setInterval === 'function'
-      ? win.setInterval(() => bindPlayerRate(getPlayer(), controller), 1000)
+      ? win.setInterval(() => {
+          bindPlayerRate(getPlayer(), controller);
+          // A new video starts at YouTube's 1x even when it plays faster.
+          controller.syncPlayerRate();
+        }, 1000)
       : null;
 
   const keyHandler = (evt) => {

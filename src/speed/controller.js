@@ -128,18 +128,33 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     if (!videoData || !videoData.video_id) return;
     lastReloadAt = Date.now();
     player.loadVideoById(videoData.video_id, at);
-    // If YouTube's own menu is bound (native-menu.js), keep what it shows in
-    // line with the real speed once the reloaded video has started.
-    const setRate = player.__ytafOriginalSetPlaybackRate;
-    if (setRate && typeof player.getPlaybackRate === 'function') {
-      win.setTimeout(() => {
-        try {
-          if (player.getPlaybackRate() !== currentSpeed)
-            setRate.call(player, currentSpeed);
-        } catch {
-          // The menu only shows a stale value; playback itself is unaffected.
-        }
-      }, 2500);
+    // YouTube resets its own rate while the reloaded video starts: show the
+    // real speed again in its menu once it has.
+    win.setTimeout(syncPlayerRate, 2500);
+  }
+
+  /**
+   * Keeps the speed shown in YouTube's own menu (player settings, next to
+   * pause and next video) in line with the real speed. The YELLOW key and the
+   * live switch change the speed without going through the player, so it kept
+   * showing "Normal" while the video played at 2x (measured on an LG C1). The
+   * original, unwrapped setPlaybackRate only updates YouTube's state: the
+   * element shim ignores the playbackRate it then writes.
+   */
+  function syncPlayerRate() {
+    try {
+      const player = getPlayer();
+      const setRate = player && player.__ytafOriginalSetPlaybackRate;
+      if (
+        !setRate ||
+        typeof player.getPlaybackRate !== 'function' ||
+        !(player.getVideoData && player.getVideoData()?.video_id)
+      )
+        return;
+      const speed = getSpeed();
+      if (player.getPlaybackRate() !== speed) setRate.call(player, speed);
+    } catch {
+      // The menu only shows a stale value; playback itself is unaffected.
     }
   }
 
@@ -158,6 +173,7 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     // Live session: each press only moves the target speed, so no debounce;
     // the change starts at the next fragment and the countdown shows when.
     if (!pending && liveSwitch && liveSwitch(speed)) {
+      syncPlayerRate();
       if (onLiveSwitch) onLiveSwitch(speed);
       else notify(`Playback speed ${speed}×`);
       return;
@@ -300,6 +316,7 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     setLiveSwitch,
     getSpeed,
     setSpeed,
+    syncPlayerRate,
     cycle,
     onRateRequest,
     onError,
