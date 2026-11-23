@@ -60,8 +60,9 @@ const press = (o, code) =>
 
 test('offsets are clamped and formatted', () => {
   const win = fakeWin();
-  assert.equal(readAudioOffset(win), 0);
-  assert.equal(changeAudioOffset(win, 30), 30);
+  // Unset: the C1 default.
+  assert.equal(readAudioOffset(win), -230);
+  assert.equal(changeAudioOffset(win, 30), -200);
   assert.equal(changeAudioOffset(win, 10000), AUDIO_OFFSET_LIMIT_MS);
   assert.equal(formatOffset(30), '+30 ms');
   assert.equal(formatOffset(-20), '-20 ms');
@@ -80,8 +81,8 @@ test('RED opens it on a video; LEFT/RIGHT change the offset and apply it', () =>
   press(o, 37);
   press(o, 37);
   press(o, 39);
-  assert.deepEqual(changes, [-10, -20, -10]);
-  assert.equal(readAudioOffset(win), -10);
+  assert.deepEqual(changes, [-240, -250, -240]);
+  assert.equal(readAudioOffset(win), -240);
   // OK closes it, and its keyup does not reach YouTube.
   assert.deepEqual(press(o, 13), [true, true, true]);
   assert.ok(!o.isOpen());

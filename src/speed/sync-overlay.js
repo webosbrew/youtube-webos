@@ -5,7 +5,7 @@
  * panel covered most of the picture, so the lips could not be watched while
  * adjusting.
  */
-import { AUDIO_OFFSET_KEY } from './controller.js';
+import { AUDIO_OFFSET_KEY, DEFAULT_AUDIO_OFFSET_MS } from './controller.js';
 import { strings } from './i18n.js';
 
 export const AUDIO_OFFSET_STEP_MS = 10;
@@ -22,10 +22,13 @@ const KEY = {
 /** @param {Window} win */
 export function readAudioOffset(win) {
   try {
-    const v = Number(win.localStorage.getItem(AUDIO_OFFSET_KEY));
-    return isFinite(v) ? v : 0;
+    const raw = win.localStorage.getItem(AUDIO_OFFSET_KEY);
+    const v = Number(raw);
+    return raw === null || raw === undefined || !isFinite(v)
+      ? DEFAULT_AUDIO_OFFSET_MS
+      : v;
   } catch {
-    return 0;
+    return DEFAULT_AUDIO_OFFSET_MS;
   }
 }
 

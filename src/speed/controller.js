@@ -25,6 +25,15 @@ export const AUDIO_LEAD_S = 1.6;
 /** localStorage key of the fine audio offset, in ms (positive = later audio). */
 export const AUDIO_OFFSET_KEY = 'ytaf-speed-audio-offset-ms';
 
+/**
+ * Offset used until the user sets one, in ms (negative = earlier audio). Set by
+ * ear on an LG OLED C1 (webOS 6), at 1x: the picture comes out ~230 ms after
+ * the video clock (picture processing), and Web Audio does not wait for it
+ * the way the TV's native audio does. It is real time, so it holds at every
+ * speed (the engine converts it to content time at the current speed).
+ */
+export const DEFAULT_AUDIO_OFFSET_MS = -230;
+
 export function createSpeedController({ win, getPlayer, notify, configRead }) {
   let currentSpeed = 1;
   let activeSink = null;
@@ -239,9 +248,11 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
   function audioOffsetMs() {
     try {
       const v = win.localStorage && win.localStorage.getItem(AUDIO_OFFSET_KEY);
-      return v === null || v === undefined ? 0 : Number(v);
+      return v === null || v === undefined
+        ? DEFAULT_AUDIO_OFFSET_MS
+        : Number(v);
     } catch {
-      return 0;
+      return DEFAULT_AUDIO_OFFSET_MS;
     }
   }
 
