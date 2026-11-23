@@ -120,6 +120,107 @@ function createAudioOffsetControl() {
   return row;
 }
 
+const PANEL_SCROLL_MARGIN_PX = 16;
+
+/*
+ * The options don't all fit on screen, but the panel can't use native
+ * scrolling: the YouTube app resets `scrollTop` of scrolled elements back to
+ * 0 right away (measured on webOS 6). So the content sits in an inner wrapper
+ * that we move with `transform`, and up/down drive it ourselves.
+ */
+
+/** @param {HTMLElement} panel */
+function panelContent(panel) {
+  return /** @type {HTMLElement} */ (panel.querySelector('.ytaf-ui-content'));
+}
+
+/**
+ * @param {HTMLElement} panel
+ * @param {number} offset Pixels the content is moved up.
+ */
+function setPanelOffset(panel, offset) {
+  const content = panelContent(panel);
+  const style = window.getComputedStyle(panel);
+  const visible =
+    panel.clientHeight -
+    parseFloat(style.paddingTop) -
+    parseFloat(style.paddingBottom);
+  const max = Math.max(0, content.offsetHeight - visible);
+  const v = Math.round(Math.max(0, Math.min(max, offset)));
+  panel.dataset.offset = String(v);
+  content.style.transform = v ? `translateY(${-v}px)` : '';
+}
+
+/** @param {HTMLElement} panel */
+function getPanelOffset(panel) {
+  return Number(panel.dataset.offset) || 0;
+}
+
+/**
+ * Move the content so the focused control's row is fully visible. The spatial
+ * navigation polyfill focuses with `preventScroll` and only picks candidates
+ * already on screen, so the options below the fold were unreachable.
+ * @param {HTMLElement} panel
+ */
+function keepFocusedVisible(panel) {
+  const elm = document.activeElement;
+  if (!elm || elm === panel || !panel.contains(elm)) return;
+  const row = elm.closest('label, .ytaf-audio-offset') || elm;
+  const p = panel.getBoundingClientRect();
+  const r = row.getBoundingClientRect();
+  const offset = getPanelOffset(panel);
+  if (r.top < p.top + PANEL_SCROLL_MARGIN_PX) {
+    setPanelOffset(panel, offset - (p.top + PANEL_SCROLL_MARGIN_PX - r.top));
+  } else if (r.bottom > p.bottom - PANEL_SCROLL_MARGIN_PX) {
+    setPanelOffset(
+      panel,
+      offset + r.bottom - (p.bottom - PANEL_SCROLL_MARGIN_PX)
+    );
+  }
+}
+
+/**
+ * Up/down move through the panel's controls in order, one row at a time
+ * (both audio-sync buttons are one row). At the ends, move to the edge so the
+ * heading or the footer shows.
+ * @param {HTMLElement} panel
+ * @param {1 | -1} step
+ */
+function moveFocusVertically(panel, step) {
+  const controls = Array.prototype.slice.call(
+    panel.querySelectorAll('input, button')
+  );
+  const rowOf = (elm) => elm.closest('label, .ytaf-audio-offset') || elm;
+  const current = document.activeElement;
+  let i = controls.indexOf(current);
+  if (i === -1) {
+    // Panel itself focused: start at the first (or last) control.
+    i = step > 0 ? -1 : controls.length;
+  } else {
+    const row = rowOf(current);
+    while (controls[i + step] && rowOf(controls[i + step]) === row) i += step;
+  }
+  let next = controls[i + step];
+  if (next && step < 0) {
+    // Entering a row from below: land on its first control.
+    const row = rowOf(next);
+    while (controls[i + step - 1] && rowOf(controls[i + step - 1]) === row) {
+      i -= 1;
+    }
+    next = controls[i + step];
+  }
+  if (next) {
+    next.focus({ preventScroll: true });
+    // First and last rows also bring the heading or the footer into view.
+    if (rowOf(next) === rowOf(controls[0])) setPanelOffset(panel, 0);
+    else if (rowOf(next) === rowOf(controls[controls.length - 1])) {
+      setPanelOffset(panel, Infinity);
+    } else keepFocusedVisible(panel);
+  } else {
+    setPanelOffset(panel, step > 0 ? Infinity : 0);
+  }
+}
+
 function createOptionsPanel() {
   const elmContainer = document.createElement('div');
 
@@ -148,7 +249,13 @@ function createOptionsPanel() {
       }
 
       if (evt.keyCode in ARROW_KEY_CODE) {
-        navigate(ARROW_KEY_CODE[evt.keyCode]);
+        const dir = ARROW_KEY_CODE[evt.keyCode];
+        if (dir === 'up' || dir === 'down') {
+          moveFocusVertically(elmContainer, dir === 'down' ? 1 : -1);
+        } else {
+          navigate(dir);
+          keepFocusedVisible(elmContainer);
+        }
       } else if (evt.keyCode === 13) {
         // "OK" button
 
@@ -173,23 +280,27 @@ function createOptionsPanel() {
     true
   );
 
+  const elmContent = document.createElement('div');
+  elmContent.className = 'ytaf-ui-content';
+  elmContainer.appendChild(elmContent);
+
   const elmHeading = document.createElement('h1');
   elmHeading.textContent = 'webOS YouTube Extended';
-  elmContainer.appendChild(elmHeading);
+  elmContent.appendChild(elmHeading);
 
-  elmContainer.appendChild(createConfigCheckbox('enableAdBlock'));
-  elmContainer.appendChild(createConfigCheckbox('upgradeThumbnails'));
-  elmContainer.appendChild(createConfigCheckbox('hideLogo'));
-  elmContainer.appendChild(createConfigCheckbox('showWatch'));
-  elmContainer.appendChild(createConfigCheckbox('removeShorts'));
-  elmContainer.appendChild(createConfigCheckbox('forceHighResVideo'));
-  elmContainer.appendChild(createConfigCheckbox('removeEndscreen'));
-  elmContainer.appendChild(createConfigCheckbox('autoAccountSelect'));
+  elmContent.appendChild(createConfigCheckbox('enableAdBlock'));
+  elmContent.appendChild(createConfigCheckbox('upgradeThumbnails'));
+  elmContent.appendChild(createConfigCheckbox('hideLogo'));
+  elmContent.appendChild(createConfigCheckbox('showWatch'));
+  elmContent.appendChild(createConfigCheckbox('removeShorts'));
+  elmContent.appendChild(createConfigCheckbox('forceHighResVideo'));
+  elmContent.appendChild(createConfigCheckbox('removeEndscreen'));
+  elmContent.appendChild(createConfigCheckbox('autoAccountSelect'));
   if (supportsPlaybackSpeed(window)) {
-    elmContainer.appendChild(createConfigCheckbox('enablePlaybackSpeed'));
-    elmContainer.appendChild(createAudioOffsetControl());
+    elmContent.appendChild(createConfigCheckbox('enablePlaybackSpeed'));
+    elmContent.appendChild(createAudioOffsetControl());
   }
-  elmContainer.appendChild(createConfigCheckbox('enableSponsorBlock'));
+  elmContent.appendChild(createConfigCheckbox('enableSponsorBlock'));
 
   const elmBlock = document.createElement('blockquote');
 
@@ -201,13 +312,13 @@ function createOptionsPanel() {
   elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockMusicOfftopic'));
   elmBlock.appendChild(createConfigCheckbox('enableSponsorBlockPreview'));
 
-  elmContainer.appendChild(elmBlock);
+  elmContent.appendChild(elmBlock);
 
   const elmSponsorLink = document.createElement('small');
   elmSponsorLink.className = 'ytaf-ui-sponsor';
   elmSponsorLink.textContent =
     'Sponsor segments skipping - https://sponsor.ajay.app';
-  elmContainer.appendChild(elmSponsorLink);
+  elmContent.appendChild(elmSponsorLink);
 
   const version = document.createElement('div');
   version.className = 'ytaf-ui-version';
@@ -233,7 +344,8 @@ function showOptionsPanel(visible) {
   if (visible && !optionsPanelVisible) {
     console.debug('Showing and focusing options panel!');
     optionsPanel.style.display = 'block';
-    optionsPanel.focus();
+    setPanelOffset(optionsPanel, 0);
+    optionsPanel.focus({ preventScroll: true });
     optionsPanelVisible = true;
   } else if (!visible && optionsPanelVisible) {
     console.debug('Hiding options panel!');

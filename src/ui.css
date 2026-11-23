@@ -13,9 +13,10 @@
   padding: 1em;
   font-size: 1.4rem;
   z-index: 1000;
-  /* The list is taller than the panel with every option: scroll, so the
-     focused item stays visible. */
-  overflow-y: auto;
+  /* The list is taller than the panel with every option. Native scrolling
+     doesn't stick in the YouTube app, so ui.js moves .ytaf-ui-content with
+     a transform to keep the focused item visible. */
+  overflow: hidden;
 }
 
 .ytaf-ui-container :focus {
