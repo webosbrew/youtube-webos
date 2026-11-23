@@ -278,6 +278,11 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     return engine;
   }
 
+  /** Applies a new audio offset to the playing audio right away. */
+  function resyncAudio() {
+    if (activeSink) activeSink.engine.resync();
+  }
+
   function handleKey(evt) {
     // YTAF's ui.js reads colour keys from charCode, the webOS docs from keyCode:
     // accept both.
@@ -317,6 +322,7 @@ export function createSpeedController({ win, getPlayer, notify, configRead }) {
     getSpeed,
     setSpeed,
     syncPlayerRate,
+    resyncAudio,
     cycle,
     onRateRequest,
     onError,

@@ -8,6 +8,7 @@ import {
 import { installSpeedButtonPatch } from './speed-button.js';
 import { hasAudioCodecs } from './legacy-decoder.js';
 import { createSpeedToast } from './speed-toast.js';
+import { createSyncOverlay } from './sync-overlay.js';
 
 export function supportsPlaybackSpeed(win) {
   return (
@@ -60,7 +61,17 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
         }, 1000)
       : null;
 
+  // RED: audio sync pill, adjusted while watching the picture.
+  const syncOverlay =
+    win.document && typeof win.document.createElement === 'function'
+      ? createSyncOverlay(win, {
+          getPlayer,
+          onChange: () => controller.resyncAudio()
+        })
+      : null;
+
   const keyHandler = (evt) => {
+    if (syncOverlay && syncOverlay.handleKey(evt)) return;
     controller.handleKey(evt);
   };
 

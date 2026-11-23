@@ -9,7 +9,11 @@ import {
 import './ui.css';
 import { requireElement } from './player_api/helpers';
 import { supportsPlaybackSpeed } from './speed/index.js';
-import { AUDIO_OFFSET_KEY } from './speed/controller.js';
+import {
+  AUDIO_OFFSET_STEP_MS,
+  readAudioOffset as readOffset,
+  changeAudioOffset
+} from './speed/sync-overlay.js';
 import { strings as speedStrings } from './speed/i18n.js';
 
 // We handle key events ourselves.
@@ -68,18 +72,6 @@ function createConfigCheckbox(key) {
   return elmLabel;
 }
 
-const AUDIO_OFFSET_STEP_MS = 10;
-const AUDIO_OFFSET_LIMIT_MS = 400;
-
-function readAudioOffset() {
-  try {
-    const v = Number(window.localStorage.getItem(AUDIO_OFFSET_KEY));
-    return isFinite(v) ? v : 0;
-  } catch {
-    return 0;
-  }
-}
-
 /**
  * Fine A/V sync for the playback-speed audio (it plays through Web Audio, whose
  * output latency to the TV speakers is not fully reported). Applied live.
@@ -95,19 +87,13 @@ function createAudioOffsetControl() {
   later.textContent = `${t.later} \u25B6`;
 
   const render = () => {
-    const v = readAudioOffset();
+    const v = readOffset(window);
     text.textContent = `${t.audioSync}: ${v > 0 ? '+' : ''}${v} ms\u00A0`;
   };
   const change = (delta) => {
-    const v = Math.max(
-      -AUDIO_OFFSET_LIMIT_MS,
-      Math.min(AUDIO_OFFSET_LIMIT_MS, readAudioOffset() + delta)
-    );
-    try {
-      window.localStorage.setItem(AUDIO_OFFSET_KEY, String(v));
-    } catch {
-      // not saved; nothing else to do
-    }
+    changeAudioOffset(window, delta);
+    // Heard at once, not after the slow drift correction.
+    window.ytafSpeed?.resyncAudio?.();
     render();
   };
   earlier.addEventListener('click', () => change(-AUDIO_OFFSET_STEP_MS));

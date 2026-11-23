@@ -92,3 +92,45 @@ test('extra: destroy() during active decode leaves nothing behind', async () => 
   assert.equal(world.timeouts.length, 0, 'no leftover intervals/timeouts');
   assert.equal(world.errors.length, 0);
 });
+
+test('extra: a new audio offset is applied at once by resync()', async () => {
+  const world = makeWorld();
+  const video = new world.FakeVideo();
+  let offsetMs = 0;
+  const engine = new AudioEngine({
+    win: world.win,
+    speed: world.speed,
+    leadS: 0.4,
+    chunkS: 0.1,
+    getExtraDelayMs: () => offsetMs,
+    onError: (e) => world.errors.push(e),
+    createStretcher: ({ channels }) => new ExactStretcher({ channels })
+  });
+  engine.attachVideo(video);
+  engine.configure(aacCfg);
+  engine.push(chunks(0, 10));
+  await world.advance(100);
+  video.play();
+  await world.advance(2000);
+  const err = (from, to) => {
+    const srcs = audible(world).filter((s) => s.when >= from && s.when < to);
+    assert.ok(srcs.length > 0);
+    return (
+      srcs.reduce((sum, s) => sum + s.content - video.contentAt(s.when), 0) /
+      srcs.length
+    );
+  };
+  const before = err(world.now - 1, world.now);
+  // 30 ms later: under the drift correction's 45 ms threshold, so without
+  // resync() it would never be heard.
+  offsetMs = 30;
+  engine.resync();
+  const t = world.now;
+  await world.advance(1500);
+  const after = err(t + 0.3, t + 1.2);
+  assert.ok(
+    // In content time: 30 ms of real time at the world's speed.
+    Math.abs(after - before + 0.03 * world.speed) <= 0.006,
+    `moved by ${((after - before) * 1000).toFixed(1)} ms, expected ${-30 * world.speed}`
+  );
+});

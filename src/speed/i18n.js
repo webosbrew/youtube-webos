@@ -12,7 +12,9 @@ const STRINGS = {
     activeNow: 'Active now',
     audioSync: 'Audio sync (playback speed)',
     earlier: 'Earlier',
-    later: 'Later'
+    later: 'Later',
+    syncTitle: 'Audio sync',
+    syncHint: '◀ Earlier   Later ▶   ·   OK closes'
   },
   pt: {
     changingTo: (s) => `Mudando para ${s}`,
@@ -23,7 +25,9 @@ const STRINGS = {
     activeNow: 'Ativada agora',
     audioSync: 'Sincronia do áudio (velocidade)',
     earlier: 'Adiantar',
-    later: 'Atrasar'
+    later: 'Atrasar',
+    syncTitle: 'Sincronia do áudio',
+    syncHint: '◀ Adiantar   Atrasar ▶   ·   OK fecha'
   }
 };
 

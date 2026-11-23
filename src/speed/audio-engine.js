@@ -429,6 +429,15 @@ export class AudioEngine {
     }
   }
 
+  /**
+   * Re-anchors the queued audio at the next tick, e.g. after the user changes
+   * the audio offset: the drift correction ignores anything under 45 ms and
+   * fixes the rest by 8% tempo over seconds, so a 10 ms step was never heard.
+   */
+  resync() {
+    this.resyncPending = true;
+  }
+
   stopFuture() {
     const nowCtx = this.ctx.currentTime;
     for (const s of this.sources) {
@@ -515,7 +524,8 @@ export class AudioEngine {
         last2.every((d) => Math.abs(d) > 0.25) &&
         last2[0] * last2[1] > 0);
 
-    if (jumped || starving) {
+    if (jumped || starving || this.resyncPending) {
+      this.resyncPending = false;
       this.stopFuture();
       this.sources.clear();
       this.nextWhen = nowCtx + 0.03;
