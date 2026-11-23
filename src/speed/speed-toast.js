@@ -79,6 +79,13 @@ const CSS = `
 .ytaf-speed-toast.ytaf-pop {
   transform: translate(-50%, 0) scale(1.045);
 }
+/* Reset to the counting look with no transition: the green check, ring and
+   label of the previous change must not animate back while the new one
+   fades in (seen on the TV: a green flash before the new number). */
+.ytaf-speed-toast.ytaf-instant,
+.ytaf-speed-toast.ytaf-instant * {
+  transition: none !important;
+}
 .ytaf-speed-toast .ytaf-ring {
   position: relative;
   width: 64px;
@@ -298,12 +305,15 @@ export function createSpeedToast(win, getStatus) {
     maxEta = 0;
     startedAt = Date.now();
     phase = 'counting';
+    setClass('ytaf-instant', true);
     setClass('ytaf-done', false);
-    // Let the styles apply before the entrance transition.
+    tick();
+    // Apply the reset now, then let the entrance (and later changes) animate.
+    void root.offsetWidth;
     win.setTimeout(() => {
+      setClass('ytaf-instant', false);
       if (phase !== 'hidden') setClass('ytaf-on', true);
     }, 16);
-    tick();
     if (phase !== 'hidden' && phase !== 'done') {
       timer = win.setInterval(tick, POLL_MS);
     }
