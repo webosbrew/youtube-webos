@@ -1,6 +1,10 @@
 export class Event {
   constructor(type) {
     this.type = type;
+    this._stopped = false;
+  }
+  stopImmediatePropagation() {
+    this._stopped = true;
   }
 }
 
@@ -8,7 +12,15 @@ export class EventTarget {
   constructor() {
     this._l = {};
   }
-  addEventListener(t, f) {
+  addEventListener(t, f, opts) {
+    if (opts && opts.once) {
+      const w = (e) => {
+        this.removeEventListener(t, w);
+        f.call(this, e);
+      };
+      (this._l[t] ||= []).push(w);
+      return;
+    }
     (this._l[t] ||= []).push(f);
   }
   removeEventListener(t, f) {
@@ -17,7 +29,10 @@ export class EventTarget {
   dispatchEvent(e) {
     if (!(e instanceof Event))
       throw new TypeError("parameter 1 is not of type 'Event'");
-    for (const f of [...(this._l[e.type] || [])]) f.call(this, e);
+    for (const f of [...(this._l[e.type] || [])]) {
+      f.call(this, e);
+      if (e._stopped) break;
+    }
     return true;
   }
   listenerCount() {

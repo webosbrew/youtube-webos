@@ -13,6 +13,9 @@
   padding: 1em;
   font-size: 1.4rem;
   z-index: 1000;
+  /* The list is taller than the panel with every option: scroll, so the
+     focused item stays visible. */
+  overflow-y: auto;
 }
 
 .ytaf-ui-container :focus {
@@ -34,6 +37,21 @@
 .ytaf-ui-container label {
   display: block;
   font-size: 1.3rem;
+}
+
+.ytaf-ui-container .ytaf-audio-offset {
+  font-size: 1.3rem;
+  margin: 0.2em 0 0.2em 1.9rem;
+}
+
+.ytaf-ui-container .ytaf-audio-offset button {
+  font: inherit;
+  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.1em 0.8em;
+  margin-left: 0.4em;
 }
 
 .ytaf-notification-container {

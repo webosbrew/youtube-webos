@@ -143,8 +143,9 @@ describe('mse-hook', () => {
     const sb = ms.addSourceBuffer('video/mp4; codecs="avc1"');
     const underlying = ms.sourceBuffers.item(0);
 
+    // Kept as content time and applied to the real SourceBuffer at the next
+    // fragment start, where the map says which speed that fragment plays at.
     sb.timestampOffset = 10;
-    assert.equal(underlying._ts, 10 / 1.5);
     assert.equal(sb.timestampOffset, 10);
 
     sb.remove(3, 6);

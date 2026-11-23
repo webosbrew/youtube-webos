@@ -6,10 +6,12 @@ import {
   hookRateAssignments
 } from './native-menu.js';
 import { installSpeedButtonPatch } from './speed-button.js';
+import { hasAudioCodecs } from './legacy-decoder.js';
+import { createSpeedToast } from './speed-toast.js';
 
 export function supportsPlaybackSpeed(win) {
   return (
-    typeof win.AudioDecoder === 'function' &&
+    hasAudioCodecs(win) &&
     typeof win.AudioContext === 'function' &&
     typeof win.MediaSource === 'function'
   );
@@ -32,8 +34,17 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
     createAudioSink: controller.createAudioSink,
     onRateRequest: controller.onRateRequest,
     onError: controller.onError,
-    onNativeAudio: controller.releaseAudioSink
+    onNativeAudio: controller.releaseAudioSink,
+    useLive: controller.useLive
   });
+  const toast =
+    win.document && typeof win.document.createElementNS === 'function'
+      ? createSpeedToast(win, mseHook.switchStatus)
+      : null;
+  controller.setLiveSwitch(
+    mseHook.switchSpeed,
+    toast ? (speed) => toast.show(speed) : null
+  );
 
   // YouTube's own "Playback speed" menu: enabled in the player config, and bound
   // to the controller on every player instance that appears.
@@ -66,5 +77,5 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
     win.document.removeEventListener('keyup', keyHandler, true);
   }
 
-  return { controller, uninstall };
+  return { controller, uninstall, mseHook };
 }

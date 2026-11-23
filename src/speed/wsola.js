@@ -13,8 +13,19 @@ export class WsolaStretcher {
     frameMs = 46,
     searchMs = 12,
     searchStep = 1,
-    corrStep = 1
+    corrStep = 1,
+    // Choose splices by normalized cross-correlation on the channel mix. The
+    // plain dot product on the left channel favoured the loudest candidate over
+    // the best-aligned one: rough, "choppy" splices at 1.5x-2x on speech.
+    normalized = true,
+    collectStats = false,
+    // Speed 1 copies the input exactly. Off, WSOLA also runs at 1, so the speed
+    // can move around 1 (A/V tempo nudges, 1x <-> 2x) without starting over.
+    bypass = true
   }) {
+    this.bypass = bypass;
+    this.normalized = normalized;
+    this.stats = collectStats ? { ncc: 0, n: 0 } : null;
     this.sampleRate = sampleRate;
     this.channels = channels;
     this.speed = 1;
@@ -89,7 +100,7 @@ export class WsolaStretcher {
     }
     this.inLen += len;
 
-    if (this.speed === 1) {
+    if (this.speed === 1 && this.bypass) {
       this._ensureOutCapacity(this.outLen + len);
       for (let c = 0; c < this.channels; c++) {
         this.outBuffer[c].set(channelArrays[c], this.outLen);
@@ -107,7 +118,7 @@ export class WsolaStretcher {
   }
 
   _process() {
-    if (this.speed === 1) return; // Handled in push/bypass
+    if (this.speed === 1 && this.bypass) return; // Handled in push/bypass
 
     while (true) {
       const minRequired =
@@ -146,8 +157,11 @@ export class WsolaStretcher {
       let bestOffset = searchStart;
       let maxCorr = -Infinity;
 
-      const targetBuf = this.inBuffer[0];
-      const searchBuf = this.inBuffer[0];
+      const b0 = this.inBuffer[0];
+      const b1 = this.channels > 1 ? this.inBuffer[1] : null;
+      const norm = this.normalized;
+      const step = this.corrStep;
+      const Hs = this.Hs;
 
       for (
         let offset = searchStart;
@@ -155,15 +169,32 @@ export class WsolaStretcher {
         offset += this.searchStep
       ) {
         let corr = 0;
-        for (let i = 0; i < this.Hs; i += this.corrStep) {
-          corr += targetBuf[target + i] * searchBuf[offset + i];
+        let energy = 0;
+        if (!norm) {
+          for (let i = 0; i < Hs; i += step) {
+            corr += b0[target + i] * b0[offset + i];
+          }
+        } else if (b1) {
+          for (let i = 0; i < Hs; i += step) {
+            const v = b0[offset + i] + b1[offset + i];
+            corr += (b0[target + i] + b1[target + i]) * v;
+            energy += v * v;
+          }
+        } else {
+          for (let i = 0; i < Hs; i += step) {
+            const v = b0[offset + i];
+            corr += b0[target + i] * v;
+            energy += v * v;
+          }
         }
+        if (norm) corr /= Math.sqrt(energy + 1e-9);
         if (corr > maxCorr) {
           maxCorr = corr;
           bestOffset = offset;
         }
       }
 
+      if (this.stats) this._splice(target, bestOffset);
       this.lastChosenStart = bestOffset;
 
       for (let c = 0; c < this.channels; c++) {
@@ -194,8 +225,28 @@ export class WsolaStretcher {
     }
   }
 
+  /** Normalized correlation of a chosen splice (diagnostics only). */
+  _splice(target, offset) {
+    const b0 = this.inBuffer[0];
+    const b1 = this.channels > 1 ? this.inBuffer[1] : b0;
+    let xy = 0;
+    let xx = 0;
+    let yy = 0;
+    for (let i = 0; i < this.Hs; i++) {
+      const x = b0[target + i] + b1[target + i];
+      const y = b0[offset + i] + b1[offset + i];
+      xy += x * y;
+      xx += x * x;
+      yy += y * y;
+    }
+    if (xx > 1e-6 && yy > 1e-6) {
+      this.stats.ncc += xy / Math.sqrt(xx * yy);
+      this.stats.n++;
+    }
+  }
+
   available() {
-    if (this.speed === 1) {
+    if (this.speed === 1 && this.bypass) {
       return this.outLen - this.outReadPos;
     }
     // The last Hs samples still wait for the next frame's overlap-add.
@@ -239,7 +290,7 @@ export class WsolaStretcher {
   }
 
   flush() {
-    if (this.speed === 1) return;
+    if (this.speed === 1 && this.bypass) return;
 
     // Pad with zeros so every real input sample goes through a full overlap-add;
     // the tail therefore ends with a short stretch of silence.

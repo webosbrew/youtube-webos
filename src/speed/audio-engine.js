@@ -1,4 +1,5 @@
 import { WsolaStretcher } from './wsola.js';
+import { getAudioCodecs } from './legacy-decoder.js';
 
 /** Drift readings averaged before any soft correction (30 ticks = 1.5 s). */
 const DRIFT_WINDOW = 30;
@@ -10,14 +11,36 @@ export class AudioEngine {
     leadS = 0.4,
     chunkS = 0.1,
     extraDelayMs = 0,
+    getExtraDelayMs = null,
     onError,
-    createStretcher
+    createStretcher,
+    speedAt = null,
+    contentAhead = null,
+    genLimit = null
   }) {
     this.win = win;
     this.speed = speed;
+    // Live sessions: the speed of the media at a content time. The engine follows
+    // it when playback crosses a speed change (mse-hook moves it to a fragment
+    // boundary ahead of the playhead, so there is no reload).
+    this.speedAt = speedAt;
+    // Live sessions: the content time the video will show dt wall seconds after
+    // it shows c (piecewise across a speed change). Without it: c + dt * speed.
+    this.contentAhead = contentAhead;
+    // Live sessions: content time not to generate audio past (while a speed
+    // change waits for its fragment, the end of the buffered video, where it
+    // may start). Infinity otherwise.
+    this.genLimit = genLimit;
+    // The speed the audio being generated is stretched at. It changes when the
+    // generated audio reaches a speed change, not when the video does: nothing
+    // queued is dropped, so the change has no gap.
+    this.genSpeed = speed;
     this.leadS = leadS;
     this.chunkS = chunkS;
     this.extraDelayMs = extraDelayMs;
+    // A user offset read at every tick (positive = later audio), for tuning by
+    // ear without rebuilding.
+    this.getExtraDelayMs = getExtraDelayMs;
     this.onError = onError;
     this.createStretcher =
       createStretcher ||
@@ -26,9 +49,18 @@ export class AudioEngine {
           sampleRate,
           channels,
           searchStep: 2,
-          corrStep: 2
+          corrStep: 2,
+          bypass: !speedAt
         }));
+    // Live sessions keep WSOLA running at 1x too: speed changes and A/V
+    // nudges then never restart it.
+    this.exactBypass = !speedAt;
+    // A/V correction by tempo: the stretcher runs at speed x nudge.f for
+    // nudge.left seconds of output.
+    this.nudge = null;
+    this.stretcherSpeed = speed;
 
+    this.codecs = getAudioCodecs(win);
     this.ctx = new win.AudioContext();
     this.gain = this.ctx.createGain();
     this.gain.connect(this.ctx.destination);
@@ -65,11 +97,13 @@ export class AudioEngine {
       // that is playing right now, and re-anchor on the next real movement.
       this.stopFuture();
       this.stretcher = null;
+      this.nudge = null;
       this.anchorPending = false;
     };
     this.onSeeking = () => {
       this.stopFuture();
       this.stretcher = null;
+      this.nudge = null;
       this.anchorPending = false;
       this.decodeGen++;
       this.sentToDecoder.clear();
@@ -84,6 +118,50 @@ export class AudioEngine {
     };
   }
 
+  /**
+   * Drops the queued audio from content time c on (stopping the buffer that
+   * spans it exactly there) and goes on generating from c. Used when a speed
+   * change is requested: audio stretched for the old speed must not run past
+   * the earliest point where the new one can start.
+   */
+  truncateAt(c) {
+    if (!this.stretcher || this.anchorPending || this.outContent <= c) return;
+    const nowCtx = this.ctx.currentTime;
+    let cutWhen = null;
+    for (const s of Array.from(this.sources)) {
+      const end = s.c0 + s.dur * s.sp;
+      if (end <= c) continue;
+      const at = s.c0 >= c ? s.when : s.when + (c - s.c0) / s.sp;
+      if (at <= nowCtx + 0.02) return; // too close: let it play
+      try {
+        s.node.stop(at);
+      } catch {
+        /* already stopped */
+      }
+      if (s.c0 >= c) this.sources.delete(s);
+      cutWhen = cutWhen === null ? at : Math.min(cutWhen, at);
+    }
+    if (cutWhen === null) return;
+    this.nextWhen = cutWhen;
+    this.outContent = c;
+    this.inPos = c;
+    this.stretcher = null;
+  }
+
+  /**
+   * Plays at a new speed from now on. The queued audio was stretched for the
+   * old one: drop it and re-anchor on the video clock (a gap of a few tens of ms).
+   */
+  setSpeed(speed) {
+    if (speed === this.speed) return;
+    this.speed = speed;
+    this.genSpeed = speed;
+    this.stopFuture();
+    this.stretcher = null;
+    this.anchorPending = true;
+    this.drifts = [];
+  }
+
   attachVideo(el) {
     this.video = el;
     this.video.addEventListener('pause', this.onPause);
@@ -91,6 +169,31 @@ export class AudioEngine {
     this.video.addEventListener('playing', this.onPlaying);
     this.lastVideoTime = this.video.currentTime;
     if (!this.video.paused) this.anchorPending = true;
+  }
+
+  /**
+   * Seconds between scheduling audio on the AudioContext and hearing it, minus
+   * the user offset. The engine used to align the scheduled time itself with
+   * the video clock, so the sound came out late by the output latency (42.7 ms
+   * of baseLatency alone on an LG C1, which has no outputLatency), noticeable at
+   * 1.5x-2x where lips move faster.
+   */
+  latencyS() {
+    const c = this.ctx;
+    let extra = this.extraDelayMs;
+    if (this.getExtraDelayMs) {
+      try {
+        const v = Number(this.getExtraDelayMs());
+        if (isFinite(v)) extra = v;
+      } catch {
+        // keep the constructor value
+      }
+    }
+    return (c.baseLatency || 0) + (c.outputLatency || 0) - extra / 1000;
+  }
+
+  ahead(c, dt) {
+    return this.contentAhead ? this.contentAhead(c, dt) : c + dt * this.speed;
   }
 
   setVolume(v, muted) {
@@ -106,7 +209,7 @@ export class AudioEngine {
     this.cfg = cfg;
     if (this.decoder && this.decoder.state !== 'closed') this.decoder.close();
     this.decoder = null;
-    this.win.AudioDecoder.isConfigSupported(cfg)
+    this.codecs.AudioDecoder.isConfigSupported(cfg)
       .then((res) => {
         // A newer configure() may have arrived while this check was pending:
         // only the latest configuration gets a decoder.
@@ -119,7 +222,7 @@ export class AudioEngine {
           );
           return;
         }
-        this.decoder = new this.win.AudioDecoder({
+        this.decoder = new this.codecs.AudioDecoder({
           output: (data) => this.onAudioData(data),
           error: (e) => this.reportError(e)
         });
@@ -158,7 +261,7 @@ export class AudioEngine {
     for (const c of chunks) {
       const ptsUs = Math.round(c.pts * 1e6);
       const durUs = Math.round(c.duration * 1e6);
-      const eac = new this.win.EncodedAudioChunk({
+      const eac = new this.codecs.EncodedAudioChunk({
         type: c.key ? 'key' : 'delta',
         timestamp: ptsUs,
         duration: durUs,
@@ -193,7 +296,7 @@ export class AudioEngine {
     if (this.stretcher && !this.anchorPending) {
       const queuedFrom =
         this.outContent -
-        Math.max(0, this.nextWhen - this.ctx.currentTime) * this.speed;
+        Math.max(0, this.nextWhen - this.ctx.currentTime) * this.genSpeed;
       if (a < this.outContent && b > queuedFrom) {
         this.stopFuture();
         this.stretcher = null;
@@ -259,6 +362,12 @@ export class AudioEngine {
     this.stopFuture();
     if (this.decoder && this.decoder.state !== 'closed') this.decoder.close();
     if (this.ctx.state !== 'closed') this.ctx.close();
+    // The encoded archive holds minutes of audio: free it even if something
+    // still references this engine (the MediaSource of a finished video).
+    this.chunks = [];
+    this.pcm = [];
+    this.stretcher = null;
+    this.sources.clear();
   }
 
   reportError(e) {
@@ -295,7 +404,12 @@ export class AudioEngine {
     if (!this.video) return;
 
     const currT = this.video.currentTime;
-    const endT = currT + 3;
+    // Decode far enough for the whole scheduled queue (leadS of output is
+    // leadS x speed of content) plus the decoder's batching delay: a fixed 3 s
+    // starved a 1.6 s queue at 2x.
+    const endT =
+      currT +
+      Math.max(3, this.leadS * Math.max(this.speed, this.genSpeed) + 2.5);
 
     const currUs = Math.round(currT * 1e6);
     const endUs = Math.round(endT * 1e6);
@@ -337,8 +451,31 @@ export class AudioEngine {
 
     const nowCtx = this.ctx.currentTime;
     const currT = this.video.currentTime;
+    const lat = this.latencyS();
+
+    if (this.speedAt) {
+      const now = this.speedAt(currT);
+      if (now) this.speed = now;
+    }
 
     if (this.video.paused) {
+      this.lastVideoTime = currT;
+      return;
+    }
+
+    // Not paused but not able to play either: loading after a speed change or a
+    // seek, or buffering. Measured on an LG C1 (webOS 6): after loadVideoById the
+    // element sits at readyState 1 for ~3 s with paused === false and a
+    // currentTime that jumped to the resume point, which looked like movement
+    // and anchored the audio; the frozen clock then hard-resynced every ~200 ms
+    // and the same phrase played over and over. Stay silent until it can play.
+    if (this.video.readyState !== undefined && this.video.readyState < 3) {
+      if (!this.anchorPending) {
+        this.stopFuture();
+        this.stretcher = null;
+        this.anchorPending = true;
+        this.drifts = [];
+      }
       this.lastVideoTime = currT;
       return;
     }
@@ -346,7 +483,7 @@ export class AudioEngine {
     if (this.anchorPending && currT !== this.lastVideoTime) {
       this.anchorPending = false;
       this.nextWhen = nowCtx + 0.03;
-      this.outContent = currT + (this.nextWhen - nowCtx) * this.speed;
+      this.outContent = this.ahead(currT, this.nextWhen + lat - nowCtx);
       this.inPos = this.outContent;
       this.stretcher = null;
     }
@@ -354,7 +491,7 @@ export class AudioEngine {
 
     if (this.anchorPending) return;
 
-    const predictedT = currT + (this.nextWhen - nowCtx) * this.speed;
+    const predictedT = this.ahead(currT, this.nextWhen + lat - nowCtx);
     const drift = this.outContent - predictedT;
     const starving = this.nextWhen <= nowCtx;
 
@@ -382,9 +519,10 @@ export class AudioEngine {
       this.stopFuture();
       this.sources.clear();
       this.nextWhen = nowCtx + 0.03;
-      this.outContent = currT + (this.nextWhen - nowCtx) * this.speed;
+      this.outContent = this.ahead(currT, this.nextWhen + lat - nowCtx);
       this.inPos = this.outContent;
       this.stretcher = null;
+      this.nudge = null;
       this.drifts = [];
       this.lastSoftFix = nowCtx;
     } else if (
@@ -401,6 +539,17 @@ export class AudioEngine {
     }
 
     while (this.nextWhen < nowCtx + this.leadS) {
+      const want = (this.speedAt && this.speedAt(this.inPos)) || this.speed;
+      const target = want * (this.nudge ? this.nudge.f : 1);
+      if (this.stretcher && target !== this.stretcherSpeed) {
+        // Between two stretched speeds WSOLA goes on; to or from an exact 1x
+        // bypass it starts over.
+        if (this.exactBypass && (target === 1 || this.stretcherSpeed === 1))
+          this.stretcher = null;
+        else this.stretcher.setSpeed(target);
+        this.stretcherSpeed = target;
+      }
+      this.genSpeed = want;
       if (!this.stretcher) {
         let blockIdx = this.pcm.findIndex(
           (p) =>
@@ -419,12 +568,19 @@ export class AudioEngine {
         this.stretcher = this.createStretcher({
           sampleRate: b.rate,
           channels: b.ch.length,
-          speed: this.speed
+          speed: target
         });
-        this.stretcher.setSpeed(this.speed);
+        this.stretcher.setSpeed(target);
+        this.stretcherSpeed = target;
       }
 
-      const pcmToPush = this.extractPcm(this.inPos, this.chunkS * this.speed);
+      const limit = this.genLimit ? this.genLimit() : Infinity;
+      const room = limit - this.inPos;
+      if (room <= 0.001) break;
+      const pcmToPush = this.extractPcm(
+        this.inPos,
+        Math.min(this.chunkS * target, room)
+      );
       if (!pcmToPush || pcmToPush.ch[0].length === 0) {
         break;
       }
@@ -458,13 +614,19 @@ export class AudioEngine {
           const srcInfo = {
             node,
             when: this.nextWhen,
-            dur: len / this.stretcherRate
+            dur: len / this.stretcherRate,
+            c0: this.outContent,
+            sp: this.genSpeed
           };
           this.sources.add(srcInfo);
           node.onended = () => this.sources.delete(srcInfo);
 
           this.nextWhen += len / this.stretcherRate;
-          this.outContent += (len / this.stretcherRate) * this.speed;
+          this.outContent += (len / this.stretcherRate) * this.stretcherSpeed;
+          if (this.nudge) {
+            this.nudge.left -= len / this.stretcherRate;
+            if (this.nudge.left <= 0) this.nudge = null;
+          }
         }
       }
     }
@@ -496,18 +658,29 @@ export class AudioEngine {
    * buffer. Audio behind: drop that much stretched output (a few ms of sound).
    */
   softCorrect(drift) {
-    if (drift > 0) {
-      this.nextWhen += drift / this.speed;
+    if (!this.exactBypass) {
+      // Absorb the drift by tempo: at most 8% faster or slower, over at least
+      // one second of output. No silence inserted (audible holes of 25-40 ms
+      // after a speed change on an LG C1) and no samples skipped (clicks).
+      const MAX = 0.08;
+      const s = this.genSpeed;
+      const T = Math.max(1, Math.abs(drift) / (MAX * s));
+      const f = Math.min(1 + MAX, Math.max(1 - MAX, 1 - drift / (s * T)));
+      this.nudge = { f, left: T };
       return;
     }
-    const want = Math.round((-drift / this.speed) * this.stretcherRate);
+    if (drift > 0) {
+      this.nextWhen += drift / this.genSpeed;
+      return;
+    }
+    const want = Math.round((-drift / this.genSpeed) * this.stretcherRate);
     const n = Math.min(want, this.stretcher.available());
     if (n > 0) {
       this.stretcher.pull(n);
-      this.outContent += (n / this.stretcherRate) * this.speed;
+      this.outContent += (n / this.stretcherRate) * this.genSpeed;
     }
     // Not enough output ready yet: skip the rest in the input instead.
-    const rest = ((want - n) / this.stretcherRate) * this.speed;
+    const rest = ((want - n) / this.stretcherRate) * this.genSpeed;
     if (rest > 0) {
       this.inPos += rest;
       this.outContent += rest;

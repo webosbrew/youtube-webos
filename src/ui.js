@@ -9,6 +9,8 @@ import {
 import './ui.css';
 import { requireElement } from './player_api/helpers';
 import { supportsPlaybackSpeed } from './speed/index.js';
+import { AUDIO_OFFSET_KEY } from './speed/controller.js';
+import { strings as speedStrings } from './speed/i18n.js';
 
 // We handle key events ourselves.
 window.__spatialNavigation__.keyMode = 'NONE';
@@ -64,6 +66,58 @@ function createConfigCheckbox(key) {
   elmLabel.appendChild(document.createTextNode('\u00A0' + configGetDesc(key)));
 
   return elmLabel;
+}
+
+const AUDIO_OFFSET_STEP_MS = 10;
+const AUDIO_OFFSET_LIMIT_MS = 400;
+
+function readAudioOffset() {
+  try {
+    const v = Number(window.localStorage.getItem(AUDIO_OFFSET_KEY));
+    return isFinite(v) ? v : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Fine A/V sync for the playback-speed audio (it plays through Web Audio, whose
+ * output latency to the TV speakers is not fully reported). Applied live.
+ */
+function createAudioOffsetControl() {
+  const row = document.createElement('div');
+  row.className = 'ytaf-audio-offset';
+  const text = document.createElement('span');
+  const earlier = document.createElement('button');
+  const later = document.createElement('button');
+  const t = speedStrings();
+  earlier.textContent = `\u25C0 ${t.earlier}`;
+  later.textContent = `${t.later} \u25B6`;
+
+  const render = () => {
+    const v = readAudioOffset();
+    text.textContent = `${t.audioSync}: ${v > 0 ? '+' : ''}${v} ms\u00A0`;
+  };
+  const change = (delta) => {
+    const v = Math.max(
+      -AUDIO_OFFSET_LIMIT_MS,
+      Math.min(AUDIO_OFFSET_LIMIT_MS, readAudioOffset() + delta)
+    );
+    try {
+      window.localStorage.setItem(AUDIO_OFFSET_KEY, String(v));
+    } catch {
+      // not saved; nothing else to do
+    }
+    render();
+  };
+  earlier.addEventListener('click', () => change(-AUDIO_OFFSET_STEP_MS));
+  later.addEventListener('click', () => change(AUDIO_OFFSET_STEP_MS));
+
+  row.appendChild(text);
+  row.appendChild(earlier);
+  row.appendChild(later);
+  render();
+  return row;
 }
 
 function createOptionsPanel() {
@@ -133,6 +187,7 @@ function createOptionsPanel() {
   elmContainer.appendChild(createConfigCheckbox('autoAccountSelect'));
   if (supportsPlaybackSpeed(window)) {
     elmContainer.appendChild(createConfigCheckbox('enablePlaybackSpeed'));
+    elmContainer.appendChild(createAudioOffsetControl());
   }
   elmContainer.appendChild(createConfigCheckbox('enableSponsorBlock'));
 

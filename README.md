@@ -83,12 +83,21 @@ Open the configuration screen with the 🟩 **Green** button, enable
 🟨 **Yellow** button cycles through 1×, 1.25×, 1.5×, 1.75× and 2×.
 
 The app scales the MSE video timestamps and time-stretches the audio with
-WebCodecs and WSOLA to preserve pitch. Changing speed briefly reloads the video
-at its current position. Above 1.25×, playback is limited to 1080p.
+WSOLA to preserve pitch. The speed changes without reloading the video: a
+countdown at the top of the screen shows when it takes effect (from the next
+video fragment, usually 2–6 s later), then confirms it. The resolution setting
+is kept at every speed (2160p at 2× works on an LG OLED C1).
 
-The option appears on devices with WebCodecs `AudioDecoder`, Web Audio and MSE.
-Unsupported audio tracks such as E-AC-3 fall back to 1×. The original
-implementation was tested on an LG OLED C4 (webOS 24).
+The option appears on devices with Web Audio and MSE. The audio is decoded
+with WebCodecs `AudioDecoder` where available, and with `decodeAudioData`
+otherwise (webOS 6 and older, Chromium 79). If the lips and the sound drift
+apart on your speakers or soundbar, adjust **Audio sync (playback speed)** in
+the configuration screen (10 ms steps). Unsupported audio tracks such as E-AC-3
+play at 1× with the TV's own audio.
+
+The first, reload-based version was tested on an LG OLED C4 (webOS 24); the
+live speed change and the `decodeAudioData` fallback on an LG OLED C1
+(webOS 6.5).
 [Playback speed pull request](https://github.com/webosbrew/youtube-webos/pull/484)
 
 ---

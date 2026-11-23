@@ -13,35 +13,87 @@ export function isSupportedSpeed(speed) {
   return SUPPORTED_SPEEDS.includes(speed);
 }
 
+function checkSpeed(value) {
+  if (!isSupportedSpeed(value)) {
+    throw new TypeError(`Unsupported speed: ${value}`);
+  }
+}
+
 /**
  * Maps time between element time and content time.
+ *
+ * The map is piecewise linear: a list of segments, each starting at content
+ * time c0 / element time e0 and running at speed s, so the speed can change in
+ * the middle of a MediaSource (from a fragment boundary on) without a reload.
+ * Consecutive segments meet, so the map stays continuous and monotonic.
  */
 export class SpeedTimeMap {
   /**
    * @param {number} speed
    */
   constructor(speed) {
-    this._speed = 1;
-    this.speed = speed;
+    checkSpeed(speed);
+    /** @type {{c0: number, e0: number, s: number}[]} */
+    this.segments = [{ c0: 0, e0: 0, s: speed }];
   }
 
   /**
-   * Gets the current speed.
+   * The speed of the last segment: the one new media is heading to.
    * @returns {number}
    */
   get speed() {
-    return this._speed;
+    return this.segments[this.segments.length - 1].s;
   }
 
   /**
-   * Sets the speed. Throws if unsupported.
+   * Sets one speed for the whole timeline. Throws if unsupported.
    * @param {number} value
    */
   set speed(value) {
-    if (!isSupportedSpeed(value)) {
-      throw new TypeError(`Unsupported speed: ${value}`);
+    checkSpeed(value);
+    this.segments = [{ c0: 0, e0: 0, s: value }];
+  }
+
+  segmentAtContent(c) {
+    const segs = this.segments;
+    for (let i = segs.length - 1; i > 0; i--) {
+      if (c >= segs[i].c0) return segs[i];
     }
-    this._speed = value;
+    return segs[0];
+  }
+
+  segmentAtElement(e) {
+    const segs = this.segments;
+    for (let i = segs.length - 1; i > 0; i--) {
+      if (e >= segs[i].e0) return segs[i];
+    }
+    return segs[0];
+  }
+
+  /**
+   * The speed media at content time c plays at.
+   * @param {number} c
+   */
+  speedAtContent(c) {
+    return this.segmentAtContent(c).s;
+  }
+
+  /**
+   * From content time c0 on, play at speed s. Later segments are dropped.
+   * @param {number} c0
+   * @param {number} s
+   * @returns {{c0: number, e0: number, s: number}}
+   */
+  addSegment(c0, s) {
+    checkSpeed(s);
+    const e0 = this.toElement(c0);
+    this.segments = this.segments.filter((seg, i) => i === 0 || seg.c0 < c0);
+    if (this.segments.length === 1 && c0 <= this.segments[0].c0) {
+      this.segments = [];
+    }
+    const seg = { c0, e0, s };
+    this.segments.push(seg);
+    return seg;
   }
 
   /**
@@ -50,7 +102,9 @@ export class SpeedTimeMap {
    * @returns {number}
    */
   toElement(t) {
-    return t / this._speed;
+    if (t === Infinity || t === -Infinity) return t;
+    const seg = this.segmentAtContent(t);
+    return seg.e0 + (t - seg.c0) / seg.s;
   }
 
   /**
@@ -59,7 +113,9 @@ export class SpeedTimeMap {
    * @returns {number}
    */
   toContent(t) {
-    return t * this._speed;
+    if (t === Infinity || t === -Infinity) return t;
+    const seg = this.segmentAtElement(t);
+    return seg.c0 + (t - seg.e0) * seg.s;
   }
 
   /**

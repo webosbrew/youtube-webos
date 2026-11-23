@@ -1,5 +1,11 @@
-export function attachElementShim(el, timeMap, { onRateRequest }) {
-  if (timeMap.speed === 1) return { detach: () => {}, isAttached: () => false };
+export function attachElementShim(
+  el,
+  timeMap,
+  { onRateRequest, live = false, beforeSeek = null, targetSpeed = null }
+) {
+  // A live session can change speed later: its shim is needed at 1x too.
+  if (!live && timeMap.speed === 1)
+    return { detach: () => {}, isAttached: () => false };
 
   const originals = {};
 
@@ -43,6 +49,8 @@ export function attachElementShim(el, timeMap, { onRateRequest }) {
       return timeMap.toContent(origGet.call(this));
     },
     function (val, origSet) {
+      // A seek may first rebase the map (live sessions): convert after it.
+      if (beforeSeek) beforeSeek(val);
       origSet.call(this, timeMap.toElement(val));
     }
   );
@@ -63,7 +71,7 @@ export function attachElementShim(el, timeMap, { onRateRequest }) {
   defineProp(
     'playbackRate',
     function () {
-      return timeMap.speed;
+      return targetSpeed ? targetSpeed() : timeMap.speed;
     },
     function (val, _origSet) {
       if (onRateRequest) onRateRequest(val);

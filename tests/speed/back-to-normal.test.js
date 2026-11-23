@@ -38,15 +38,18 @@ for (const speed of [1.5, 0.75]) {
     const engine = r.controller.activeEngine();
     assert.ok(engine, 'an engine plays at ' + speed + 'x');
     r.controller.setSpeed(1);
-    const ms = load(); // the reload, on the same <video>
-    assert.equal(ms._sbs.length, 2, 'at 1x the audio goes to the hardware');
+    const ms = load(); // a new MediaSource, on the same <video>
+    // Live mode: 1x goes through the engine too (so the speed can change
+    // without a reload), but never two engines at once.
+    assert.equal(ms._sbs.length, 1, 'live 1x: the audio goes to the engine');
     assert.equal(
       engine.destroyed,
       true,
       'old engine still alive: two audio tracks'
     );
     assert.equal(engine.ctx.state, 'closed');
-    assert.equal(r.controller.activeEngine(), null);
+    assert.notEqual(r.controller.activeEngine(), engine);
+    assert.equal(r.controller.activeEngine().speed, 1);
     r.uninstall();
   });
 }

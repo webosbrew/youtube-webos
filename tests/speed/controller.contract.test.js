@@ -127,24 +127,36 @@ describe('controller', () => {
     );
   });
 
-  test('above 1.25x quality is capped at 1080p BEFORE the reload, and restored when going back', async () => {
+  test('quality follows the settings at every speed, set BEFORE the reload', async () => {
     const { ctl, player, world } = controllerWith();
-    ctl.setSpeed(1.5);
+    ctl.setSpeed(2);
     await settle(world);
     const i = player.calls.findIndex((c) => c[0] === 'setPlaybackQualityRange');
     const j = player.calls.findIndex((c) => c[0] === 'loadVideoById');
     assert.deepEqual(player.calls[i], [
       'setPlaybackQualityRange',
-      'hd1080',
-      'hd1080'
+      'auto',
+      'auto'
     ]);
-    assert.ok(i < j, 'cap must come before the reload');
+    assert.ok(i < j, 'quality must be set before the reload');
     player.calls.length = 0;
     ctl.setSpeed(1);
     await settle(world);
     assert.deepEqual(
       player.calls.find((c) => c[0] === 'setPlaybackQualityRange'),
       ['setPlaybackQualityRange', 'auto', 'auto']
+    );
+  });
+
+  test('forceHighResVideo keeps highres at 2x too', async () => {
+    const { ctl, player, world } = controllerWith({
+      config: { forceHighResVideo: true }
+    });
+    ctl.setSpeed(2);
+    await settle(world);
+    assert.deepEqual(
+      player.calls.find((c) => c[0] === 'setPlaybackQualityRange'),
+      ['setPlaybackQualityRange', 'highres', 'highres']
     );
   });
 
