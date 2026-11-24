@@ -105,7 +105,36 @@ interface CustomEventTarget<T extends EmptyEventMap> {
   ): boolean;
 }
 
-export const CustomEventTarget = EventTarget as {
+/**
+ * `new EventTarget()` throws "Illegal constructor" before Chromium 64
+ * (webOS 3.x/4.x), so listeners live on a `DocumentFragment` instead.
+ * `event.currentTarget` and a listener's `this` are that fragment.
+ */
+class FragmentEventTarget implements EventTarget {
+  private readonly target = document.createDocumentFragment();
+
+  addEventListener(
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions
+  ): void {
+    this.target.addEventListener(type, callback, options);
+  }
+
+  removeEventListener(
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: boolean | EventListenerOptions
+  ): void {
+    this.target.removeEventListener(type, callback, options);
+  }
+
+  dispatchEvent(event: Event): boolean {
+    return this.target.dispatchEvent(event);
+  }
+}
+
+export const CustomEventTarget = FragmentEventTarget as unknown as {
   new <T extends EmptyEventMap>(): CustomEventTarget<T>;
   prototype: CustomEventTarget<EmptyEventMap>;
 };
