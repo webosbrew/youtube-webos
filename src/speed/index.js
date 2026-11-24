@@ -9,6 +9,7 @@ import { installSpeedButtonPatch } from './speed-button.js';
 import { hasAudioCodecs } from './legacy-decoder.js';
 import { createSpeedToast } from './speed-toast.js';
 import { createSyncOverlay } from './sync-overlay.js';
+import { preferNonAv1 } from './codec-pref.js';
 
 export function supportsPlaybackSpeed(win) {
   return (
@@ -22,6 +23,9 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
   if (!supportsPlaybackSpeed(win) || !configRead('enablePlaybackSpeed')) {
     return null;
   }
+
+  // Before YouTube checks codecs: AV1 can't keep up at 1.75x-2x on webOS 6.
+  const restoreCodecs = preferNonAv1(win);
 
   const controller = createSpeedController({
     win,
@@ -85,6 +89,7 @@ export function installSpeedFeature(win, { notify, configRead, getPlayer }) {
     controller.releaseAudioSink();
     restoreMenu();
     restoreRateHook();
+    restoreCodecs();
     restoreButton();
     if (bindTimer !== null) win.clearInterval(bindTimer);
     win.document.removeEventListener('keydown', keyHandler, true);
